@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+
 }
 
 
@@ -74,4 +76,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
 
     implementation(project(":core:model"))
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 }
