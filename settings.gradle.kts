@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "loom"
 include(":app")
+include(":core:model")
