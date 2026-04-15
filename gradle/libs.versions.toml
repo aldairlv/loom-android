@@ -16,7 +16,8 @@ ksp = "2.3.4" # Asegúrate de que coincida con tu versión de Kotlin (2.x)
 kotlinxDatetime = "0.6.0"
 kotlinxSerializationJson = "1.11.0"
 androidxTracing = "1.3.0-alpha02"
-androidxNavigation3 = "1.2.0-alpha01"
+androidxNavigation3 = "1.0.0"
+androidxLifecycleViewModelNavigation3 = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", version.ref = "androidxTracing" }
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "androidxNavigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "androidxNavigation3" }
+androidx-lifecycle-viewModel-navigation3 = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "androidxLifecycleViewModelNavigation3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
