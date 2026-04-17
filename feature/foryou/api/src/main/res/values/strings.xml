@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_foryou_title">For You</string>
-    <string name="feature_foryou_loading">Cargando feed...</string>
-    <string name="feature_foryou_error">Error al cargar los posts.</string>
+    <string name="feature_foryou_api_title">For You</string>
+    <string name="feature_foryou_api_loading">Cargando feed...</string>
+    <string name="feature_foryou_api_error">Error al cargar los posts.</string>
 </resources>
