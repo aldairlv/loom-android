@@ -1,5 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -33,6 +37,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -43,5 +49,17 @@ dependencies {
     implementation(project(":core:navigation"))
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
-
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.kotlinx.serialization.json)
+    //implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewModelCompose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(project(":core:ui")) // Para ver la Key
+    //implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+    //implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
+    implementation(project(":core:data"))
+    implementation(project(":core:model"))
 }

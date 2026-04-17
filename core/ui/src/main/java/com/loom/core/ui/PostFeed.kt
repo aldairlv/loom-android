@@ -1,16 +1,18 @@
 package com.loom.core.ui
-
-
-import com.loom.core.model.data.Post
-
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
-import androidx.compose.foundation.lazy.staggeredgrid.items
+//import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
+//import androidx.compose.foundation.lazy.staggeredgrid.items
 
 /**
- * Extensión para [LazyStaggeredGridScope] que define un feed de posts.
- * Siguiendo el patrón de NiA, esta función decide qué renderizar según el [feedState].
+ * Extensión para LazyStaggeredGridScope] que define un feed de posts.
+ * Siguiendo el patrón de NiA, esta función decide qué renderizar según el feedState].
  */
-fun LazyStaggeredGridScope.postsFeed(
+
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import com.loom.core.model.data.Post
+
+
+fun LazyListScope.postsFeed(
     feedState: PostFeedUiState,
     onPostClick: (String) -> Unit,
 ) {
