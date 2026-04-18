@@ -7,11 +7,12 @@ import android.os.StrictMode.ThreadPolicy.Builder
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.loom.app.util.ProfileVerifierLogger
+import com.loom.sync.initializers.Sync
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 /**
- * [Application] class for  Loom app.
+ * [Application] class for Loom app.
  */
 @HiltAndroidApp
 class LoomApplication : Application(), ImageLoaderFactory {

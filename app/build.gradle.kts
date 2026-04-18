@@ -69,6 +69,7 @@ dependencies {
 
     implementation(project(":core:data"))
     implementation(project(":core:navigation"))
+    implementation(project(":sync:work"))
 
     implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.androidx.compose.material3.adaptive.layout)
