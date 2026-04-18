@@ -1,7 +1,9 @@
 package com.loom.core.data.di
 
 import com.loom.core.data.repository.OfflineFirstPostRepository
+import com.loom.core.data.repository.OfflineFirstUserDataRepository
 import com.loom.core.data.repository.PostRepository
+import com.loom.core.data.repository.UserDataRepository
 import com.loom.core.data.util.ConnectivityManagerNetworkMonitor
 import com.loom.core.data.util.NetworkMonitor
 import dagger.Binds
@@ -22,4 +24,9 @@ abstract class DataModule {
     internal abstract fun bindsNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor
     ): NetworkMonitor
+
+    @Binds
+    internal abstract fun bindsUserDataRepository(
+        userDataRepository: OfflineFirstUserDataRepository,
+    ): UserDataRepository
 }
