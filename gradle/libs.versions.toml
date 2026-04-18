@@ -25,6 +25,9 @@ androidxHiltNavigationCompose = "1.2.0" # Versión estable recomendada
 androidxHiltLifecycleViewModelCompose = "1.3.0-alpha02"
 androidxComposeMaterial3Adaptive = "1.1.0-rc01"
 androidxComposeMaterial3AdaptiveNavigation3 = "1.3.0-alpha04"
+androidxProfileinstaller = "1.4.1"
+kotlinxCoroutines = "1.10.1"
+coil = "2.7.0"
 
 
 [libraries]
@@ -65,7 +68,12 @@ androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adap
 androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-navigation3 = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation3",version.ref="androidxComposeMaterial3AdaptiveNavigation3" }
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
+kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "kotlinxCoroutines" }
 
+coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 
 
 [plugins]
