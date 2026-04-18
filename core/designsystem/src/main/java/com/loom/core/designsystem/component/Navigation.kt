@@ -16,23 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
-/**
- * Loom Top App Bar con título centrado.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LoomTopAppBar(
-    titleRes: Int,
-    modifier: Modifier = Modifier,
-) {
-    CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(id = titleRes)) },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent
-        ),
-        modifier = modifier
-    )
-}
+
 
 /**
  * Loom Navigation Suite Scaffold.
