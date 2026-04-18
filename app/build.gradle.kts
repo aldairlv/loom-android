@@ -66,7 +66,7 @@ dependencies {
     implementation(project(":feature:foryou:api"))
     implementation(project(":feature:foryou:impl"))
     implementation(project(":core:common"))
-
+    implementation(project(":core:model"))
     implementation(project(":core:data"))
     implementation(project(":core:navigation"))
     implementation(project(":sync:work"))

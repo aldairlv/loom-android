@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.loom.core.data"
+    namespace = "com.loom.core.datastore"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -42,15 +41,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(project(":core:model"))
-    implementation(project(":core:database"))
-    implementation(project(":core:network"))
-    implementation(project(":core:common"))
-    implementation(project(":core:datastore"))
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.androidx.tracing.ktx)
+    implementation(libs.androidx.dataStore)
+    implementation(project(":core:datastore-proto"))
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+
 
 }
