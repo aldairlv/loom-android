@@ -28,7 +28,7 @@ androidxComposeMaterial3AdaptiveNavigation3 = "1.3.0-alpha04"
 androidxProfileinstaller = "1.4.1"
 kotlinxCoroutines = "1.10.1"
 coil = "2.7.0"
-
+androidxWork = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -74,6 +74,7 @@ kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-co
 coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-kt-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+androidx-work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidxWork" }
 
 
 [plugins]
