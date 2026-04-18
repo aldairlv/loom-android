@@ -48,6 +48,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.work.ktx)
     implementation(project(":core:notifications"))
+    implementation(project(":core:data"))
+    implementation(project(":core:common"))
+
+
+    implementation(libs.hilt.ext.work)
+    implementation(libs.androidx.tracing.ktx)
 
 
 }

@@ -6,8 +6,8 @@ import kotlin.coroutines.cancellation.CancellationException
 data class ChangeListVersions(val postVersion: Int = 0)
 
 interface Synchronizer {
-    suspend fun getChangeListVersions(): ChangeListVersions
-    suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)
+    //suspend fun getChangeListVersions(): ChangeListVersions
+    //suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)
     suspend fun Syncable.sync() = this@sync.syncWith(this@Synchronizer)
 }
 
