@@ -59,7 +59,15 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(project(":core:designsystem"))
     implementation(project(":feature:foryou:api"))
+    implementation(project(":feature:foryou:impl"))
+
     implementation(project(":core:data"))
     implementation(project(":core:navigation"))
+
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
+    implementation(libs.androidx.compose.material3.navigationSuite)
 
 }
