@@ -20,8 +20,12 @@ fun LoomTopAppBar(
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = stringResource(id = titleRes)) },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Unspecified,
+            navigationIconContentColor = Color.Unspecified,
+            titleContentColor = Color.Unspecified,
+            actionIconContentColor = Color.Unspecified
         ),
         modifier = modifier
     )

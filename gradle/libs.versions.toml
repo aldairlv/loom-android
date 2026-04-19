@@ -33,6 +33,7 @@ hiltExt = "1.2.0"
 androidxDataStore = "1.2.0"
 protobuf = "4.29.2"
 protobufPlugin = "0.9.6"
+androidxCoreSplashscreen = "1.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -83,6 +84,7 @@ hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hi
 androidx-dataStore = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
 protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf" }
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 
 
 [plugins]

@@ -80,5 +80,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.coil.kt)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.tracing.ktx)
+
 
 }
