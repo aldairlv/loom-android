@@ -13,6 +13,9 @@ android {
             minorApiLevel = 1
         }
     }
+    buildFeatures {
+        compose = true // <--- ESTO ES VITAL
+    }
 
     defaultConfig {
         minSdk = 24
@@ -61,5 +64,14 @@ dependencies {
     //implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
     //implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     implementation(project(":core:data"))
+    implementation(libs.kotlinx.datetime)
+
+
+
+    implementation(project(":core:designsystem"))
     implementation(project(":core:model"))
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
 }

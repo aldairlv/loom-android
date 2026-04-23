@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -21,10 +23,15 @@ import com.loom.core.ui.postsFeed
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.loom.core.ui.PostFeedPreviewParameterProvider
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.loom.core.designsystem.theme.LoomTheme // Cambia por el nombre de tu tema real
+import com.loom.core.model.data.Post
 
 
 @Composable
-fun ForYouRoute(
+fun ForYouScreen(
     modifier: Modifier = Modifier,
     viewModel: ForYouViewModel = hiltViewModel(),
 ) {
@@ -69,8 +76,35 @@ internal fun ForYouScreen(
         /*if (feedState is PostFeedUiState.Loading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
-                //color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary
             )
         }*/
+    }
+}
+
+@Preview(showBackground = true, name = "Feed con Datos")
+@Composable
+fun ForYouScreenPopulatedFeedPreview(
+    @PreviewParameter(PostFeedPreviewParameterProvider::class)
+    posts: List<Post>,
+) {
+    LoomTheme {
+        ForYouScreen(
+            feedState = PostFeedUiState.Success(
+                feed = posts,
+            ),
+            onPostClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Feed Cargando")
+@Composable
+fun ForYouScreenLoadingPreview() {
+    LoomTheme {
+        ForYouScreen(
+            feedState = PostFeedUiState.Loading,
+            onPostClick = {}
+        )
     }
 }
