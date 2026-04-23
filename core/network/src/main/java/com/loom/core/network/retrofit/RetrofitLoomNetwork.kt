@@ -10,16 +10,17 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.loom.core.network.BuildConfig
 
 /**
  * Interfaz interna de Retrofit para definir los endpoints.
  */
 private interface RetrofitLoomNetworkApi {
-    @GET(value = "posts")
+    @GET(value = "posts/")
     suspend fun getPosts(): List<NetworkPost>
 }
 
-private const val LOOM_BASE_URL = "https://api.myapp.dev/"
+private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
 
 @Singleton
 internal class RetrofitLoomNetwork @Inject constructor(

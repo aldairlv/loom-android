@@ -1,3 +1,7 @@
+import com.android.build.api.variant.BuildConfigField
+import java.io.StringReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
@@ -7,6 +11,11 @@ plugins {
 
 android {
     namespace = "com.loom.core.network"
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -57,4 +66,20 @@ dependencies {
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
     implementation(libs.androidx.tracing.ktx)
+}
+
+val backendUrl = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["BACKEND_URL"]
+}.orElse("http://example.com")
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields!!.put("BACKEND_URL", backendUrl.map { value ->
+            BuildConfigField(type = "String", value = """"$value"""", comment = null)
+        })
+    }
 }

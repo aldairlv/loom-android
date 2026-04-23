@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM posts ORDER BY publish_date DESC")
+    @Query("SELECT * FROM posts ORDER BY created_at DESC")
     fun getPostEntities(): Flow<List<PostEntity>>
 
     @Upsert

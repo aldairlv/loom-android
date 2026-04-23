@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -15,4 +16,6 @@ kotlin {
 dependencies {
     // Añade esta línea para que Post reconozca Instant
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+    implementation(libs.kotlinx.serialization.json)
+
 }
