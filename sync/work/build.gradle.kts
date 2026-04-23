@@ -44,17 +44,17 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+
     implementation(libs.androidx.work.ktx)
     implementation(project(":core:notifications"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
-
-
+    implementation(libs.hilt.core)
+    ksp(libs.hilt.ext.compiler)
     implementation(libs.hilt.ext.work)
     implementation(libs.androidx.tracing.ktx)
-
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.kotlinx.serialization.json)

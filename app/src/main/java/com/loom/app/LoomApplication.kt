@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy.Builder
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.loom.app.util.ProfileVerifierLogger
@@ -16,11 +18,13 @@ import javax.inject.Inject
  */
 @HiltAndroidApp
 class LoomApplication : Application(), ImageLoaderFactory {
+
     @Inject
     lateinit var imageLoader: dagger.Lazy<ImageLoader>
 
     @Inject
     lateinit var profileVerifierLogger: ProfileVerifierLogger
+
 
     override fun onCreate() {
         super.onCreate()

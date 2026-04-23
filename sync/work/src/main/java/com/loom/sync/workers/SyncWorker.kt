@@ -28,7 +28,7 @@ import com.loom.sync.initializers.SyncConstraints
  * sync functionality.
  */
 @HiltWorker
-internal class SyncWorker @AssistedInject constructor(
+class SyncWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val postRepository: PostRepository,

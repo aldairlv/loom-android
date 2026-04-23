@@ -79,9 +79,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.hilt.ext.work)
     implementation(libs.coil.kt)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.tracing.ktx)
+    implementation(libs.hilt.ext.compiler)
+    implementation(libs.hilt.core)
+
 
 
 }
