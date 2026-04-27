@@ -1,12 +1,13 @@
 pluginManagement {
     repositories {
-        google {
+        /*google {
             content {
                 includeGroupByRegex("com\\.android.*")
                 includeGroupByRegex("com\\.google.*")
                 includeGroupByRegex("androidx.*")
             }
-        }
+        }*/
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
@@ -24,3 +25,19 @@ dependencyResolutionManagement {
 
 rootProject.name = "loom"
 include(":app")
+include(":core:model")
+include(":core:database")
+include(":core:network")
+include(":core:data")
+include(":core:common")
+include(":feature:foryou")
+include(":feature:foryou:api")
+include(":core:navigation")
+include(":feature:foryou:impl")
+include(":core:ui")
+include(":core:designsystem")
+include(":sync")
+include(":sync:work")
+include(":core:notifications")
+include(":core:datastore")
+include(":core:datastore-proto")
