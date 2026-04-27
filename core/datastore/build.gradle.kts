@@ -47,6 +47,4 @@ dependencies {
     implementation(project(":core:datastore-proto"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
-
-
 }

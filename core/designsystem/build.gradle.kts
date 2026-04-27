@@ -11,7 +11,7 @@ android {
         }
     }
     buildFeatures {
-        compose = true // <--- ESTO ES VITAL
+        compose = true
     }
 
     defaultConfig {
@@ -51,4 +51,7 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.compose.material3.navigationSuite)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
 }

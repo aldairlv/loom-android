@@ -48,7 +48,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:datastore"))
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-    // Hilt
+    implementation("androidx.room:room-ktx:2.6.1")
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.tracing.ktx)

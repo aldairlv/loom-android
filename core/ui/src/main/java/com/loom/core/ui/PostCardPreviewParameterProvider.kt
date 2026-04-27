@@ -16,18 +16,19 @@ class PostCardPreviewParameterProvider : PreviewParameterProvider<Post> {
 }
 
 object PreviewData {
-    private val now = Clock.System.now()
+    val now = Clock.System.now()
     val post = Post(
-        id = 1L,
+        id = "1Lrrfc",
         blogId = 101,
+        username = "Jeffer",
         timestamp = now.toEpochMilliseconds(),
         tags = listOf("android", "compose", "kotlin"),
-        contentBlocks = listOf(
+        content = listOf(
             PostContent.Text("¡Acabo de publicar mi primer proyecto en Compose! 🚀"),
             PostContent.Image("https://http.cat/images/100.jpg", 1080, 720)
         ),
         likesCount = 124,
-        reposts_count = 12,
+        repostsCount = 12,
         commentsCount = 5,
         notesCount = 141,
         createdAt = now.minus(10.minutes),

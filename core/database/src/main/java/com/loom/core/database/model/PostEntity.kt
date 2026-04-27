@@ -10,13 +10,12 @@ import kotlinx.datetime.Instant
 @Entity(tableName = "posts")
 data class PostEntity(
     @PrimaryKey
-    val id: Long,
+    val id: String,
     @ColumnInfo(name = "blog_id")
     val blogId: Int,
+    val username: String,
     val timestamp: Long,
     val tags: List<String>,
-    @ColumnInfo(name = "content_blocks")
-    val contentBlocks: List<PostContent>, // Necesitarás un TypeConverter para esto
     @ColumnInfo(name = "likes_count")
     val likesCount: Int,
     @ColumnInfo(name = "reposts_count")
@@ -28,19 +27,22 @@ data class PostEntity(
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
     @ColumnInfo(name = "updated_at")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val content: List<PostContent> // Se guarda como String/JSON en la DB via TypeConverter
 )
 
-fun PostEntity.asExternalModel() = Post(
+// DB -> Model
+fun PostEntity.asExternalPostModel() = Post(
     id = id,
     blogId = blogId,
+    username = username,
     timestamp = timestamp,
-    tags = tags,
-    contentBlocks = contentBlocks,
     likesCount = likesCount,
-    reposts_count = repostsCount,
+    repostsCount = repostsCount,
     commentsCount = commentsCount,
     notesCount = notesCount,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    tags = tags,
+    content = content
 )

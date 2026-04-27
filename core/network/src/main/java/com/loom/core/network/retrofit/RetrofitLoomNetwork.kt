@@ -11,6 +11,10 @@ import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.loom.core.network.BuildConfig
+import com.loom.core.network.model.NetworkLoomResponse
+import com.loom.core.network.model.NetworkTimelineResponse
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 /**
  * Interfaz interna de Retrofit para definir los endpoints.
@@ -18,7 +22,15 @@ import com.loom.core.network.BuildConfig
 private interface RetrofitLoomNetworkApi {
     @GET(value = "posts/")
     suspend fun getPosts(): List<NetworkPost>
+
+    // NUEVO: Endpoint para cualquier timeline con soporte de cursor
+    @GET(value = "timeline/{type}")
+    suspend fun getTimeline(
+        @Path("type") type: String,
+        @Query("cursor") cursor: String?
+    ): NetworkLoomResponse
 }
+
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
 
@@ -38,4 +50,12 @@ internal class RetrofitLoomNetwork @Inject constructor(
         .create(RetrofitLoomNetworkApi::class.java) // 1. Cambiado .class por .java
 
     override suspend fun getPosts(): List<NetworkPost> = networkApi.getPosts()
+
+    override suspend fun getTimeline(
+        timelineCategory: String,
+        cursor: String?
+    ): NetworkTimelineResponse {
+        val result = networkApi.getTimeline(timelineCategory, cursor)
+        return result.response.timeline
+    }
 }

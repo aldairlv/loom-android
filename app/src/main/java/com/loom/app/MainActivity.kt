@@ -16,7 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.loom.app.ui.rememberLoomAppState
 
 import com.loom.core.data.util.NetworkMonitor
-import com.loom.core.data.repository.PostRepository
+//import com.loom.core.data.repository.PostRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,15 +30,18 @@ import androidx.tracing.trace
 import com.loom.app.util.isSystemInDarkTheme
 import com.loom.app.MainActivityUiState.Loading
 import com.loom.app.ui.LoomApp
+import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.designsystem.theme.LoomTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
-
+/*
     @Inject
-    lateinit var postRepository: PostRepository
+    lateinit var postRepository: PostRepository*/
+    @Inject
+    lateinit var timelineRepository: TimelineRepository
 
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -102,7 +105,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val appState = rememberLoomAppState(
                 networkMonitor = networkMonitor,
-                postRepository = postRepository,
+                timelineRepository = timelineRepository,
+                //postRepository = postRepository,
             )
 
             CompositionLocalProvider(

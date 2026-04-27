@@ -11,7 +11,6 @@ import com.loom.feature.foryou.impl.ForYouScreen
 
 fun EntryProviderScope<NavKey>.forYouEntry(navigator: Navigator) {
     entry<ForYouNavKey> {
-        // TODO: Aquí cargamos la pantalla de For You
         ForYouScreen()
     }
 }

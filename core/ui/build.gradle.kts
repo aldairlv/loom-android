@@ -11,7 +11,7 @@ android {
         }
     }
     buildFeatures {
-        compose = true // <--- ESTO ES VITAL
+        compose = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"
@@ -69,13 +69,11 @@ dependencies {
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
     implementation(libs.androidx.compose.foundation)
-
-
-    """
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3") // Para Card, Text, Icon
-    implementation("androidx.compose.material:material-icons-extended") // Para Icons.Default.MoreHoriz
-"""
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.material)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
+    implementation(libs.androidx.compose.material3.navigationSuite)
 }

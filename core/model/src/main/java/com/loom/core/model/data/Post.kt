@@ -3,21 +3,23 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class Post(
-    val id: Long,
+    val id: String,
     val blogId: Int,
+    val username: String,
     val timestamp: Long,
     val tags: List<String>,
-    val contentBlocks: List<PostContent>,
     val likesCount: Int,
-    val reposts_count: Int,
+    val repostsCount: Int,
     val commentsCount: Int,
     val notesCount: Int,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val content: List<PostContent>
 )
 
-// En :core:model -> Post.kt
+
 @Serializable
 sealed interface PostContent {
     @Serializable

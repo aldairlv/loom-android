@@ -26,28 +26,28 @@ val FOR_YOU = TopLevelNavItem(
     )
 
 val EVENTS = TopLevelNavItem(
-    selectedIcon = LoomIcons.Events, // Icono de grupo/usuarios tipo Messenger
+    selectedIcon = LoomIcons.Events,
     unselectedIcon = LoomIcons.EventsBorder,
     iconTextId = forYouR.string.feature_foryou_api_title,
     titleTextId = forYouR.string.feature_foryou_api_title,
 )
 
 val SEARCH = TopLevelNavItem(
-    selectedIcon = LoomIcons.Search, // Lupa rellena
-    unselectedIcon = LoomIcons.SearchBorder, // Lupa lineal
+    selectedIcon = LoomIcons.Search,
+    unselectedIcon = LoomIcons.SearchBorder,
     iconTextId = forYouR.string.feature_foryou_api_title,
     titleTextId = forYouR.string.feature_foryou_api_title,
 )
 
 val PROFILE = TopLevelNavItem(
-    selectedIcon = LoomIcons.Person, // Usuario único relleno
+    selectedIcon = LoomIcons.Person,
     unselectedIcon = LoomIcons.PersonBorder,
     iconTextId = forYouR.string.feature_foryou_api_title,
     titleTextId = forYouR.string.feature_foryou_api_title,
 )
 
 val ACTIVITY = TopLevelNavItem(
-    selectedIcon = LoomIcons.Activity, // El rayo para notificaciones/actividad
+    selectedIcon = LoomIcons.Activity,
     unselectedIcon = LoomIcons.ActivityBorder,
     iconTextId = forYouR.string.feature_foryou_api_title,
     titleTextId = forYouR.string.feature_foryou_api_title,

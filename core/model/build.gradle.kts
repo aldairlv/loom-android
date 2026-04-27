@@ -14,8 +14,6 @@ kotlin {
 }
 
 dependencies {
-    // Añade esta línea para que Post reconozca Instant
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
     implementation(libs.kotlinx.serialization.json)
-
 }

@@ -44,12 +44,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    // Librerías del catálogo
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
-
-    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 

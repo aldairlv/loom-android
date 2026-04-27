@@ -10,7 +10,9 @@ import androidx.work.WorkerParameters
 import com.loom.core.common.network.Dispatcher
 import com.loom.core.common.network.LoomDispatchers.IO
 import com.loom.core.data.Synchronizer
-import com.loom.core.data.repository.PostRepository
+//import com.loom.core.data.repository.PostRepository
+import com.loom.core.data.repository.TimelineRepository
+
 import com.loom.sync.initializers.syncForegroundInfo
 import com.loom.sync.status.SyncSubscriber
 import dagger.assisted.Assisted
@@ -31,7 +33,8 @@ import com.loom.sync.initializers.SyncConstraints
 class SyncWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    private val postRepository: PostRepository,
+    //private val postRepository: PostRepository,
+    private val timelineRepository: TimelineRepository,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
 
     private val syncSubscriber: SyncSubscriber,
@@ -48,7 +51,10 @@ class SyncWorker @AssistedInject constructor(
 
             // First sync the repositories in parallel
             val syncedSuccessfully = awaitAll(
-                async { postRepository.sync() },
+                async {
+                    //postRepository.sync()
+                    timelineRepository.sync()
+                      },
             ).all { it }
 
 

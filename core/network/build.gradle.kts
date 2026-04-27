@@ -51,11 +51,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    // Librerías del catálogo
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
-
-    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")

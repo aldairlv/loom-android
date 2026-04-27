@@ -44,7 +44,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
     implementation(libs.androidx.work.ktx)
     implementation(project(":core:notifications"))
     implementation(project(":core:data"))
@@ -58,11 +57,7 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
-    // Necesarias para que el módulo entienda Compose y el ciclo de vida
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
-
 }

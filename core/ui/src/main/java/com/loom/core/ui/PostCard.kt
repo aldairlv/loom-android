@@ -43,38 +43,35 @@ import coil.compose.rememberAsyncImagePainter
 import com.loom.core.designsystem.R.drawable
 import com.loom.core.designsystem.theme.LoomTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 
 @Composable
 fun PostCardExpanded(
     post: Post,
-    //onFollowClick: () -> Unit,
-    //onMenuClick: () -> Unit,
-    //onTagClick: (String) -> Unit,
-    //onViewAllTagsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1A1A1A) // Gris oscuro estilo Tumblr
+            containerColor = Color(0xFF1A1A1A)
         )
     ) {
-        val isLiked = false // Estado ficticio para el corazón
+        val isLiked = false
         val onToggleLike = { /*TODO*/ }
-        val isCommented = false // Estado ficticio para la nube
+        val isCommented = false
         val onToggleComment = { /*TODO*/ }
-        val isReposted = false // Estado ficticio para las flechas
+        val isReposted = false
         val onToggleRepost = { /*TODO*/ }
         val isInteracted = false
         val onToggleInteracted = { /*TODO*/ }
         val likesCount = post.likesCount
         val commentsCount = post.commentsCount
-        val repostsCount = post.reposts_count
+        val repostsCount = post.repostsCount
         val notesCount = post.notesCount
 
 
-        Column(modifier = Modifier.padding(vertical = 12.dp)) {
+        Column(modifier = Modifier ){
 
             // --- PARTE SUPERIOR: Usuario y Acciones ---
             Row(
@@ -95,7 +92,7 @@ fun PostCardExpanded(
 
                 // Nombre de usuario (con ellipsis si es largo)
                 Text(
-                    text = "AldairBlog",
+                    text = post.username,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -107,7 +104,7 @@ fun PostCardExpanded(
                 if (true) {//!post.isFollowed
                     Text(
                         text = "Seguir",
-                        color = Color(0xFF00B8FF), // Azul Tumblr
+                        color = Color(0xFF00B8FF),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             //.clickable { onFollowClick() }
@@ -127,20 +124,17 @@ fun PostCardExpanded(
             // --- CONTENIDO DEL POST ---
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .padding( vertical = 8.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .fillMaxWidth()
             ) {
-                //postContent()
-                if (post.contentBlocks.isNotEmpty()) {
-                    PostContentList(post.contentBlocks)
+                if (post.content.isNotEmpty()) {
+                    PostContentList(post.content)
                 }
             }
 
             // --- TAGS ---
-            // --- TAGS ---
             if (post.tags.isNotEmpty()) {
-
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 8.dp)
@@ -155,45 +149,39 @@ fun PostCardExpanded(
                 }
 
             }
-            /*Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                // Flujo de texto para los tags
-                Text(
-                    text = "#tag1",//post.tags.joinToString(" ") { "#$it" },
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-                // Botón "Ver todas" si los tags son muchos (simplificado)
-                Text(
-                    text = "Ver todas",
-                    color = Color.LightGray,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        //.clickable { onViewAllTagsClick() }
-                )
-            }*/
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- INTERACCIONES (BOTTOM BAR) ---
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                InteractionButton(isInteracted,notesCount, onToggleInteracted)
-                CommentButton(isCommented, commentsCount, onToggleComment)
-                RepostButton(isReposted, repostsCount, onToggleRepost)
-                LikeButton(isLiked, likesCount,onToggleLike)
+                InteractionButton(
+                    isInteracted,notesCount, onToggleInteracted,
+                    modifier = Modifier.weight(1f)
+                )
+                CommentButton(
+                    isCommented, commentsCount, onToggleComment,
+                    modifier = Modifier.weight(1f)
+                )
+                RepostButton(
+                    isReposted, repostsCount, onToggleRepost,
+                    modifier = Modifier.weight(1f)
+
+                )
+                LikeButton(
+                    isLiked, likesCount,onToggleLike,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
 }
+
+
+
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -208,11 +196,10 @@ fun PostTags(
     ContextualFlowRow(
         modifier = modifier.fillMaxWidth(),
         itemCount = tags.size,
-        maxLines = 3, // Límite de 3 filas
+        maxLines = 3,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         overflow = ContextualFlowRowOverflow.expandIndicator {
-            // Este es el "Ver todas" que aparece al final de la 3ra fila
             Text(
                 text = "... Ver todas",
                 color = Color.LightGray,
@@ -234,9 +221,6 @@ fun TagItem(
     tag: String,
     onClick: () -> Unit
 ) {
-    // Aquí implementamos el texto con el '#' delante
-    // Para el efecto de "subrayado", en móviles solemos usar la respuesta táctil
-    // Pero si quieres subrayado visual programático:
     Text(
         text = "#$tag",
         color = Color.Gray,
@@ -252,34 +236,22 @@ fun TagItem(
 
 @Composable
 fun PostContentList(
-    contentBlocks: List<PostContent>,
+    content: List<PostContent>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        contentBlocks.forEach { block ->
+        content.forEach { block ->
             when (block) {
                 is PostContent.Text -> {
                     Text(
                         text = block.text,
                         color = Color.White,
                         fontSize = 16.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(start = 8.dp , end= 8.dp, bottom = 8.dp)
                     )
                 }
                 is PostContent.Image -> {
-                    // Aquí usarías una librería como Coil para cargar la URL
                     AsyncImage(imageUrl = block.imageUrl)
-
-                    // Placeholder visual:
-                    /*Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.DarkGray)
-                    ) {
-                        Text("Imagen: ${block.width}x${block.height}", Modifier.align(Alignment.Center))
-                    }*/
                 }
             }
         }
@@ -307,7 +279,6 @@ fun AsyncImage(
         contentAlignment = Alignment.Center,
     ) {
         if (isLoading) {
-            // Display a progress bar while loading
             CircularProgressIndicator(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -326,18 +297,15 @@ fun AsyncImage(
             } else {
                 painterResource(drawable.core_designsystem_ic_placeholder_default)
             },
-            // TODO b/226661685: Investigate using alt text of  image to populate content description
-            // decorative image,
             contentDescription = null,
         )
     }
 }
 
 
-
 @Composable
-fun LikeButton(
-    isBookmarked: Boolean,
+fun InteractionButton(
+    isInteracted: Boolean,
     count: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -347,35 +315,35 @@ fun LikeButton(
         modifier = modifier
     ) {
         LoomIconToggleButton(
-            checked = isBookmarked,
+            checked = isInteracted,
             onCheckedChange = { onClick() },
-            modifier = modifier,
             icon = {
                 Icon(
-                    imageVector = LoomIcons.LikeBorder,
-                    contentDescription = "Like",
+                    imageVector = LoomIcons.InteractionBorder,
+                    contentDescription = "Interaction",
                     tint = Color.Gray
                 )
             },
             checkedIcon = {
                 Icon(
-                    imageVector = LoomIcons.Like,
-                    contentDescription = "Like",
-                    tint = Color.Red
+                    imageVector = LoomIcons.Interaction,
+                    contentDescription = "Interaction",
+                    tint = Color.Yellow
                 )
             },
         )
+
         if (count > 0) {
             Text(
                 text = count.toString(),
                 color = Color.LightGray,
-                fontSize = 14.sp
+                fontSize = 14.sp,
             )
         }
+
+
     }
 }
-
-
 
 @Composable
 fun CommentButton(
@@ -391,7 +359,6 @@ fun CommentButton(
         LoomIconToggleButton(
             checked = isCommented,
             onCheckedChange = { onClick() },
-            modifier = modifier,
             icon = {
                 Icon(
                     imageVector = LoomIcons.CommentBorder,
@@ -418,7 +385,6 @@ fun CommentButton(
     }
 }
 
-
 @Composable
 fun RepostButton(
     isReposted: Boolean,
@@ -433,7 +399,6 @@ fun RepostButton(
         LoomIconToggleButton(
             checked = isReposted,
             onCheckedChange = { onClick() },
-            modifier = modifier,
             icon = {
                 Icon(
                     imageVector = LoomIcons.RepostBorder,
@@ -460,10 +425,9 @@ fun RepostButton(
     }
 }
 
-
 @Composable
-fun InteractionButton(
-    isInteracted: Boolean,
+fun LikeButton(
+    isLiked: Boolean,
     count: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -473,21 +437,20 @@ fun InteractionButton(
         modifier = modifier
     ) {
         LoomIconToggleButton(
-            checked = isInteracted,
+            checked = isLiked,
             onCheckedChange = { onClick() },
-            modifier = modifier,
             icon = {
                 Icon(
-                    imageVector = LoomIcons.InteractionBorder,
-                    contentDescription = "Interaction",
+                    imageVector = LoomIcons.LikeBorder,
+                    contentDescription = "Like",
                     tint = Color.Gray
                 )
             },
             checkedIcon = {
                 Icon(
-                    imageVector = LoomIcons.Interaction,
-                    contentDescription = "Interaction",
-                    tint = Color.Yellow
+                    imageVector = LoomIcons.Like,
+                    contentDescription = "Like",
+                    tint = Color.Red
                 )
             },
         )
@@ -495,12 +458,12 @@ fun InteractionButton(
             Text(
                 text = count.toString(),
                 color = Color.LightGray,
-                fontSize = 14.sp,
+                fontSize = 14.sp
             )
         }
-
     }
 }
+
 
 
 @Preview(showBackground = true, name = "Feed con Datos")

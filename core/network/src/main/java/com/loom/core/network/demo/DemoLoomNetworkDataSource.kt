@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import javax.inject.Inject
 
+/*
 class DemoLoomNetworkDataSource @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher, // Deberás tener tu módulo de Dispatchers
     private val networkJson: Json,
@@ -21,3 +22,5 @@ class DemoLoomNetworkDataSource @Inject constructor(
             assets.open("posts.json").use { networkJson.decodeFromStream(it) }
         }
 }
+
+ */

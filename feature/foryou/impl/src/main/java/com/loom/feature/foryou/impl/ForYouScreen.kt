@@ -26,8 +26,12 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.loom.core.ui.PostFeedPreviewParameterProvider
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.loom.core.designsystem.theme.LoomTheme // Cambia por el nombre de tu tema real
+import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.Post
+import com.loom.core.model.data.TimelineObject
+import com.loom.core.ui.TimelinePreviewParameterProvider
+import com.loom.core.ui.TimelineUiState
+import com.loom.core.ui.timeline
 
 
 @Composable
@@ -35,10 +39,9 @@ fun ForYouScreen(
     modifier: Modifier = Modifier,
     viewModel: ForYouViewModel = hiltViewModel(),
 ) {
-    val feedState by viewModel.feedState.collectAsStateWithLifecycle()
-
+    val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
     ForYouScreen(
-        feedState = feedState,
+        timelineState = timelineState,
         onPostClick = { /* Navegar al detalle */ },
         modifier = modifier,
     )
@@ -46,7 +49,7 @@ fun ForYouScreen(
 
 @Composable
 internal fun ForYouScreen(
-    feedState: PostFeedUiState,
+    timelineState: TimelineUiState,
     onPostClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -57,53 +60,41 @@ internal fun ForYouScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("forYou:feed"),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre PostCards
+            verticalArrangement = Arrangement.spacedBy(5.dp) // Espacio entre PostCards
         ) {
-            // Usamos tu extensión de LazyListScope
-            postsFeed(
-                feedState = feedState,
+            timeline(
+                timelineState = timelineState,
                 onPostClick = onPostClick
             )
 
-            // Espacio extra al final para que el último post no quede pegado a la barra
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
             }
         }
 
         // Pantalla de carga (opcional, ya que postsFeed puede manejar Loading)
-        /*if (feedState is PostFeedUiState.Loading) {
+        /*
+        if (feedState is PostFeedUiState.Loading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = MaterialTheme.colorScheme.primary
             )
-        }*/
+        }
+        */
     }
 }
 
-@Preview(showBackground = true, name = "Feed con Datos")
+@Preview(showBackground = true, name = "Timeline con Datos")
 @Composable
-fun ForYouScreenPopulatedFeedPreview(
-    @PreviewParameter(PostFeedPreviewParameterProvider::class)
-    posts: List<Post>,
+fun ForYouScreenPopulatedTimelinePreview(
+    @PreviewParameter(TimelinePreviewParameterProvider::class)
+    timelineObjects: List<TimelineObject>,
 ) {
     LoomTheme {
         ForYouScreen(
-            feedState = PostFeedUiState.Success(
-                feed = posts,
+            timelineState = TimelineUiState.Success(
+                timelineObjects = timelineObjects,
             ),
-            onPostClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Feed Cargando")
-@Composable
-fun ForYouScreenLoadingPreview() {
-    LoomTheme {
-        ForYouScreen(
-            feedState = PostFeedUiState.Loading,
             onPostClick = {}
         )
     }

@@ -8,6 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.loom.core.designsystem.icon.LoomIcons
+import com.loom.core.designsystem.theme.LoomTheme
 
 
 /**
@@ -53,7 +55,7 @@ fun LoomIconToggleButton(
         if (checked) checkedIcon() else icon()
     }
 }
-/*
+
 @ThemePreviews
 @Composable
 fun IconButtonPreview() {
@@ -63,13 +65,13 @@ fun IconButtonPreview() {
             onCheckedChange = { },
             icon = {
                 Icon(
-                    imageVector = LoomIcons.BookmarkBorder,
+                    imageVector = LoomIcons.InteractionBorder,
                     contentDescription = null,
                 )
             },
             checkedIcon = {
                 Icon(
-                    imageVector = LoomIcons.Bookmark,
+                    imageVector = LoomIcons.Interaction,
                     contentDescription = null,
                 )
             },
@@ -86,13 +88,13 @@ fun IconButtonPreviewUnchecked() {
             onCheckedChange = { },
             icon = {
                 Icon(
-                    imageVector = LoomIcons.BookmarkBorder,
+                    imageVector = LoomIcons.CommentBorder,
                     contentDescription = null,
                 )
             },
             checkedIcon = {
                 Icon(
-                    imageVector = LoomIcons.Bookmark,
+                    imageVector = LoomIcons.Comment,
                     contentDescription = null,
                 )
             },
@@ -101,7 +103,7 @@ fun IconButtonPreviewUnchecked() {
 }
 
 
-*/
+
 object LoomIconButtonDefaults {
     // TODO: File bug
     // IconToggleButton disabled container alpha not exposed by IconButtonDefaults

@@ -32,13 +32,10 @@ android {
     }
 }
 dependencies {
-    // Las fundamentales para que rememberNavBackStack funcione
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
-    // Necesarias para que el módulo entienda Compose y el ciclo de vida
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 }

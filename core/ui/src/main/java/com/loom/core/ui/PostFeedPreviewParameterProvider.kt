@@ -18,62 +18,66 @@ object PreviewParameterData {
     private val now = Clock.System.now()
     val posts = listOf(
         Post(
-            id = 1L,
+            id = "kvnfvhjf",
             blogId = 101,
+            username = "Page One",
             timestamp = now.toEpochMilliseconds(),
             tags = listOf("android", "compose", "kotlin"),
-            contentBlocks = listOf(
+            content = listOf(
                 PostContent.Text("¡Acabo de publicar mi primer proyecto en Compose! 🚀"),
                 PostContent.Image("https://http.cat/images/100.jpg", 1080, 720)
             ),
             likesCount = 124,
-            reposts_count = 12,
+            repostsCount = 12,
             commentsCount = 5,
             notesCount = 141,
             createdAt = now.minus(10.minutes),
             updatedAt = now.minus(10.minutes)
         ),
         Post(
-            id = 2L,
+            id = "2Lscd",
             blogId = 102,
+            username = "userw3",
             timestamp = now.minus(2.hours).toEpochMilliseconds(),
             tags = listOf("ui", "ux"),
-            contentBlocks = listOf(
+            content = listOf(
                 PostContent.Text("Explorando las bondades de PreviewParameterProvider para organizar mis estados de UI.")
             ),
             likesCount = 45,
-            reposts_count = 2,
+            repostsCount = 2,
             commentsCount = 0,
             notesCount = 47,
             createdAt = now.minus(2.hours),
             updatedAt = now.minus(1.hours)
         ),
         Post(
-            id = 3L,
+            id = "3Lcdcsc",
             blogId = 103,
+            username = "Conrad",
             timestamp = now.minus(1.days).toEpochMilliseconds(),
             tags = listOf("tips", "arch"),
-            contentBlocks = listOf(
+            content = listOf(
                 PostContent.Text("Tip del día: Usa estados sellados (Sealed Classes) para gestionar la carga de datos."),
                 PostContent.Image("https://example.com/diagram.png", 800, 600)
             ),
             likesCount = 890,
-            reposts_count = 150,
+            repostsCount = 150,
             commentsCount = 23,
             notesCount = 1063,
             createdAt = now.minus(1.days),
             updatedAt = now.minus(1.days)
         ),
         Post(
-            id = 4L,
+            id = "3ihif",
             blogId = 104,
+            username = "Jeffer",
             timestamp = Instant.parse("2026-04-10T12:00:00Z").toEpochMilliseconds(),
             tags = listOf("ios", "swift"),
-            contentBlocks = listOf(
+            content = listOf(
                 PostContent.Text("Tip del día 4: Diferencias en el manejo de estados entre plataformas.")
             ),
             likesCount = 12,
-            reposts_count = 1,
+            repostsCount = 1,
             commentsCount = 1,
             notesCount = 14,
             createdAt = Instant.parse("2026-04-10T12:00:00Z"),
