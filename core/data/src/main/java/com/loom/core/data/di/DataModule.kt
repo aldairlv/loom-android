@@ -1,6 +1,8 @@
 package com.loom.core.data.di
 
 //import com.loom.core.data.repository.OfflineFirstPostRepository
+import com.loom.core.data.repository.ExploreRepository
+import com.loom.core.data.repository.OfflineFirstExploreRepository
 import com.loom.core.data.repository.OfflineFirstTimelineRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
 //import com.loom.core.data.repository.PostRepository
@@ -18,16 +20,15 @@ import dagger.hilt.components.SingletonComponent
 abstract class DataModule {
 
     @Binds
+    internal abstract fun bindsExploreRepository(
+        exploreRepository: OfflineFirstExploreRepository
+    ): ExploreRepository
+
+    @Binds
     internal abstract fun bindsTimelineRepository(
         timelineRepository: OfflineFirstTimelineRepository
     ): TimelineRepository
 
-    /*
-    @Binds
-    internal abstract fun bindsPostRepository(
-        postRepository: OfflineFirstPostRepository
-    ): PostRepository
-    */
 
     @Binds
     internal abstract fun bindsNetworkMonitor(
