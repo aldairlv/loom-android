@@ -30,6 +30,7 @@ import androidx.tracing.trace
 import com.loom.app.util.isSystemInDarkTheme
 import com.loom.app.MainActivityUiState.Loading
 import com.loom.app.ui.LoomApp
+import com.loom.core.data.repository.ExploreRepository
 import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.designsystem.theme.LoomTheme
 
@@ -37,9 +38,8 @@ import com.loom.core.designsystem.theme.LoomTheme
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
-/*
     @Inject
-    lateinit var postRepository: PostRepository*/
+    lateinit var exploreRepository: ExploreRepository
     @Inject
     lateinit var timelineRepository: TimelineRepository
 
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
             val appState = rememberLoomAppState(
                 networkMonitor = networkMonitor,
                 timelineRepository = timelineRepository,
-                //postRepository = postRepository,
+                exploreRepository = exploreRepository,
             )
 
             CompositionLocalProvider(

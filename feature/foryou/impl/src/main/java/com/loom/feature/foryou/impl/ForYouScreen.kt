@@ -2,34 +2,28 @@ package com.loom.feature.foryou.impl
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.loom.core.ui.PostFeedUiState
-import com.loom.core.ui.postsFeed
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.loom.core.ui.PostFeedPreviewParameterProvider
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.loom.core.designsystem.theme.LoomTheme
-import com.loom.core.model.data.Post
 import com.loom.core.model.data.TimelineObject
-import com.loom.core.ui.TimelinePreviewParameterProvider
+//import com.loom.core.ui.TimelinePreviewParameterProvider
 import com.loom.core.ui.TimelineUiState
 import com.loom.core.ui.timeline
 
@@ -43,6 +37,7 @@ fun ForYouScreen(
     ForYouScreen(
         timelineState = timelineState,
         onPostClick = { /* Navegar al detalle */ },
+        onLoadMore = { viewModel.loadMore() }, // 👈 aquí sí
         modifier = modifier,
     )
 }
@@ -51,12 +46,16 @@ fun ForYouScreen(
 internal fun ForYouScreen(
     timelineState: TimelineUiState,
     onPostClick: (String) -> Unit,
+    onLoadMore: () -> Unit, // 👈 nuevo
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
+
     ) {
+        val listState = rememberLazyListState()
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .testTag("forYou:feed"),
@@ -69,6 +68,18 @@ internal fun ForYouScreen(
 
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+            }
+        }
+        LaunchedEffect(listState) {
+            snapshotFlow {
+                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            }.collect { lastVisibleIndex ->
+
+                val totalItems = listState.layoutInfo.totalItemsCount
+
+                if (lastVisibleIndex != null && lastVisibleIndex >= totalItems - 5) {
+                    onLoadMore()
+                }
             }
         }
 
@@ -95,7 +106,8 @@ fun ForYouScreenPopulatedTimelinePreview(
             timelineState = TimelineUiState.Success(
                 timelineObjects = timelineObjects,
             ),
-            onPostClick = {}
+            onPostClick = {},
+            onLoadMore = {}
         )
     }
 }

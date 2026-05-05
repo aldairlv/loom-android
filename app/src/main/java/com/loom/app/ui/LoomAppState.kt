@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.loom.app.navigation.TOP_LEVEL_NAV_ITEMS
+import com.loom.core.data.repository.ExploreRepository
 import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.data.util.NetworkMonitor
 import com.loom.core.navigation.NavigationState
@@ -15,13 +16,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-//import com.loom.core.data.repository.PostRepository
+
 
 @Composable
 fun rememberLoomAppState(
     networkMonitor: NetworkMonitor,
-    //postRepository: PostRepository,
     timelineRepository: TimelineRepository,
+    exploreRepository: ExploreRepository,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 
     ): LoomAppState {
@@ -32,13 +33,15 @@ fun rememberLoomAppState(
         coroutineScope,
         networkMonitor,
         timelineRepository,
-        //postRepository,
+        exploreRepository,
+
     ) {
         LoomAppState(
             navigationState = navigationState,
             coroutineScope = coroutineScope,
             networkMonitor = networkMonitor,
             timelineRepository = timelineRepository,
+            exploreRepository = exploreRepository,
             //postRepository = postRepository,
         )
     }
@@ -50,7 +53,7 @@ class LoomAppState(
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor,
     timelineRepository: TimelineRepository,
-    //postRepository: PostRepository,
+    exploreRepository: ExploreRepository,
 
     ) {
 

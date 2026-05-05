@@ -23,7 +23,7 @@ class ForYouViewModel @Inject constructor(
     private val timelineRepository: TimelineRepository,
 ) : ViewModel() {
     val timelineState: StateFlow<TimelineUiState> =
-        timelineRepository.getTimelineObjects(TimelineCategory.FOR_YOU)
+        timelineRepository.getObjects(TimelineCategory.FOR_YOU)
             .map<List<TimelineObject>, TimelineUiState>(TimelineUiState::Success)
             .stateIn(
                 scope = viewModelScope,
@@ -34,6 +34,20 @@ class ForYouViewModel @Inject constructor(
     fun updateLike(postId: String, isLiked: Boolean) {
         viewModelScope.launch {
             // postRepository.updateLike(postId, isLiked)
+        }
+    }
+    private var isLoadingMore = false
+
+    fun loadMore() {
+        if (isLoadingMore) return
+
+        viewModelScope.launch {
+            isLoadingMore = true
+            timelineRepository.syncTimeline(
+                timelineCategory = TimelineCategory.FOR_YOU,
+                forceRefresh = false
+            )
+            isLoadingMore = false
         }
     }
 }

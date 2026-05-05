@@ -36,8 +36,8 @@ val EVENTS = TopLevelNavItem(
 val EXPLORE = TopLevelNavItem(
     selectedIcon = LoomIcons.Search,
     unselectedIcon = LoomIcons.SearchBorder,
-    iconTextId = forYouR.string.feature_foryou_api_title,
-    titleTextId = forYouR.string.feature_foryou_api_title,
+    iconTextId = forYouR.string.feature_explore_api_title,
+    titleTextId = forYouR.string.feature_explore_api_title,
 )
 
 val PROFILE = TopLevelNavItem(

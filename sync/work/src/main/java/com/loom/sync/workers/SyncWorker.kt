@@ -22,6 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import androidx.tracing.traceAsync
+import com.loom.core.data.repository.ExploreRepository
 import com.loom.sync.initializers.SyncConstraints
 
 
@@ -35,6 +36,7 @@ class SyncWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     //private val postRepository: PostRepository,
     private val timelineRepository: TimelineRepository,
+    private val exploreRepository: ExploreRepository,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
 
     private val syncSubscriber: SyncSubscriber,
@@ -54,6 +56,7 @@ class SyncWorker @AssistedInject constructor(
                 async {
                     //postRepository.sync()
                     timelineRepository.sync()
+                    exploreRepository.sync()
                       },
             ).all { it }
 
