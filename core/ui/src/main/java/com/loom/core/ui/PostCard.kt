@@ -253,55 +253,13 @@ fun PostContentList(
                 is PostContent.Image -> {
                     AsyncImage(imageUrl = block.imageUrl)
                 }
+                is PostContent.Video -> {
+                    AsyncVideo(videoUrl = block.videoUrl)
+                }
             }
         }
     }
 }
-
-@Composable
-fun AsyncImage(
-    imageUrl: String?,
-) {
-    var isLoading by remember { mutableStateOf(true) }
-    var isError by remember { mutableStateOf(false) }
-    val imageLoader = rememberAsyncImagePainter(
-        model = imageUrl,
-        onState = { state ->
-            isLoading = state is AsyncImagePainter.State.Loading
-            isError = state is AsyncImagePainter.State.Error
-        },
-    )
-    val isLocalInspection = LocalInspectionMode.current
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(180.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(80.dp),
-                color = MaterialTheme.colorScheme.tertiary,
-            )
-        }
-
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp),
-            contentScale = ContentScale.Crop,
-            painter = if (isError.not() && !isLocalInspection) {
-                imageLoader
-            } else {
-                painterResource(drawable.core_designsystem_ic_placeholder_default)
-            },
-            contentDescription = null,
-        )
-    }
-}
-
 
 @Composable
 fun InteractionButton(
