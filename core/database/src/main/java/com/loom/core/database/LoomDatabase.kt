@@ -6,10 +6,15 @@ import androidx.room.TypeConverters
 import com.loom.core.database.dao.CarouselDao
 import com.loom.core.database.dao.EventDao
 import com.loom.core.database.dao.PostDao
+import com.loom.core.database.dao.TagDao
 import com.loom.core.database.dao.TimelineDao
 import com.loom.core.database.dao.TimelineMetadataDao
 import com.loom.core.database.dao.TitleDao
+import com.loom.core.database.dao.TrendDao
 import com.loom.core.database.dao.UserDao
+import com.loom.core.database.model.TagEntity
+import com.loom.core.database.model.TrendEntity
+import com.loom.core.database.model.TrendItemEntity
 import com.loom.core.database.model.PostEntity
 import com.loom.core.database.model.CarouselEntity
 import com.loom.core.database.model.EventEntity
@@ -23,6 +28,9 @@ import com.loom.core.database.model.EventParticipantEntity
 
 @Database(
     entities = [
+        TrendEntity::class,
+        TrendItemEntity::class,
+        TagEntity::class,
         PostEntity::class,
         TimelineEntity::class,
         TimelineMetadataEntity::class,
@@ -38,6 +46,8 @@ import com.loom.core.database.model.EventParticipantEntity
 )
 @TypeConverters(InstantConverter::class)
 internal abstract class LoomDatabase : RoomDatabase() {
+    abstract fun trendDao(): TrendDao
+    abstract fun tagDao(): TagDao
     abstract fun postDao(): PostDao
     abstract fun timelineDao(): TimelineDao
     abstract fun timelineMetadataDao(): TimelineMetadataDao

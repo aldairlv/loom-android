@@ -4,9 +4,11 @@ import com.loom.core.database.LoomDatabase
 import com.loom.core.database.dao.CarouselDao
 import com.loom.core.database.dao.EventDao
 import com.loom.core.database.dao.PostDao
+import com.loom.core.database.dao.TagDao
 import com.loom.core.database.dao.TimelineDao
 import com.loom.core.database.dao.TimelineMetadataDao
 import com.loom.core.database.dao.TitleDao
+import com.loom.core.database.dao.TrendDao
 import com.loom.core.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -16,6 +18,17 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DaosModule {
+
+    @Provides
+    fun providesTrendDao(
+        database: LoomDatabase,
+    ): TrendDao = database.trendDao()
+
+    @Provides
+    fun providesTagDao(
+        database: LoomDatabase,
+    ): TagDao = database.tagDao()
+
     @Provides
     fun providesPostDao(
         database: LoomDatabase,
