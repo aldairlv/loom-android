@@ -1,10 +1,10 @@
 package com.loom.core.network.model
 
-import com.loom.core.network.serialization.polymorphic.NetworkTimelineObjectSerializer
+import com.loom.core.network.serialization.polymorphic.NetworkObjectSerializer
 import kotlinx.serialization.Serializable
 
-@Serializable(with = NetworkTimelineObjectSerializer::class)
-sealed interface NetworkTimelineObject{
+@Serializable(with = NetworkObjectSerializer::class)
+sealed interface NetworkObject{
     val objectType: String
     val id: String
     val streamGlobalPosition: Int

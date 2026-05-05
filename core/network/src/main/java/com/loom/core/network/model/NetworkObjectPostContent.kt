@@ -4,7 +4,6 @@ import com.loom.core.network.serialization.polymorphic.NetworkContentObjectSeria
 import kotlinx.serialization.Serializable
 
 @Serializable(with = NetworkContentObjectSerializer::class)
-
 sealed interface NetworkContentObject {
     val type: String
 }

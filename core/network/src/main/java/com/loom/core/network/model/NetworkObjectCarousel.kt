@@ -4,10 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("title")
-data class NetworkTimelineObjectTitle(
+@SerialName("carousel")
+data class NetworkObjectCarousel(
     override val objectType: String,
     override val id: String,
     override val streamGlobalPosition: Int,
-    val text: String
-) : NetworkTimelineObject
+    val elements: List<NetworkObjectCarouselElement>
+) : NetworkObject

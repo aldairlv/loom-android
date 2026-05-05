@@ -4,6 +4,6 @@ import com.loom.core.network.serialization.polymorphic.NetworkCarouselElementObj
 import kotlinx.serialization.Serializable
 
 @Serializable(with = NetworkCarouselElementObjectSerializer::class)
-sealed interface NetworkCarouselElementObject {
+sealed interface NetworkObjectCarouselElement {
     val id: String
 }

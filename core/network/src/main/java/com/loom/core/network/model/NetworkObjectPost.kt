@@ -6,7 +6,7 @@ import kotlinx.datetime.Instant
 
 @Serializable
 @SerialName("post")
-data class NetworkTimelineObjectPost(
+data class NetworkObjectPost(
     override val objectType: String,
     override val id: String,
     override val streamGlobalPosition: Int,
@@ -21,4 +21,4 @@ data class NetworkTimelineObjectPost(
     val updatedAt: Instant,
     val tags: List<String>,
     val content: List<NetworkContentObject>
-) : NetworkTimelineObject
+) : NetworkObject

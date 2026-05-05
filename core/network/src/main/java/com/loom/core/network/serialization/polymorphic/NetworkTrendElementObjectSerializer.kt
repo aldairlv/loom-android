@@ -1,31 +1,30 @@
 package com.loom.core.network.serialization.polymorphic
 
-import com.loom.core.network.model.NetworkObjectCarouselElement
-import com.loom.core.network.model.NetworkCarouselElementObjectEvent
-import com.loom.core.network.model.NetworkCarouselElementObjectUser
+import com.loom.core.network.model.NetworkObjectTrendElement
+import com.loom.core.network.model.NetworkObjectTrendElementTag
+import com.loom.core.network.model.NetworkObjectTrendElementVideo
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-object NetworkCarouselElementObjectSerializer :
-    JsonContentPolymorphicSerializer<NetworkObjectCarouselElement>(
-        NetworkObjectCarouselElement::class
+object NetworkTrendElementObjectSerializer:
+    JsonContentPolymorphicSerializer<NetworkObjectTrendElement>(
+        NetworkObjectTrendElement::class
     ) {
 
     override fun selectDeserializer(
         element: JsonElement
-    ): DeserializationStrategy<out NetworkObjectCarouselElement> {
-
+    ): DeserializationStrategy<out NetworkObjectTrendElement> {
         val type = element
             .jsonObject["objectType"]
             ?.jsonPrimitive
             ?.content
 
         return when (type) {
-            "user_card" -> NetworkCarouselElementObjectUser.serializer()
-            "event_card" -> NetworkCarouselElementObjectEvent.serializer()
+            "tag" -> NetworkObjectTrendElementTag.serializer()
+            "video"-> NetworkObjectTrendElementVideo.serializer()
             else -> error("Unknown type: $type")
         }
     }

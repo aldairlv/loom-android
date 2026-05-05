@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
 class NetworkCarouselElementObjectUser (
     override val id: String,
     val resource: List<NetworkUser>,
-): NetworkCarouselElementObject {
+): NetworkObjectCarouselElement {
 
 }

@@ -9,5 +9,5 @@ class NetworkCarouselElementObjectEvent (
     override val id: String,
     val tags: List<String>,
     val resource: List<NetworkEvent>,
-): NetworkCarouselElementObject {
+): NetworkObjectCarouselElement {
 }
