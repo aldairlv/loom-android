@@ -3,6 +3,7 @@ package com.loom.core.network.serialization.polymorphic
 import com.loom.core.network.model.NetworkContentObject
 import com.loom.core.network.model.NetworkContentObjectImage
 import com.loom.core.network.model.NetworkContentObjectText
+import com.loom.core.network.model.NetworkContentObjectVideo
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
@@ -24,6 +25,7 @@ object NetworkContentObjectSerializer :
         return when (type) {
             "image" -> NetworkContentObjectImage.serializer()
             "text" -> NetworkContentObjectText.serializer()
+            "video" -> NetworkContentObjectVideo.serializer()
             else -> error("Unknown type: $type")
         }
     }

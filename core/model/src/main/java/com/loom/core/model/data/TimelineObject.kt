@@ -24,6 +24,14 @@ sealed interface TimelineObject {
     }
 
     @Serializable
+    @SerialName("trend_type")
+    data class TrendObject(
+        val content: TrendCategory
+    ) : TimelineObject {
+        override val id: String = "title_${content.id}"
+    }
+
+    @Serializable
     @SerialName("carousel_type")
     data class CarouselObject(
         val content: Carousel

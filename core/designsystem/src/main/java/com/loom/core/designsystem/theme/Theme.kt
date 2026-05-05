@@ -27,7 +27,8 @@ val LightDefaultColorScheme = lightColorScheme(
 val DarkDefaultColorScheme = darkColorScheme(
     primary = Purple80,
     onPrimary = Purple20,
-    background = Color(0xFF1C1B1F),
+    background = Color(0x00000000),
+    //background = Color(0xFF1C1B1F),
     surface = Color(0xFF1C1B1F),
 )
 

@@ -1,21 +1,22 @@
 package com.loom.core.network.serialization.polymorphic
 
-import com.loom.core.network.model.NetworkTimelineObject
-import com.loom.core.network.model.NetworkTimelineObjectCarousel
-import com.loom.core.network.model.NetworkTimelineObjectPost
-import com.loom.core.network.model.NetworkTimelineObjectTitle
+import com.loom.core.network.model.NetworkObject
+import com.loom.core.network.model.NetworkObjectCarousel
+import com.loom.core.network.model.NetworkObjectPost
+import com.loom.core.network.model.NetworkObjectTitle
+import com.loom.core.network.model.NetworkObjectTrend
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-object NetworkTimelineObjectSerializer :
-    JsonContentPolymorphicSerializer<NetworkTimelineObject>(NetworkTimelineObject::class) {
+object NetworkObjectSerializer :
+    JsonContentPolymorphicSerializer<NetworkObject>(NetworkObject::class) {
 
     override fun selectDeserializer(
         element: JsonElement
-    ): DeserializationStrategy<out NetworkTimelineObject> {
+    ): DeserializationStrategy<out NetworkObject> {
 
         val type = element
             .jsonObject["objectType"]
@@ -23,9 +24,10 @@ object NetworkTimelineObjectSerializer :
             ?.content
 
         return when (type) {
-            "post" -> NetworkTimelineObjectPost.serializer()
-            "title" -> NetworkTimelineObjectTitle.serializer()
-            "carousel" -> NetworkTimelineObjectCarousel.serializer()
+            "post" -> NetworkObjectPost.serializer()
+            "title" -> NetworkObjectTitle.serializer()
+            "carousel" -> NetworkObjectCarousel.serializer()
+            "trend" -> NetworkObjectTrend.serializer()
             else -> error("Unknown type: $type")
         }
     }

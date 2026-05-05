@@ -48,6 +48,7 @@ fun TimelineObject(
         is TimelineObject.PostObject -> PostCardExpanded(post = timelineObject.content)
         is TimelineObject.CarouselObject -> CarouselCardExpanded(carousel = timelineObject.content)
         is TimelineObject.TitleObject -> TitleHeader(title = timelineObject.content)
+        is TimelineObject.TrendObject -> TrendSection(trendCategory = timelineObject.content)
     }
 }
 

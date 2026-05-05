@@ -23,6 +23,7 @@ data class CarouselEventElement(
     val resource: List<EventProfile>
 ) : CarouselElement
 
+
 @Serializable
 data class Carousel(
     val id: String,

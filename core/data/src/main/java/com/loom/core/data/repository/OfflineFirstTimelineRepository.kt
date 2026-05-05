@@ -18,20 +18,26 @@ import com.loom.core.database.dao.TimelineDao
 import com.loom.core.database.dao.TimelineMetadataDao
 import com.loom.core.database.dao.TitleDao
 import com.loom.core.database.dao.UserDao
+import com.loom.core.database.model.CarouselEntity
+import com.loom.core.database.model.CarouselItemEntity
 import com.loom.core.database.model.TimelineMetadataEntity
 import com.loom.core.database.model.asExternalModel
 import com.loom.core.model.enum.TimelineCategory
 import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkCarouselElementObjectEvent
 import com.loom.core.network.model.NetworkCarouselElementObjectUser
-import com.loom.core.network.model.NetworkTimelineObjectCarousel
-import com.loom.core.network.model.NetworkTimelineObjectPost
-import com.loom.core.network.model.NetworkTimelineObjectTitle
-import com.loom.core.network.model.NetworkTimelineResponse
+import com.loom.core.network.model.NetworkObjectCarousel
+import com.loom.core.network.model.NetworkObjectPost
+import com.loom.core.network.model.NetworkObjectTitle
+import com.loom.core.network.model.NetworkObjectsResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.loom.core.database.model.PostEntity
+import com.loom.core.database.model.UserEntity
+import com.loom.core.database.model.EventEntity
+
 
 class OfflineFirstTimelineRepository @Inject constructor(
     private val timelineDao: TimelineDao,
@@ -46,7 +52,7 @@ class OfflineFirstTimelineRepository @Inject constructor(
 ) : TimelineRepository {
     private var isFirstLoad = true
 
-    override fun getTimelineObjects(timelineCategory: TimelineCategory) =
+    override fun getObjects(timelineCategory: TimelineCategory) =
         timelineDao.getTimeline(timelineCategory.value)
             .map { it.map { entity -> entity.asExternalModel() } }
 
@@ -84,44 +90,70 @@ class OfflineFirstTimelineRepository @Inject constructor(
 
     private suspend fun processAndSaveResponse(
         timelineCategory: TimelineCategory,
-        response: NetworkTimelineResponse
+        response: NetworkObjectsResponse
     ) {
+        val postsToSave = mutableListOf<PostEntity>()
+        val usersToSave = mutableListOf<UserEntity>()
+        val eventsToSave = mutableListOf<EventEntity>()
+        val carouselsToSave = mutableListOf<CarouselEntity>()
+        val carouselItemsToSave = mutableListOf<CarouselItemEntity>()
+
         response.elements.forEach { netObj ->
             when (netObj) {
-                is NetworkTimelineObjectPost -> {
-                    postDao.upsertPosts(listOf(netObj.asInternalPostEntity()))
+                is NetworkObjectPost -> {
+                    postsToSave.add(netObj.asInternalPostEntity())
                 }
-                is NetworkTimelineObjectTitle -> {
+                is NetworkObjectTitle -> {
                     titleDao.upsertTitle(netObj.id, netObj.text)
                 }
-                is NetworkTimelineObjectCarousel -> {
+                is NetworkObjectCarousel -> {
                     netObj.elements.forEach { element ->
                         when (element) {
                             is NetworkCarouselElementObjectUser -> {
                                 val users = element.resource
-                                userDao.upsertUsers(users.map { it.asInternalUserEntity() })
+                                usersToSave.addAll(
+                                    users.map { it.asInternalUserEntity() }
+                                )
 
                                 users.forEach { netUser ->
                                     netUser.posts.let { netPosts ->
-                                        postDao.upsertPosts(netPosts.map { it.asInternalUserPostEntity() })
+                                        postsToSave.addAll(
+                                            netUser.posts.map { it.asInternalUserPostEntity() }
+                                        )
                                     }
                                 }
                             }
                             is NetworkCarouselElementObjectEvent -> {
-                                eventDao.upsertEvents(element.resource.map { it.asInternalEventEntity() })
+                                eventsToSave.addAll(
+                                    element.resource.map { it.asInternalEventEntity() }
+                                )
                             }
                         }
                     }
 
-                    carouselDao.upsertCarousel(
-                        netObj.asInternalCarouselEntity(),
-                        netObj.asInternalCarouselItemEntities()
-                    )
+                    carouselsToSave.add(netObj.asInternalCarouselEntity())
+                    carouselItemsToSave.addAll(netObj.asInternalCarouselItemEntities())
                 }
+                else -> { throw IllegalArgumentException("Wrong element type: $netObj") }
             }
         }
 
-        val entities = response.elements.map { it.asInternalTimelineEntity(timelineCategory.value) }
+        if (postsToSave.isNotEmpty()) postDao.upsertPosts(postsToSave)
+        if (usersToSave.isNotEmpty()) userDao.upsertUsers(usersToSave)
+        if (eventsToSave.isNotEmpty()) eventDao.upsertEvents(eventsToSave)
+        if (carouselsToSave.isNotEmpty()) {
+            carouselsToSave.forEachIndexed { index, carousel ->
+                carouselDao.upsertCarousel(
+                    carousel,
+                    carouselItemsToSave.filter { it.carouselId == carousel.id }
+                )
+            }
+        }
+
+
+        val entities = response.elements.map {
+            it.asInternalTimelineEntity(timelineCategory.value)
+        }
         timelineDao.upsertTimelineObjects(entities)
 
         timelineMetadataDao.upsertMetadata(

@@ -26,7 +26,14 @@ data class PopulatedTimelineObject(
         parentColumn = "object_id",
         entityColumn = "id"
     )
-    val carousel: PopulatedCarousel? = null
+    val carousel: PopulatedCarousel? = null,
+
+    @Relation(
+        entity = TrendEntity::class,
+        parentColumn = "object_id",
+        entityColumn = "id"
+    )
+    val trend: PopulatedTrend? = null // <--- Agregar esto
 )
 
 fun PopulatedTimelineObject.asExternalModel(): TimelineObject {
@@ -39,6 +46,9 @@ fun PopulatedTimelineObject.asExternalModel(): TimelineObject {
         )
         TimelineObjectType.CAROUSEL.value -> TimelineObject.CarouselObject(
             content = carousel?.asExternalCarouselModel() ?: throw IllegalStateException("Carousel data missing")
+        )
+        TimelineObjectType.TREND.value -> TimelineObject.TrendObject(
+            content = trend?.asExternalTrendModel() ?: throw IllegalStateException("Trend data missing")
         )
         else -> throw IllegalArgumentException("Unknown type: ${entity.objectType}")
     }

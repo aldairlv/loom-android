@@ -41,6 +41,7 @@ import com.loom.core.designsystem.component.LoomTopAppBar
 import com.loom.core.navigation.Navigator
 import com.loom.core.navigation.toEntries
 import com.loom.feature.foryou.impl.navigation.forYouEntry
+import com.loom.feature.explore.impl.navigation.exploreEntry
 
 @Composable
 fun LoomApp(
@@ -153,6 +154,7 @@ internal fun LoomApp(
 
                     val entryProvider = entryProvider {
                         forYouEntry(navigator)
+                        exploreEntry(navigator)
                     }
                     NavDisplay(
                         entries = appState.navigationState.toEntries(entryProvider),

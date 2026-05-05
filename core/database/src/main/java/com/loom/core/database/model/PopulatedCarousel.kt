@@ -66,5 +66,5 @@ fun PopulatedCarousel.asExternalCarouselModel() = Carousel(
     type = entity.objectType,
     elements = items
         .sortedBy { it.itemEntity.position }
-        .map { it.asExternalCarouselItemModel() } // Sin parámetros
+        .map { it.asExternalCarouselItemModel() }
 )

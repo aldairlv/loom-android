@@ -1,6 +1,6 @@
 package com.loom.core.network.serialization.polymorphic
 
-import com.loom.core.network.model.NetworkCarouselElementObject
+import com.loom.core.network.model.NetworkObjectCarouselElement
 import com.loom.core.network.model.NetworkCarouselElementObjectEvent
 import com.loom.core.network.model.NetworkCarouselElementObjectUser
 import kotlinx.serialization.DeserializationStrategy
@@ -10,11 +10,13 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 object NetworkCarouselElementObjectSerializer :
-    JsonContentPolymorphicSerializer<NetworkCarouselElementObject>(NetworkCarouselElementObject::class) {
+    JsonContentPolymorphicSerializer<NetworkObjectCarouselElement>(
+        NetworkObjectCarouselElement::class
+    ) {
 
     override fun selectDeserializer(
         element: JsonElement
-    ): DeserializationStrategy<out NetworkCarouselElementObject> {
+    ): DeserializationStrategy<out NetworkObjectCarouselElement> {
 
         val type = element
             .jsonObject["objectType"]

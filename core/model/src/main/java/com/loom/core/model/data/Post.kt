@@ -24,12 +24,22 @@ data class Post(
 sealed interface PostContent {
     @Serializable
     @SerialName("text")
-    data class Text(val text: String) : PostContent
+    data class Text(
+        val text: String
+    ) : PostContent
 
     @Serializable
     @SerialName("image")
     data class Image(
         val imageUrl: String,
+        val width: Int,
+        val height: Int
+    ) : PostContent
+
+    @Serializable
+    @SerialName("video")
+    data class Video(
+        val videoUrl: String,
         val width: Int,
         val height: Int
     ) : PostContent

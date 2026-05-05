@@ -4,6 +4,7 @@ package com.loom.app.navigation
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.loom.feature.foryou.api.navigation.ForYouNavKey
+import com.loom.feature.explore.api.navigation.ExploreNavKey
 
 import com.loom.core.designsystem.icon.LoomIcons
 import com.loom.feature.foryou.api.R as forYouR
@@ -32,11 +33,11 @@ val EVENTS = TopLevelNavItem(
     titleTextId = forYouR.string.feature_foryou_api_title,
 )
 
-val SEARCH = TopLevelNavItem(
+val EXPLORE = TopLevelNavItem(
     selectedIcon = LoomIcons.Search,
     unselectedIcon = LoomIcons.SearchBorder,
-    iconTextId = forYouR.string.feature_foryou_api_title,
-    titleTextId = forYouR.string.feature_foryou_api_title,
+    iconTextId = forYouR.string.feature_explore_api_title,
+    titleTextId = forYouR.string.feature_explore_api_title,
 )
 
 val PROFILE = TopLevelNavItem(
@@ -55,4 +56,5 @@ val ACTIVITY = TopLevelNavItem(
 
 val TOP_LEVEL_NAV_ITEMS = mapOf(
     ForYouNavKey to FOR_YOU,
+    ExploreNavKey to EXPLORE,
 )

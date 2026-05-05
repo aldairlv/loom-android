@@ -11,7 +11,8 @@ import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.loom.core.network.BuildConfig
-import com.loom.core.network.model.NetworkLoomResponse
+import com.loom.core.network.model.NetworkExploreResponse
+import com.loom.core.network.model.NetworkObjectsResponse
 import com.loom.core.network.model.NetworkTimelineResponse
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -20,17 +21,20 @@ import retrofit2.http.Query
  * Interfaz interna de Retrofit para definir los endpoints.
  */
 private interface RetrofitLoomNetworkApi {
-    @GET(value = "posts/")
+    @GET(value = "/posts/")
     suspend fun getPosts(): List<NetworkPost>
 
-    // NUEVO: Endpoint para cualquier timeline con soporte de cursor
     @GET(value = "timeline/{type}")
     suspend fun getTimeline(
         @Path("type") type: String,
         @Query("cursor") cursor: String?
-    ): NetworkLoomResponse
-}
+    ): NetworkTimelineResponse
 
+    @GET(value = "explore/")
+    suspend fun getExplore(
+        @Query("cursor") cursor: String?
+    ): NetworkExploreResponse
+}
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
 
@@ -39,7 +43,6 @@ internal class RetrofitLoomNetwork @Inject constructor(
     networkJson: Json,
     okhttpCallFactory: dagger.Lazy<Call.Factory>,
 ) : LoomNetworkDataSource {
-
     private val networkApi = Retrofit.Builder()
         .baseUrl(LOOM_BASE_URL)
         .callFactory { okhttpCallFactory.get().newCall(it) }
@@ -51,10 +54,17 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun getPosts(): List<NetworkPost> = networkApi.getPosts()
 
+    override suspend fun getExplore(
+        cursor: String?
+    ): NetworkObjectsResponse {
+        val result = networkApi.getExplore( cursor)
+        return result.response.explore
+    }
+
     override suspend fun getTimeline(
         timelineCategory: String,
         cursor: String?
-    ): NetworkTimelineResponse {
+    ): NetworkObjectsResponse {
         val result = networkApi.getTimeline(timelineCategory, cursor)
         return result.response.timeline
     }
