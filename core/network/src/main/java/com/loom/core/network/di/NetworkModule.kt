@@ -16,6 +16,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
 import coil.decode.SvgDecoder
+import com.loom.core.network.retrofit.AuthInterceptor
+import com.loom.core.network.retrofit.TokenAuthenticator
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -31,7 +33,12 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun okHttpCallFactory(): Call.Factory = OkHttpClient.Builder()
+    fun okHttpCallFactory(
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
+    ): Call.Factory = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .authenticator(tokenAuthenticator)
         .addInterceptor(
             HttpLoggingInterceptor().apply {
                 setLevel(HttpLoggingInterceptor.Level.BODY)

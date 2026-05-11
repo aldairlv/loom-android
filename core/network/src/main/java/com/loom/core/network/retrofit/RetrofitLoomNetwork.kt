@@ -11,9 +11,19 @@ import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.loom.core.network.BuildConfig
+import com.loom.core.network.model.NetworkAuthResponse
 import com.loom.core.network.model.NetworkExploreResponse
+import com.loom.core.network.model.NetworkLoginRequest
+import com.loom.core.network.model.NetworkLogoutResponse
 import com.loom.core.network.model.NetworkObjectsResponse
+import com.loom.core.network.model.NetworkRefreshRequest
+import com.loom.core.network.model.NetworkRegisterRequest
 import com.loom.core.network.model.NetworkTimelineResponse
+import com.loom.core.network.model.NetworkTokenResponse
+import com.loom.core.network.model.NetworkValidateEmailRequest
+import com.loom.core.network.model.NetworkValidateEmailResponse
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -21,6 +31,24 @@ import retrofit2.http.Query
  * Interfaz interna de Retrofit para definir los endpoints.
  */
 private interface RetrofitLoomNetworkApi {
+    @POST(value = "auth/login/")
+    suspend fun login(
+        @Body request: NetworkLoginRequest
+    ): NetworkAuthResponse
+
+    @POST(value = "auth/registration/")
+    suspend fun register(
+        @Body request: NetworkRegisterRequest
+    ): NetworkAuthResponse
+
+    @POST(value = "auth/logout/")
+    suspend fun logout(): NetworkLogoutResponse
+
+    @POST(value = "auth/token/refresh/")
+    suspend fun refreshToken(
+        @Body request: NetworkRefreshRequest
+    ): NetworkTokenResponse
+
     @GET(value = "/posts/")
     suspend fun getPosts(): List<NetworkPost>
 
@@ -34,6 +62,11 @@ private interface RetrofitLoomNetworkApi {
     suspend fun getExplore(
         @Query("cursor") cursor: String?
     ): NetworkExploreResponse
+
+    @POST(value = "auth/email/validate/")
+    suspend fun validateEmail(
+        @Body request: NetworkValidateEmailRequest
+    ): NetworkValidateEmailResponse
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -52,6 +85,21 @@ internal class RetrofitLoomNetwork @Inject constructor(
         .build()
         .create(RetrofitLoomNetworkApi::class.java) // 1. Cambiado .class por .java
 
+    override suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse =
+        networkApi.login(request)
+
+    override suspend fun register(
+        request: NetworkRegisterRequest
+    ): NetworkAuthResponse =
+        networkApi.register(request)
+
+    override suspend fun logout(): NetworkLogoutResponse =
+        networkApi.logout()
+
+    override suspend fun refreshToken(refreshToken: String): NetworkTokenResponse =
+        networkApi.refreshToken(NetworkRefreshRequest(refreshToken))
+
+
     override suspend fun getPosts(): List<NetworkPost> = networkApi.getPosts()
 
     override suspend fun getExplore(
@@ -68,4 +116,14 @@ internal class RetrofitLoomNetwork @Inject constructor(
         val result = networkApi.getTimeline(timelineCategory, cursor)
         return result.response.timeline
     }
+
+    override suspend fun validateEmail(
+        email: String
+    ): NetworkValidateEmailResponse {
+        return networkApi.validateEmail(
+            NetworkValidateEmailRequest(email)
+        )
+    }
+
+
 }
