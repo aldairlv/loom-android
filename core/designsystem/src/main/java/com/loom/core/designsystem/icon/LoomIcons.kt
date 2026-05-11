@@ -1,6 +1,7 @@
 package com.loom.core.designsystem.icon
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
@@ -22,6 +23,10 @@ import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.ChatBubble
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.rounded.Email
 
 
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -69,4 +74,10 @@ object LoomIcons {
     // Interaction
     val Interaction = Icons.Rounded.Insights
     val InteractionBorder = Icons.Outlined.Insights
+
+    // Next
+    val ArrowBack = Icons.AutoMirrored.Rounded.ArrowBack
+
+    val Email = Icons.Rounded.Email
+    val EmailBorder = Icons.Outlined.Email
 }
