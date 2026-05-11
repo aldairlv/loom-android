@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation3.runtime.NavKey
+import com.loom.app.navigation.ALL_TOP_LEVEL_DESTINATIONS
 import com.loom.app.navigation.TOP_LEVEL_NAV_ITEMS
 import com.loom.core.data.repository.ExploreRepository
 import com.loom.core.data.repository.TimelineRepository
@@ -16,17 +18,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import com.loom.feature.auth.api.navigation.LandingNavKey
+
 
 
 @Composable
 fun rememberLoomAppState(
+    startKey: NavKey,
     networkMonitor: NetworkMonitor,
     timelineRepository: TimelineRepository,
     exploreRepository: ExploreRepository,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 
     ): LoomAppState {
-    val navigationState = rememberNavigationState(ForYouNavKey, TOP_LEVEL_NAV_ITEMS.keys)
+
+    //val navigationState = rememberNavigationState(startKey, TOP_LEVEL_NAV_ITEMS.keys)
+    val navigationState = rememberNavigationState(startKey, ALL_TOP_LEVEL_DESTINATIONS)
 
     return remember(
         navigationState,

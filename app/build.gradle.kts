@@ -86,4 +86,6 @@ dependencies {
     implementation(project(":sync:work"))
     implementation(project(":feature:explore:api"))
     implementation(project(":feature:explore:impl"))
+    implementation(project(":feature:auth:api"))
+    implementation(project(":feature:auth:impl"))
 }

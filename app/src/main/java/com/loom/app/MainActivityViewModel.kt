@@ -14,6 +14,8 @@ import javax.inject.Inject
 import com.loom.core.model.data.UserData
 import com.loom.app.MainActivityUiState.Loading
 import com.loom.app.MainActivityUiState.Success
+import com.loom.core.model.data.SessionState
+import com.loom.core.model.data.isLoggedIn
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
@@ -26,6 +28,19 @@ class MainActivityViewModel @Inject constructor(
         initialValue = Loading,
         started = SharingStarted.WhileSubscribed(5_000),
     )
+
+    val sessionState: StateFlow<SessionState> =
+        userDataRepository.userData.map { userData ->
+            if (userData.isLoggedIn) {
+                SessionState.LoggedIn(userData)
+            } else {
+                SessionState.LoggedOut
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = SessionState.Loading
+        )
 }
 
 sealed interface MainActivityUiState {
@@ -66,4 +81,6 @@ sealed interface MainActivityUiState {
      * Returns `true` if dark theme should be used.
      */
     fun shouldUseDarkTheme(isSystemDarkTheme: Boolean) = isSystemDarkTheme
+
+
 }
