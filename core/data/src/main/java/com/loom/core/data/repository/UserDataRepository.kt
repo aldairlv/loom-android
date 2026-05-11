@@ -32,4 +32,14 @@ interface UserDataRepository {
      * Sets whether the user has completed the onboarding process.
      */
     suspend fun setShouldHideOnboarding(shouldHideOnboarding: Boolean)
+
+    /**
+     * Sets the auth tokens and user id.
+     */
+    suspend fun setTokens(accessToken: String, refreshToken: String, userId: String)
+
+    /**
+     * Clears the auth tokens and user id.
+     */
+    suspend fun clearTokens()
 }
