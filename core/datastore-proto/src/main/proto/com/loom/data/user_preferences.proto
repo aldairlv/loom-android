@@ -11,4 +11,7 @@ message UserPreferences {
   DarkThemeConfigProto dark_theme_config = 2;
   bool use_dynamic_color = 3;
   bool should_hide_onboarding = 4;
+  string access_token = 5;
+  string refresh_token = 6;
+  string user_id = 7;
 }
