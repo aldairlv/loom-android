@@ -20,13 +20,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.TimelineObject
-//import com.loom.core.ui.TimelinePreviewParameterProvider
 import com.loom.core.ui.TimelineUiState
 import com.loom.core.ui.timeline
-
 
 @Composable
 fun ForYouScreen(
@@ -84,14 +81,14 @@ internal fun ForYouScreen(
         }
 
         // Pantalla de carga (opcional, ya que postsFeed puede manejar Loading)
-        /*
-        if (feedState is PostFeedUiState.Loading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        */
+
+        //if (feedState is PostFeedUiState.Loading) {
+          //  CircularProgressIndicator(
+              //  modifier = Modifier.align(Alignment.Center),
+            //    color = MaterialTheme.colorScheme.primary
+          //  )
+        //}
+
     }
 }
 

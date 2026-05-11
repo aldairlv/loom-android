@@ -7,6 +7,9 @@ import com.loom.feature.foryou.api.navigation.ForYouNavKey
 import com.loom.feature.explore.api.navigation.ExploreNavKey
 
 import com.loom.core.designsystem.icon.LoomIcons
+import com.loom.feature.auth.api.navigation.LandingNavKey
+import com.loom.feature.auth.api.navigation.EmailInputNavKey
+import com.loom.feature.auth.api.navigation.PasswordInputNavKey
 import com.loom.feature.foryou.api.R as forYouR
 /**
  * Type for the top level navigation items in the Loom application.
@@ -58,3 +61,6 @@ val TOP_LEVEL_NAV_ITEMS = mapOf(
     ForYouNavKey to FOR_YOU,
     ExploreNavKey to EXPLORE,
 )
+
+
+val ALL_TOP_LEVEL_DESTINATIONS = TOP_LEVEL_NAV_ITEMS.keys + LandingNavKey

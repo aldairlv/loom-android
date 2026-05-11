@@ -54,4 +54,11 @@ dependencies {
     implementation(libs.androidx.tracing.ktx)
     implementation("androidx.media3:media3-exoplayer:1.4.1") // Verifica la versión más reciente
     implementation("androidx.media3:media3-ui:1.4.1")
+
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.androidx.tracing.ktx)
+    implementation(libs.kotlinx.serialization.json)
 }

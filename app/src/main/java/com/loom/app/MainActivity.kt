@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tracing.trace
 import com.loom.app.util.isSystemInDarkTheme
 import com.loom.app.MainActivityUiState.Loading
@@ -33,6 +35,9 @@ import com.loom.app.ui.LoomApp
 import com.loom.core.data.repository.ExploreRepository
 import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.designsystem.theme.LoomTheme
+import com.loom.core.model.data.SessionState
+import com.loom.feature.auth.api.navigation.LandingNavKey
+import com.loom.feature.foryou.api.navigation.ForYouNavKey
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -103,20 +108,42 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
 
         setContent {
-            val appState = rememberLoomAppState(
-                networkMonitor = networkMonitor,
-                timelineRepository = timelineRepository,
-                exploreRepository = exploreRepository,
-            )
+            val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
 
-            CompositionLocalProvider(
+            // 1. Mientras cargamos, no pintamos nada (el SplashScreen se mantiene)
+            if (sessionState is SessionState.Loading) return@setContent
 
-            ) {
-                LoomTheme(
-                    darkTheme = themeSettings.darkTheme,
-                    disableDynamicTheming = themeSettings.disableDynamicTheming,
+            /*val startKey = when (sessionState) {
+                is SessionState.LoggedIn -> ForYouNavKey
+                is SessionState.LoggedOut -> LandingNavKey
+            }*/
+
+            // 2. Usamos key para separar el "Mundo Auth" del "Mundo App"
+            key(sessionState is SessionState.LoggedIn) {
+                val startKey = when (sessionState) {
+                    is SessionState.LoggedIn -> ForYouNavKey
+                    else -> LandingNavKey
+                }
+
+                val appState = rememberLoomAppState(
+                    startKey = startKey,
+                    networkMonitor = networkMonitor,
+                    timelineRepository = timelineRepository,
+                    exploreRepository = exploreRepository,
+                )
+
+                CompositionLocalProvider(
+
                 ) {
-                    LoomApp(appState)
+                    LoomTheme(
+                        darkTheme = themeSettings.darkTheme,
+                        disableDynamicTheming = themeSettings.disableDynamicTheming,
+                    ) {
+                        LoomApp(
+                            appState = appState,
+                            sessionState = sessionState
+                        )
+                    }
                 }
             }
         }

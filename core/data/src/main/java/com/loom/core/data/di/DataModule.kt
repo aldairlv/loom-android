@@ -1,7 +1,10 @@
 package com.loom.core.data.di
 
 //import com.loom.core.data.repository.OfflineFirstPostRepository
+import com.loom.core.data.repository.AuthRepository
+import com.loom.core.data.repository.DataTokenManager
 import com.loom.core.data.repository.ExploreRepository
+import com.loom.core.data.repository.OfflineFirstAuthRepository
 import com.loom.core.data.repository.OfflineFirstExploreRepository
 import com.loom.core.data.repository.OfflineFirstTimelineRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
@@ -10,6 +13,7 @@ import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.data.repository.UserDataRepository
 import com.loom.core.data.util.ConnectivityManagerNetworkMonitor
 import com.loom.core.data.util.NetworkMonitor
+import com.loom.core.network.retrofit.TokenManager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,6 +22,7 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
+
 
     @Binds
     internal abstract fun bindsExploreRepository(
@@ -39,4 +44,14 @@ abstract class DataModule {
     internal abstract fun bindsUserDataRepository(
         userDataRepository: OfflineFirstUserDataRepository,
     ): UserDataRepository
+
+    @Binds
+    internal abstract fun bindsTokenManager(
+        dataTokenManager: DataTokenManager,
+    ): TokenManager
+
+    @Binds
+    internal abstract fun bindsAuthRepository(
+        authRepository: OfflineFirstAuthRepository
+    ): AuthRepository
 }

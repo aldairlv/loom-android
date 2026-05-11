@@ -34,6 +34,9 @@ class LoomPreferencesDataSource @Inject constructor(
                 },
                 useDynamicColor = it.useDynamicColor,
                 shouldHideOnboarding = it.shouldHideOnboarding,
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken,
+                userId = it.userId,
             )
         }
 
@@ -70,6 +73,26 @@ class LoomPreferencesDataSource @Inject constructor(
     suspend fun setShouldHideOnboarding(shouldHideOnboarding: Boolean) {
         userPreferences.updateData {
             it.copy { this.shouldHideOnboarding = shouldHideOnboarding }
+        }
+    }
+
+    suspend fun setTokens(accessToken: String, refreshToken: String, userId: String) {
+        userPreferences.updateData {
+            it.copy {
+                this.accessToken = accessToken
+                this.refreshToken = refreshToken
+                this.userId = userId
+            }
+        }
+    }
+
+    suspend fun clearTokens() {
+        userPreferences.updateData {
+            it.copy {
+                this.accessToken = ""
+                this.refreshToken = ""
+                this.userId = ""
+            }
         }
     }
 }

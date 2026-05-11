@@ -2,8 +2,16 @@ package com.loom.core.navigation
 
 import androidx.navigation3.runtime.NavKey
 
-class Navigator(val state: NavigationState) {
+class Navigator(
+    val state: NavigationState,
+    private val isLoggedIn: () -> Boolean,
+    private val landingKey: NavKey
+) {
     fun navigate(key: NavKey) {
+        if (key is RequiresLogin && !isLoggedIn()) {
+            navigate(landingKey)
+            return
+        }
         when (key) {
             state.currentTopLevelKey -> clearSubStack()
             in state.topLevelKeys -> goToTopLevel(key)
@@ -37,5 +45,19 @@ class Navigator(val state: NavigationState) {
         state.currentSubStack.run {
             if (size > 1) subList(1, size).clear()
         }
+    }
+
+
+    fun resetTo(key: NavKey) {
+        state.topLevelStack.apply {
+            clear()
+            add(key)
+        }
+    }
+
+    // O la versión combinada que sugeriste
+    fun loginAndGoTo(key: NavKey) {
+        state.currentSubStack.clear() // Limpia el flujo de auth actual
+        resetTo(key) // Resetea el stack principal al destino final
     }
 }

@@ -40,9 +40,12 @@ include(":feature:foryou")
 include(":feature:foryou:api")
 include(":feature:foryou:impl")
 include(":feature:explore")
+include(":feature:auth")
 include(":sync")
 include(":sync:work")
 
 
 include(":feature:explore:api")
 include(":feature:explore:impl")
+include(":feature:auth:api")
+include(":feature:auth:impl")

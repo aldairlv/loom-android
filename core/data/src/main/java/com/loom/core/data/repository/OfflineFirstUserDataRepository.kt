@@ -32,4 +32,12 @@ internal class OfflineFirstUserDataRepository @Inject constructor(
     override suspend fun setShouldHideOnboarding(shouldHideOnboarding: Boolean) {
         loomPreferencesDataSource.setShouldHideOnboarding(shouldHideOnboarding)
     }
+
+    override suspend fun setTokens(accessToken: String, refreshToken: String, userId: String) {
+        loomPreferencesDataSource.setTokens(accessToken, refreshToken, userId)
+    }
+
+    override suspend fun clearTokens() {
+        loomPreferencesDataSource.clearTokens()
+    }
 }

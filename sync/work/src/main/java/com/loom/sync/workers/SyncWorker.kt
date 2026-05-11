@@ -23,7 +23,11 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import androidx.tracing.traceAsync
 import com.loom.core.data.repository.ExploreRepository
+import com.loom.core.data.repository.UserDataRepository
 import com.loom.sync.initializers.SyncConstraints
+import kotlinx.coroutines.flow.first
+import com.loom.core.model.data.isLoggedIn
+
 
 
 /**
@@ -37,6 +41,7 @@ class SyncWorker @AssistedInject constructor(
     //private val postRepository: PostRepository,
     private val timelineRepository: TimelineRepository,
     private val exploreRepository: ExploreRepository,
+    private val userDataRepository: UserDataRepository,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
 
     private val syncSubscriber: SyncSubscriber,
@@ -46,6 +51,14 @@ class SyncWorker @AssistedInject constructor(
         appContext.syncForegroundInfo()
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
+        // 2. Comprobamos el estado del usuario antes de empezar
+        val userData = userDataRepository.userData.first()
+        if (!userData.isLoggedIn) {
+            // Si no está logueado, terminamos con éxito pero sin hacer nada.
+            // No usamos retry porque no queremos que WorkManager siga intentándolo.
+            return@withContext Result.success()
+        }
+
         traceAsync("Sync", 0) {
 
 
@@ -56,7 +69,7 @@ class SyncWorker @AssistedInject constructor(
                 async {
                     //postRepository.sync()
                     timelineRepository.sync()
-                    exploreRepository.sync()
+                    //exploreRepository.sync()
                       },
             ).all { it }
 

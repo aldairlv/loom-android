@@ -2,6 +2,7 @@ package com.loom.core.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -38,7 +39,7 @@ fun AsyncImage(
     )
     val isLocalInspection = LocalInspectionMode.current
     Box(
-        modifier = Modifier.fillMaxWidth(),//.height(180.dp),
+        modifier = Modifier.fillMaxSize(),//.height(180.dp),
         contentAlignment = Alignment.Center,
     ) {
         if (isLoading) {
@@ -51,7 +52,8 @@ fun AsyncImage(
         }
 
         Image(
-            modifier = Modifier.fillMaxWidth(),//.height(180.dp),
+            modifier = Modifier.fillMaxSize(),//.height(180.dp),
+            //contentScale = ContentScale.Crop,
             contentScale = ContentScale.Crop,
             painter = if (isError.not() && !isLocalInspection) {
                 imageLoader

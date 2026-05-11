@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:notifications"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation(project(":core:model"))
     implementation(libs.hilt.core)
     ksp(libs.hilt.ext.compiler)
     implementation(libs.hilt.ext.work)
