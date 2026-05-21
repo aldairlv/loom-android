@@ -37,7 +37,7 @@ import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.SessionState
 import com.loom.feature.auth.api.navigation.LandingNavKey
-import com.loom.feature.foryou.api.navigation.ForYouNavKey
+import com.loom.feature.home.api.navigation.HomeNavKey
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
             // 2. Usamos key para separar el "Mundo Auth" del "Mundo App"
             key(sessionState is SessionState.LoggedIn) {
                 val startKey = when (sessionState) {
-                    is SessionState.LoggedIn -> ForYouNavKey
+                    is SessionState.LoggedIn -> HomeNavKey
                     else -> LandingNavKey
                 }
 

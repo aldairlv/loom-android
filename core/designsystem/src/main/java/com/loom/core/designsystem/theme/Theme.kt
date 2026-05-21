@@ -17,19 +17,28 @@ import androidx.compose.ui.unit.dp
 
 // Esquema por defecto (Light)
 val LightDefaultColorScheme = lightColorScheme(
-    primary = Purple40,
-    onPrimary = Color.White,
-    background = Color.White,
-    surface = Color.White,
+    primary = DarkBlue20,
+    onPrimary = White,
+    primaryContainer = DarkBlue90,
+    onPrimaryContainer =  DarkBlue20,
+    background =  DarkBlue20,
+    surface = DarkBlue20,
+    onSurface = Grey50,
+    surfaceVariant = DarkBlue35,
 )
 
 // Esquema por defecto (Dark)
 val DarkDefaultColorScheme = darkColorScheme(
-    primary = Purple80,
-    onPrimary = Purple20,
-    background = Color(0x00000000),
-    //background = Color(0xFF1C1B1F),
-    surface = Color(0xFF1C1B1F),
+    primary = DarkBlue20,
+    onPrimary = White,
+    primaryContainer = DarkBlue90,
+    onPrimaryContainer =  DarkBlue20,
+    background = Black,
+    onBackground = White,
+    surface = Black,
+    onSurface = Grey30,
+    surfaceVariant = DarkBlue35,
+    secondary = Grey
 )
 
 @Composable

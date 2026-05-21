@@ -5,8 +5,8 @@ import androidx.navigation3.runtime.NavKey
 import com.loom.core.navigation.Navigator
 import com.loom.feature.auth.api.navigation.PasswordInputNavKey
 import com.loom.feature.auth.impl.PasswordInputScreen
-import com.loom.feature.foryou.api.navigation.ForYouNavKey
 import com.loom.feature.auth.api.navigation.CompleteRegisterBirthDateNavKey
+import com.loom.feature.home.api.navigation.HomeNavKey
 
 fun EntryProviderScope<NavKey>.passwordInputEntry(navigator: Navigator) {
     entry<PasswordInputNavKey> {key ->
@@ -25,8 +25,7 @@ fun EntryProviderScope<NavKey>.passwordInputEntry(navigator: Navigator) {
                     )
                 )
                                   },
-            onClickLogin = { navigator.resetTo(ForYouNavKey) }
-            //onClickLogin = { navigator.navigate(ForYouNavKey) }
+            onClickLogin = { navigator.resetTo(HomeNavKey) }
         )
     }
 }

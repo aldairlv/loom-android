@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import com.loom.core.navigation.Navigator
 import com.loom.feature.auth.api.navigation.CompleteRegisterUsernameNavKey
 import com.loom.feature.auth.impl.CompleteRegisterUsernameScreen
-import com.loom.feature.foryou.api.navigation.ForYouNavKey
+import com.loom.feature.home.api.navigation.HomeNavKey
 
 
 fun EntryProviderScope<NavKey>.completeRegisterUsernameEntry(navigator: Navigator) {
@@ -18,7 +18,7 @@ fun EntryProviderScope<NavKey>.completeRegisterUsernameEntry(navigator: Navigato
             birthDay = key.birthDay,
             birthYear = key.birthYear,
             onBackClick = { navigator.goBack() },
-            onRegisterSuccess = { navigator.resetTo(ForYouNavKey) }
+            onRegisterSuccess = { navigator.resetTo(HomeNavKey) }
         )
     }
 }

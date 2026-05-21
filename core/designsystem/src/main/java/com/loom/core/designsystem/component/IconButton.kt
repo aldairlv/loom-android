@@ -1,111 +1,68 @@
 package com.loom.core.designsystem.component
 
-import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ripple
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.loom.core.designsystem.icon.LoomIcons
 import com.loom.core.designsystem.theme.LoomTheme
 
-
-/**
- * Loom toggle button with icon and checked icon content slots. Wraps Material 3
- * [IconButton].
- *
- * @param checked Whether the toggle button is currently checked.
- * @param onCheckedChange Called when the user clicks the toggle button and toggles checked.
- * @param modifier Modifier to be applied to the toggle button.
- * @param enabled Controls the enabled state of the toggle button. When `false`, this toggle button
- * will not be clickable and will appear disabled to accessibility services.
- * @param icon The icon content to show when unchecked.
- * @param checkedIcon The icon content to show when checked.
- */
 @Composable
-fun LoomIconToggleButton(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+fun LoomIconButton(
+    icon: ImageVector,
+    contentDescription: String?,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    icon: @Composable () -> Unit,
-    checkedIcon: @Composable () -> Unit = icon,
+    tint: Color = Color.Unspecified,
+    iconSize: Dp = 24.dp,
+    padding: Dp = 8.dp, // Aquí controlas el espacio extra alrededor del icono
+    rippleRadius: Dp = 20.dp // Controla el tamaño del destello circular
 ) {
-    // TODO: File bug
-    // Can't use regular IconToggleButton as it doesn't include a shape (appears square)
-    FilledIconToggleButton(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        modifier = modifier,
-        enabled = enabled,
-        colors = IconButtonDefaults.iconToggleButtonColors(
-            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = if (checked) {
-                MaterialTheme.colorScheme.onBackground.copy(
-                    alpha = LoomIconButtonDefaults.DISABLED_ICON_BUTTON_CONTAINER_ALPHA,
+    Box(
+        modifier = modifier
+            .clickable(
+                onClick = onClick,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = ripple(
+                    bounded = false,
+                    radius = rippleRadius
                 )
-            } else {
-                Color.Transparent
-            },
-        ),
+            )
+            .padding(padding), // El padding va DESPUÉS del clickable para que el área táctil sea cómoda
+        contentAlignment = Alignment.Center
     ) {
-        if (checked) checkedIcon() else icon()
-    }
-}
-
-@ThemePreviews
-@Composable
-fun IconButtonPreview() {
-    LoomTheme {
-        LoomIconToggleButton(
-            checked = true,
-            onCheckedChange = { },
-            icon = {
-                Icon(
-                    imageVector = LoomIcons.InteractionBorder,
-                    contentDescription = null,
-                )
-            },
-            checkedIcon = {
-                Icon(
-                    imageVector = LoomIcons.Interaction,
-                    contentDescription = null,
-                )
-            },
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = tint,
+            modifier = Modifier.size(iconSize)
         )
     }
 }
 
 @ThemePreviews
 @Composable
-fun IconButtonPreviewUnchecked() {
+fun LoomIconButtonPreview() {
     LoomTheme {
-        LoomIconToggleButton(
-            checked = false,
-            onCheckedChange = { },
-            icon = {
-                Icon(
-                    imageVector = LoomIcons.CommentBorder,
-                    contentDescription = null,
-                )
-            },
-            checkedIcon = {
-                Icon(
-                    imageVector = LoomIcons.Comment,
-                    contentDescription = null,
-                )
-            },
-        )
+        LoomBackground {
+            LoomIconButton(
+                icon = LoomIcons.Like,
+                contentDescription = null,
+                onClick = {}
+            )
+        }
     }
-}
-
-
-
-object LoomIconButtonDefaults {
-    // TODO: File bug
-    // IconToggleButton disabled container alpha not exposed by IconButtonDefaults
-    const val DISABLED_ICON_BUTTON_CONTAINER_ALPHA = 0.12f
 }

@@ -77,8 +77,6 @@ dependencies {
     implementation(libs.hilt.ext.compiler)
     implementation(libs.hilt.core)
     implementation(project(":core:designsystem"))
-    implementation(project(":feature:foryou:api"))
-    implementation(project(":feature:foryou:impl"))
     implementation(project(":core:common"))
     implementation(project(":core:model"))
     implementation(project(":core:data"))
@@ -88,4 +86,6 @@ dependencies {
     implementation(project(":feature:explore:impl"))
     implementation(project(":feature:auth:api"))
     implementation(project(":feature:auth:impl"))
+    implementation(project(":feature:home:api"))
+    implementation(project(":feature:home:impl"))
 }

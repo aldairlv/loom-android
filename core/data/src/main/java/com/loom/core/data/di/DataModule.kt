@@ -4,8 +4,10 @@ package com.loom.core.data.di
 import com.loom.core.data.repository.AuthRepository
 import com.loom.core.data.repository.DataTokenManager
 import com.loom.core.data.repository.ExploreRepository
+import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.OfflineFirstAuthRepository
 import com.loom.core.data.repository.OfflineFirstExploreRepository
+import com.loom.core.data.repository.OfflineFirstHomeRepository
 import com.loom.core.data.repository.OfflineFirstTimelineRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
 //import com.loom.core.data.repository.PostRepository
@@ -54,4 +56,9 @@ abstract class DataModule {
     internal abstract fun bindsAuthRepository(
         authRepository: OfflineFirstAuthRepository
     ): AuthRepository
+
+    @Binds
+    internal abstract fun bindsHomeRepository(
+        eventsFeedRepository: OfflineFirstHomeRepository
+    ): HomeRepository
 }

@@ -5,6 +5,7 @@ import com.loom.core.network.model.NetworkLoginRequest
 import com.loom.core.network.model.NetworkLogoutResponse
 import com.loom.core.network.model.NetworkObjectsResponse
 import com.loom.core.network.model.NetworkPost
+import com.loom.core.network.model.NetworkPostsFeedResponse
 import com.loom.core.network.model.NetworkRegisterRequest
 import com.loom.core.network.model.NetworkTimelineResponse
 import com.loom.core.network.model.NetworkTokenResponse
@@ -33,4 +34,17 @@ interface LoomNetworkDataSource {
     suspend fun validateEmail(
         email: String
     ): NetworkValidateEmailResponse
+
+
+    suspend fun getPostsFeedForYou(
+        cursor: String? = null
+    ): NetworkPostsFeedResponse
+
+    suspend fun getPostsFeedFollowing(
+        cursor: String? = null
+    ): NetworkPostsFeedResponse
+
+    suspend fun getPostsFeedTags(
+        cursor: String? = null
+    ): NetworkPostsFeedResponse
 }

@@ -3,14 +3,14 @@ package com.loom.app.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.loom.feature.foryou.api.navigation.ForYouNavKey
 import com.loom.feature.explore.api.navigation.ExploreNavKey
 
 import com.loom.core.designsystem.icon.LoomIcons
 import com.loom.feature.auth.api.navigation.LandingNavKey
 import com.loom.feature.auth.api.navigation.EmailInputNavKey
 import com.loom.feature.auth.api.navigation.PasswordInputNavKey
-import com.loom.feature.foryou.api.R as forYouR
+import com.loom.feature.home.api.navigation.HomeNavKey
+import com.loom.feature.home.api.R as homeR
 /**
  * Type for the top level navigation items in the Loom application.
  */
@@ -22,43 +22,43 @@ data class TopLevelNavItem(
 )
 
 
-val FOR_YOU = TopLevelNavItem(
+val HOME = TopLevelNavItem(
         selectedIcon = LoomIcons.Home,
         unselectedIcon = LoomIcons.HomeBorder,
-        iconTextId = forYouR.string.feature_foryou_api_title,
-        titleTextId = forYouR.string.feature_foryou_api_title,
+        iconTextId = homeR.string.feature_home_api_title,
+        titleTextId = homeR.string.feature_home_api_title,
     )
 
 val EVENTS = TopLevelNavItem(
     selectedIcon = LoomIcons.Events,
     unselectedIcon = LoomIcons.EventsBorder,
-    iconTextId = forYouR.string.feature_foryou_api_title,
-    titleTextId = forYouR.string.feature_foryou_api_title,
+    iconTextId = homeR.string.feature_home_api_title,
+    titleTextId = homeR.string.feature_home_api_title,
 )
 
 val EXPLORE = TopLevelNavItem(
     selectedIcon = LoomIcons.Search,
     unselectedIcon = LoomIcons.SearchBorder,
-    iconTextId = forYouR.string.feature_explore_api_title,
-    titleTextId = forYouR.string.feature_explore_api_title,
+    iconTextId = homeR.string.feature_home_api_title,
+    titleTextId = homeR.string.feature_home_api_title,
 )
 
 val PROFILE = TopLevelNavItem(
     selectedIcon = LoomIcons.Person,
     unselectedIcon = LoomIcons.PersonBorder,
-    iconTextId = forYouR.string.feature_foryou_api_title,
-    titleTextId = forYouR.string.feature_foryou_api_title,
+    iconTextId = homeR.string.feature_home_api_title,
+    titleTextId = homeR.string.feature_home_api_title,
 )
 
 val ACTIVITY = TopLevelNavItem(
     selectedIcon = LoomIcons.Activity,
     unselectedIcon = LoomIcons.ActivityBorder,
-    iconTextId = forYouR.string.feature_foryou_api_title,
-    titleTextId = forYouR.string.feature_foryou_api_title,
+    iconTextId = homeR.string.feature_home_api_title,
+    titleTextId = homeR.string.feature_home_api_title,
 )
 
 val TOP_LEVEL_NAV_ITEMS = mapOf(
-    ForYouNavKey to FOR_YOU,
+    HomeNavKey to HOME,
     ExploreNavKey to EXPLORE,
 )
 
