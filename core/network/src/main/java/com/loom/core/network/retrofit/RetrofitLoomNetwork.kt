@@ -16,6 +16,7 @@ import com.loom.core.network.model.NetworkExploreResponse
 import com.loom.core.network.model.NetworkLoginRequest
 import com.loom.core.network.model.NetworkLogoutResponse
 import com.loom.core.network.model.NetworkObjectsResponse
+import com.loom.core.network.model.NetworkPostsFeedResponse
 import com.loom.core.network.model.NetworkRefreshRequest
 import com.loom.core.network.model.NetworkRegisterRequest
 import com.loom.core.network.model.NetworkTimelineResponse
@@ -67,6 +68,22 @@ private interface RetrofitLoomNetworkApi {
     suspend fun validateEmail(
         @Body request: NetworkValidateEmailRequest
     ): NetworkValidateEmailResponse
+
+
+    @GET(value = "posts/posts/recommend/")
+    suspend fun getPostsFeedForYou(
+        @Query("cursor") cursor: String?
+    ): NetworkPostsFeedResponse
+
+    @GET(value = "posts/posts/following/")
+    suspend fun getPostsFeedFollowing(
+        @Query("cursor") cursor: String?
+    ): NetworkPostsFeedResponse
+
+    @GET(value = "posts/posts/tags/")
+    suspend fun getPostsFeedTags(
+        @Query("cursor") cursor: String?
+    ): NetworkPostsFeedResponse
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -124,6 +141,16 @@ internal class RetrofitLoomNetwork @Inject constructor(
             NetworkValidateEmailRequest(email)
         )
     }
+
+
+    override suspend fun getPostsFeedForYou(cursor: String?): NetworkPostsFeedResponse =
+        networkApi.getPostsFeedForYou(cursor)
+
+    override suspend fun getPostsFeedFollowing(cursor: String?): NetworkPostsFeedResponse =
+        networkApi.getPostsFeedFollowing(cursor)
+
+    override suspend fun getPostsFeedTags(cursor: String?): NetworkPostsFeedResponse =
+        networkApi.getPostsFeedTags(cursor)
 
 
 }
