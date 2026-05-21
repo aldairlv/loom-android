@@ -27,9 +27,12 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.rounded.Email
+import androidx.compose.runtime.Composable
 
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.loom.core.designsystem.R
 
 /**
  * Loom icons. Material icons are [ImageVector]s.
@@ -60,16 +63,16 @@ object LoomIcons {
     val ActivityBorder = Icons.Outlined.Bolt
 
     // Like
-    val Like = Icons.Rounded.Favorite
-    val LikeBorder = Icons.Outlined.FavoriteBorder
+    //val Like = Icons.Rounded.Favorite
+    //val LikeBorder = Icons.Outlined.FavoriteBorder
 
     // Repost
     val Repost = Icons.Rounded.Repeat
     val RepostBorder = Icons.Outlined.Repeat
 
     // Comment
-    val Comment = Icons.Rounded.ChatBubble
-    val CommentBorder = Icons.Outlined.ChatBubbleOutline
+    //val Comment = Icons.Rounded.ChatBubble
+    //val CommentBorder = Icons.Outlined.ChatBubbleOutline
 
     // Interaction
     val Interaction = Icons.Rounded.Insights
@@ -80,4 +83,25 @@ object LoomIcons {
 
     val Email = Icons.Rounded.Email
     val EmailBorder = Icons.Outlined.Email
+
+    // Dentro de tu object LoomIcons
+
+    val Settings: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(id = R.drawable.icon_settings)
+
+    val Like: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(id = R.drawable.icons_rounded_heart)
+    val LikeBorder: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(id = R.drawable.icons_outlined_heart)
+
+    val Comment: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(id = R.drawable.icons_rounded_comment)
+    val CommentBorder: ImageVector
+        @Composable
+        get() = ImageVector.vectorResource(id = R.drawable.icons_outlined_comment)
+
 }

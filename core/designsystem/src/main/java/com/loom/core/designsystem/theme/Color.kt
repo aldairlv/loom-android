@@ -1,13 +1,15 @@
 package com.loom.core.designsystem.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
+import com.google.android.material.color.utilities.TonalPalette
 
-internal val Blue10 = Color(0xFF001F28)
-internal val Blue20 = Color(0xFF003544)
-internal val Blue30 = Color(0xFF004D61)
-internal val Blue40 = Color(0xFF006780)
-internal val Blue80 = Color(0xFF5DD5FC)
-internal val Blue90 = Color(0xFFB8EAFF)
+//internal val DarkBlue10 = Color(0xFF001F28)
+//internal val DarkBlue20 = Color(0xFF003544)
+//internal val DarkBlue30 = Color(0xFF004D61)
+//internal val DarkBlue40 = Color(0xFF006780)
+//internal val DarkBlue80 = Color(0xFF5DD5FC)
+//internal val DarkBlue90 = Color(0xFFB8EAFF)
 
 internal val DarkGreen10 = Color(0xFF0D1F12)
 internal val DarkGreen20 = Color(0xFF223526)
@@ -47,3 +49,71 @@ internal val Red30 = Color(0xFF8C1D18)
 internal val Red40 = Color(0xFFB3261E)
 internal val Red80 = Color(0xFFF2B8B5)
 internal val Red90 = Color(0xFFF9DEDC)
+
+
+
+internal val Blue0 = Color(0xFF000000)
+internal val Blue5 = Color(0xFF00131F)
+internal val Blue10 = Color(0xFF001E2E)
+internal val Blue15 = Color(0xFF00293D)
+internal val Blue20 = Color(0xFF00344C)
+internal val Blue25 = Color(0xFF00405C)
+internal val Blue30 = Color(0xFF004C6C)
+internal val Blue35 = Color(0xFF00587D)
+internal val Blue40 = Color(0xFF00658F)
+internal val Blue50 = Color(0xFF2C7EAB)
+internal val Blue60 = Color(0xFF4C98C6)
+internal val Blue70 = Color(0xFF69B3E2)
+internal val Blue80 = Color(0xFF85CFFF)
+internal val Blue90 = Color(0xFFC7E7FF)
+internal val Blue95 = Color(0xFFE5F2FF)
+internal val Blue98 = Color(0xFFF6FAFF)
+internal val Blue99 = Color(0xFFFBFCFF)
+internal val Blue100 = Color(0xFFFFFFFF)
+
+
+internal val DarkBlue0 = Color(0xFF000000)
+internal val DarkBlue5 = Color(0xFF011126)
+internal val DarkBlue10 = Color(0xFF0A1C31)
+internal val DarkBlue15 = Color(0xFF16263C)
+internal val DarkBlue20 = Color(0xFF213147)
+internal val DarkBlue25 = Color(0xFF2C3C53)
+internal val DarkBlue30 = Color(0xFF38485F)
+internal val DarkBlue35 = Color(0xFF43536B)
+internal val DarkBlue40 = Color(0xFF4F5F77)
+internal val DarkBlue50 = Color(0xFF687891)
+internal val DarkBlue60 = Color(0xFF8192AC)
+internal val DarkBlue70 = Color(0xFF9CACC7)
+internal val DarkBlue80 = Color(0xFFB7C7E3)
+internal val DarkBlue90 = Color(0xFFD4E3FF)
+internal val DarkBlue95 = Color(0xFFEBF1FF)
+internal val DarkBlue98 = Color(0xFFF8F9FF)
+internal val DarkBlue99 = Color(0xFFFDFCFF)
+internal val DarkBlue100 = Color(0xFFFFFFFF)
+
+
+
+internal val Grey0 = Color(0xFF000000)
+internal val Grey5 = Color(0xFF06121E)
+internal val Grey10 = Color(0xFF101C29)
+internal val Grey15 = Color(0xFF1B2734)
+internal val Grey20 = Color(0xFF26313F)
+internal val Grey25 = Color(0xFF313C4A)
+internal val Grey30 = Color(0xFF3C4856)
+internal val Grey35 = Color(0xFF485362)
+internal val Grey40 = Color(0xFF535F6F)
+internal val Grey50 = Color(0xFF6C7888)
+internal val Grey60 = Color(0xFF8692A2)
+internal val Grey70 = Color(0xFFA0ACBD)
+internal val Grey80 = Color(0xFFBBC7D9)
+internal val Grey90 = Color(0xFFD7E3F6)
+internal val Grey95 = Color(0xFFE9F1FF)
+internal val Grey98 = Color(0xFFF8F9FF)
+internal val Grey99 = Color(0xFFFDFCFF)
+internal val Grey100 = Color(0xFFFFFFFF)
+
+internal val White =  Color(0xFFFFFFFF)
+internal val Black = Color(0xFF000000)
+internal val Grey = Color(0xFF1A1A1A)
+
+
