@@ -43,11 +43,11 @@ import com.loom.core.navigation.toEntries
 import com.loom.feature.auth.api.navigation.LandingNavKey
 import com.loom.feature.auth.impl.navigation.completeRegisterBirthDateEntry
 import com.loom.feature.auth.impl.navigation.completeRegisterUsernameEntry
-import com.loom.feature.foryou.impl.navigation.forYouEntry
 import com.loom.feature.explore.impl.navigation.exploreEntry
 import com.loom.feature.auth.impl.navigation.landingEntry
 import com.loom.feature.auth.impl.navigation.emailInputEntry
 import com.loom.feature.auth.impl.navigation.passwordInputEntry
+import com.loom.feature.home.impl.navigation.homeEntry
 
 
 @Composable
@@ -113,7 +113,7 @@ internal fun LoomApp(
         completeRegisterUsernameEntry(navigator)
 
         // Main
-        forYouEntry(navigator)
+        homeEntry(navigator)
         exploreEntry(navigator)
     }
 

@@ -66,5 +66,5 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
-    implementation(project(":feature:foryou:api"))
+    implementation(project(":feature:home:api"))
 }
