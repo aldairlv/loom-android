@@ -1,5 +1,6 @@
 package com.loom.feature.home.impl.routes
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.loom.core.data.repository.HomeRepository
@@ -54,6 +55,7 @@ class FollowingViewModel @Inject constructor(
             }
 
             try {
+                Log.d("LOOM_DEBUG", "FollowingViewModel: Fetching posts. isLoadMore=$isLoadMore, cursor=$currentCursor")
                 val cursorToPass = currentCursor?.let {
                     if (it.contains("cursor=")) {
                         val extracted = it.substringAfter("cursor=").substringBefore("&")
@@ -64,6 +66,7 @@ class FollowingViewModel @Inject constructor(
                 }
 
                 val result = homeRepository.getPostsFeedFollowing(cursorToPass)
+                Log.d("LOOM_DEBUG", "FollowingViewModel: Repository returned ${result.posts.size} posts")
 
                 currentCursor = result.nextCursor
 
@@ -74,7 +77,9 @@ class FollowingViewModel @Inject constructor(
                     posts = allPosts.toList(),
                     isFetchingMore = false
                 )
+                Log.d("LOOM_DEBUG", "FollowingViewModel: State updated to Success. Total posts: ${allPosts.size}")
             } catch (e: Exception) {
+                Log.e("LOOM_DEBUG", "FollowingViewModel: Error fetching posts", e)
                 _uiState.value = FollowingUiState.Error
             }
         }

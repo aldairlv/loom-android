@@ -2,7 +2,7 @@ package com.loom.core.ui
 //import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 //import androidx.compose.foundation.lazy.staggeredgrid.items
 
-
+/*
 
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -74,3 +74,4 @@ sealed interface TimelineUiState {
         val timelineObjects: List<TimelineObject>,
     ) : TimelineUiState
 }
+*/

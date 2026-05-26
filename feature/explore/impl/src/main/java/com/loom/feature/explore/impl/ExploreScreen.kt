@@ -19,8 +19,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.TimelineObject
-import com.loom.core.ui.TimelineUiState
-import com.loom.core.ui.timeline
+//import com.loom.core.ui.TimelineUiState
+//import com.loom.core.ui.timeline
 
 
 @Composable
@@ -29,9 +29,9 @@ fun ExploreScreen(
     viewModel: ExploreViewModel = hiltViewModel(),
 
 ) {
-    val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
+    //val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
     ExploreScreen(
-        timelineState = timelineState,
+        //timelineState = timelineState,
         onPostClick = { /* Navegar al detalle */ },
 
         modifier = modifier,
@@ -40,7 +40,7 @@ fun ExploreScreen(
 
 @Composable
 internal fun ExploreScreen(
-    timelineState: TimelineUiState,
+    //timelineState: TimelineUiState,
     onPostClick: (String) -> Unit,
 
     modifier: Modifier = Modifier,
@@ -54,10 +54,10 @@ internal fun ExploreScreen(
                 .testTag("forYou:feed"),
             verticalArrangement = Arrangement.spacedBy(5.dp) // Espacio entre PostCards
         ) {
-            timeline(
+           /* timeline(
                 timelineState = timelineState,
                 onPostClick = onPostClick
-            )
+            )*/
 
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
@@ -66,7 +66,7 @@ internal fun ExploreScreen(
 
     }
 }
-
+/*
 @Preview(showBackground = true, name = "Explore con Datos")
 @Composable
 fun ExploreScreenPopulatedTimelinePreview(
@@ -82,3 +82,4 @@ fun ExploreScreenPopulatedTimelinePreview(
         )
     }
 }
+*/

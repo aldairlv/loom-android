@@ -1,5 +1,5 @@
 package com.loom.core.ui
-
+/*
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.loom.core.model.data.Carousel
 import com.loom.core.model.data.CarouselUserElement
@@ -1128,3 +1128,4 @@ class CarouselUsersPreviewProvider : PreviewParameterProvider<Carousel> {
 class CarouselEventsPreviewProvider : PreviewParameterProvider<Carousel> {
     override val values = sequenceOf(CarouselEventsPreviewParameterData.carousel)
 }
+*/

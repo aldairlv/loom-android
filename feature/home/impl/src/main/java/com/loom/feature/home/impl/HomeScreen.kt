@@ -3,6 +3,7 @@ package com.loom.feature.home.impl
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.loom.core.designsystem.theme.LoomTheme
+import com.loom.core.ui.post.DraggableCreatePostButton
 import com.loom.core.ui.tabs.CollapsibleTabsScaffold
 import com.loom.core.ui.tabs.TabItem
 import com.loom.core.ui.tabs.TabsBar
@@ -26,6 +28,7 @@ import com.loom.core.ui.tabs.TabsSettingsSheet
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onCreateClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val tabs by viewModel.tabs.collectAsStateWithLifecycle()
@@ -35,6 +38,9 @@ fun HomeScreen(
             tabs = tabs,
             onToggleTab = viewModel::toggleTab
 
+        )
+        DraggableCreatePostButton(
+            onClick = onCreateClick
         )
     }
 }
@@ -59,6 +65,7 @@ internal fun HomeScreen(
                 onSettingsClick = { showSettings = true },
             )
         },
+        modifier = Modifier.imePadding(),
     ) { _, tab ->
         // tab aquí es TabItem, necesitas mapear a HomeTab
         val eventTab = when (tab.key) {

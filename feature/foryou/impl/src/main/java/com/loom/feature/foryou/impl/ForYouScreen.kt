@@ -22,26 +22,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.TimelineObject
-import com.loom.core.ui.TimelineUiState
-import com.loom.core.ui.timeline
+//import com.loom.core.ui.TimelineUiState
+//import com.loom.core.ui.timeline
 
 @Composable
 fun ForYouScreen(
     modifier: Modifier = Modifier,
     viewModel: ForYouViewModel = hiltViewModel(),
 ) {
-    val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
+    /*val timelineState by viewModel.timelineState.collectAsStateWithLifecycle()
     ForYouScreen(
         timelineState = timelineState,
         onPostClick = { /* Navegar al detalle */ },
         onLoadMore = { viewModel.loadMore() }, // 👈 aquí sí
         modifier = modifier,
-    )
+    )*/
 }
 
 @Composable
 internal fun ForYouScreen(
-    timelineState: TimelineUiState,
+    //timelineState: TimelineUiState,
     onPostClick: (String) -> Unit,
     onLoadMore: () -> Unit, // 👈 nuevo
     modifier: Modifier = Modifier,
@@ -58,10 +58,10 @@ internal fun ForYouScreen(
                 .testTag("forYou:feed"),
             verticalArrangement = Arrangement.spacedBy(5.dp) // Espacio entre PostCards
         ) {
-            timeline(
+           /* timeline(
                 timelineState = timelineState,
                 onPostClick = onPostClick
-            )
+            )*/
 
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
@@ -91,7 +91,7 @@ internal fun ForYouScreen(
 
     }
 }
-
+/*
 @Preview(showBackground = true, name = "Timeline con Datos")
 @Composable
 fun ForYouScreenPopulatedTimelinePreview(
@@ -107,4 +107,4 @@ fun ForYouScreenPopulatedTimelinePreview(
             onLoadMore = {}
         )
     }
-}
+}*/
