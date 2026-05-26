@@ -4,7 +4,7 @@ import com.loom.core.common.network.Dispatcher
 import com.loom.core.common.network.LoomDispatchers.IO
 import com.loom.core.data.Syncable
 import com.loom.core.data.Synchronizer
-import com.loom.core.data.model.asPostEntity
+//import com.loom.core.data.model.asPostEntity
 import com.loom.core.data.suspendRunCatching
 import com.loom.core.database.dao.PostDao
 import com.loom.core.database.model.asExternalModel
@@ -20,7 +20,7 @@ internal class OfflineFirstPostRepository @Inject constructor(
     private val network: LoomNetworkDataSource,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
 ) : PostRepository {
-
+/*
     override fun getPosts() = postDao.getPostEntities()
         .map { it.map { entity -> entity.asExternalModel() } }
 
@@ -31,5 +31,5 @@ internal class OfflineFirstPostRepository @Inject constructor(
                 postDao.upsertPosts(networkPosts.map { it.asPostEntity() })
             }
         }.isSuccess
-}
-*/
+    */
+}*/

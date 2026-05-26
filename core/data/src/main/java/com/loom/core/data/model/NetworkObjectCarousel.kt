@@ -1,5 +1,5 @@
 package com.loom.core.data.model
-
+/*
 import com.loom.core.database.model.CarouselEntity
 import com.loom.core.database.model.CarouselItemEntity
 import com.loom.core.network.model.NetworkObjectCarousel
@@ -45,3 +45,4 @@ fun NetworkObjectCarousel.asInternalCarouselItemEntities(): List<CarouselItemEnt
     }
 }
 
+*/

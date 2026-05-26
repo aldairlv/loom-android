@@ -1,5 +1,5 @@
 package com.loom.core.data.model
-
+/*
 import com.loom.core.database.model.PopulatedTrend
 import com.loom.core.database.model.TagEntity
 import com.loom.core.database.model.TrendEntity
@@ -60,3 +60,4 @@ fun NetworkObjectTrendElementTag.asInternalTrendTagEntity(): TagEntity{
     )
 }
 
+*/

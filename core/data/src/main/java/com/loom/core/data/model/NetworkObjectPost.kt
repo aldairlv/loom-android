@@ -1,5 +1,5 @@
 package com.loom.core.data.model
-
+/*
 import com.loom.core.database.model.PostEntity
 import com.loom.core.network.model.NetworkObjectPost
 import com.loom.core.model.data.PostContent
@@ -64,3 +64,5 @@ fun NetworkPost.asInternalUserPostEntity(): PostEntity {
         content = content.map { it.asPostContent() }
     )
 }
+
+ */
