@@ -32,8 +32,8 @@ import androidx.tracing.trace
 import com.loom.app.util.isSystemInDarkTheme
 import com.loom.app.MainActivityUiState.Loading
 import com.loom.app.ui.LoomApp
-import com.loom.core.data.repository.ExploreRepository
-import com.loom.core.data.repository.TimelineRepository
+//import com.loom.core.data.repository.ExploreRepository
+//import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.SessionState
 import com.loom.feature.auth.api.navigation.LandingNavKey
@@ -43,10 +43,10 @@ import com.loom.feature.home.api.navigation.HomeNavKey
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
-    @Inject
+    /*@Inject
     lateinit var exploreRepository: ExploreRepository
     @Inject
-    lateinit var timelineRepository: TimelineRepository
+    lateinit var timelineRepository: TimelineRepository*/
 
     private val viewModel: MainActivityViewModel by viewModels()
 
@@ -128,8 +128,8 @@ class MainActivity : ComponentActivity() {
                 val appState = rememberLoomAppState(
                     startKey = startKey,
                     networkMonitor = networkMonitor,
-                    timelineRepository = timelineRepository,
-                    exploreRepository = exploreRepository,
+                    //timelineRepository = timelineRepository,
+                    //exploreRepository = exploreRepository,
                 )
 
                 CompositionLocalProvider(

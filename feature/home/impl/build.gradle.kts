@@ -16,7 +16,6 @@ android {
     buildFeatures {
         compose = true
     }
-
     defaultConfig {
         minSdk = 24
 
@@ -27,7 +26,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
 }
 
 dependencies {
@@ -52,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(project(":feature:home:api"))
+    implementation(project(":feature:post-editor:api"))
     implementation(project(":core:navigation"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:model"))

@@ -47,6 +47,8 @@ import com.loom.feature.explore.impl.navigation.exploreEntry
 import com.loom.feature.auth.impl.navigation.landingEntry
 import com.loom.feature.auth.impl.navigation.emailInputEntry
 import com.loom.feature.auth.impl.navigation.passwordInputEntry
+import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
+import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
 
 
@@ -115,94 +117,104 @@ internal fun LoomApp(
         // Main
         homeEntry(navigator)
         exploreEntry(navigator)
+        createPostEntry(navigator)
     }
 
     val isLoggedIn = sessionState is SessionState.LoggedIn
+    val currentKey = appState.navigationState.currentKey
 
     if (isLoggedIn) {
-        // El Scaffold de navegación que adapta entre Barra inferior y Rail lateral
-        LoomNavigationSuiteScaffold(
-            navigationSuiteItems = {
-                TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
-                    val selected = navKey == appState.navigationState.currentTopLevelKey
-                    item(
-                        selected = selected,
-                        onClick = { navigator.navigate(navKey) },
-                        icon = {
-                            Icon(
-                                imageVector = navItem.unselectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = navItem.selectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(navItem.iconTextId)) },
-                    )
-                }
-            },
-            windowAdaptiveInfo = windowAdaptiveInfo,
-        ) {
-            Scaffold(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onBackground,
-                snackbarHost = { SnackbarHost(snackbarHostState) },
-            ) { padding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .consumeWindowInsets(padding)
-                        .windowInsetsPadding(
-                            WindowInsets.safeDrawing.only(
-                                WindowInsetsSides.Horizontal,
-                            ),
-                        ),
-                ) {
-
-                    // Only show the top app bar on top level destinations.
-
-                    var shouldShowTopAppBar = false
-
-                    /*
-                    if (appState.navigationState.currentKey in appState.navigationState.topLevelKeys) {
-                        shouldShowTopAppBar = true
-                        val currentDest =
-                            TOP_LEVEL_NAV_ITEMS[appState.navigationState.currentTopLevelKey]
-                                ?: error("Top level nav item not found for ${appState.navigationState.currentTopLevelKey}")
-
-                        LoomTopAppBar(
-                            titleRes = currentDest.titleTextId
-                        )
-
-                    }
-                    */
-
-                    Box(
-                        modifier = Modifier.consumeWindowInsets(
-                            if (shouldShowTopAppBar) {
-                                WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
-                            } else {
-                                WindowInsets(0, 0, 0, 0)
+        if (currentKey == CreatePostNavKey){
+            NavDisplay(
+                entries = appState.navigationState.toEntries(entryProvider),
+                onBack = { navigator.goBack() },
+            )
+        } else {
+            // El Scaffold de navegación que adapta entre Barra inferior y Rail lateral
+            LoomNavigationSuiteScaffold(
+                navigationSuiteItems = {
+                    TOP_LEVEL_NAV_ITEMS.forEach { (navKey, navItem) ->
+                        val selected = navKey == appState.navigationState.currentTopLevelKey
+                        item(
+                            selected = selected,
+                            onClick = { navigator.navigate(navKey) },
+                            icon = {
+                                Icon(
+                                    imageVector = navItem.unselectedIcon,
+                                    contentDescription = null
+                                )
                             },
-                        ),
+                            selectedIcon = {
+                                Icon(
+                                    imageVector = navItem.selectedIcon,
+                                    contentDescription = null
+                                )
+                            },
+                            label = { Text(stringResource(navItem.iconTextId)) },
+                        )
+                    }
+                },
+                windowAdaptiveInfo = windowAdaptiveInfo,
+            ) {
+                Scaffold(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
+                ) { padding ->
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .consumeWindowInsets(padding)
+                            .windowInsetsPadding(
+                                WindowInsets.safeDrawing.only(
+                                    WindowInsetsSides.Horizontal,
+                                ),
+                            ),
                     ) {
 
-                        val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
+                        // Only show the top app bar on top level destinations.
+
+                        var shouldShowTopAppBar = false
+
+                        /*
+                        if (appState.navigationState.currentKey in appState.navigationState.topLevelKeys) {
+                            shouldShowTopAppBar = true
+                            val currentDest =
+                                TOP_LEVEL_NAV_ITEMS[appState.navigationState.currentTopLevelKey]
+                                    ?: error("Top level nav item not found for ${appState.navigationState.currentTopLevelKey}")
+    
+                            LoomTopAppBar(
+                                titleRes = currentDest.titleTextId
+                            )
+    
+                        }
+                        */
+
+                        Box(
+                            modifier = Modifier.consumeWindowInsets(
+                                if (shouldShowTopAppBar) {
+                                    WindowInsets.safeDrawing.only(WindowInsetsSides.Top)
+                                } else {
+                                    WindowInsets(0, 0, 0, 0)
+                                },
+                            ),
+                        ) {
+
+                            val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
 
-                        NavDisplay(
-                            entries = appState.navigationState.toEntries(entryProvider),
-                            sceneStrategy = listDetailStrategy,
-                            onBack = { navigator.goBack() },
-                        )
+                            NavDisplay(
+                                entries = appState.navigationState.toEntries(entryProvider),
+                                sceneStrategy = listDetailStrategy,
+                                onBack = { navigator.goBack() },
+                            )
+                        }
                     }
                 }
             }
         }
+        
     } else {
         // sin bottom bar
        NavDisplay(

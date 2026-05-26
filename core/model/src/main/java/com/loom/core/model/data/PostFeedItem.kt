@@ -1,46 +1,66 @@
 package com.loom.core.model.data
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class PostFeedItem(
     val id: String,
     val author: PostAuthor,
-    val parent: PostParent?,
-    val root: PostParent?,
+    val parent: PostParent? = null,
+    val root: PostParent? = null,
+    val trail: List<PostFeedItem> = emptyList(),
     val status: String,
     val tags: List<String>,
     val contents: List<PostFeedContent>,
+    val layout: List<LayoutRoot> = emptyList(),
     val createdAt: Instant,
     val updatedAt: Instant,
-    val publishedAt: Instant?
+    val publishedAt: Instant? = null
 )
 
+@Serializable
 data class PostAuthor(
     val id: String,
     val displayName: String,
     val avatarUrl: String
 )
 
+@Serializable
 data class PostParent(
     val id: String,
-    val author: PostAuthor
+    val author: PostAuthor,
+    val contents: List<PostFeedContent>? = null,
+    val layout: List<LayoutRoot>? = null
 )
 
+@Serializable
 data class PostFeedContent(
     val id: Int,
-    val type: String, // "text" or "image"
+    val type: String, // "text" or "image" or "video"
     val order: Int,
-    val text: String?,
-    val media: PostMedia?
+    val text: String? = null,
+    val media: PostMedia? = null
 )
 
+@Serializable
 data class PostMedia(
     val id: String,
     val url: String,
     val type: String,
     val width: Int,
     val height: Int
+)
+
+@Serializable
+data class LayoutRoot(
+    val type: String,
+    val display: List<LayoutRow>
+)
+
+@Serializable
+data class LayoutRow(
+    val blocks: List<Int>
 )
 
 data class PostsFeedResult(

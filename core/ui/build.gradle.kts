@@ -80,4 +80,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.4.1") // Verifica la versión más reciente
     implementation("androidx.media3:media3-ui:1.4.1")
     implementation(libs.androidx.compose.foundation.layout)
+    implementation("io.coil-kt:coil-gif:2.6.0")
 }
