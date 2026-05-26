@@ -1,6 +1,8 @@
 package com.loom.core.database.di
 
 import com.loom.core.database.LoomDatabase
+import com.loom.core.database.dao.UserAccountProfileDao
+/*
 import com.loom.core.database.dao.CarouselDao
 import com.loom.core.database.dao.EventDao
 import com.loom.core.database.dao.PostDao
@@ -10,6 +12,7 @@ import com.loom.core.database.dao.TimelineMetadataDao
 import com.loom.core.database.dao.TitleDao
 import com.loom.core.database.dao.TrendDao
 import com.loom.core.database.dao.UserDao
+*/
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +22,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 internal object DaosModule {
 
+    /*
     @Provides
     fun providesTrendDao(
         database: LoomDatabase,
@@ -63,5 +67,11 @@ internal object DaosModule {
     fun providesEventDao(
         database: LoomDatabase,
     ): EventDao = database.eventDao()
+    */
+
+    @Provides
+    fun providesUserAccountProfileDao(
+        database: LoomDatabase,
+    ): UserAccountProfileDao = database.userAccountProfileDao()
 
 }

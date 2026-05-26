@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -16,3 +17,4 @@ data class TimelineMetadataEntity(
     @ColumnInfo(name = "last_updated")
     val lastUpdated: Long
 )
+*/

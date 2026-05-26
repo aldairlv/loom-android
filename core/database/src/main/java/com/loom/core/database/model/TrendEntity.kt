@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -40,3 +41,4 @@ data class TrendItemEntity(
 
     val position: Int  // Orden que manda el backend durante la sesión
 )
+*/

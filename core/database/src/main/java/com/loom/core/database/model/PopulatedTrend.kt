@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.loom.core.model.data.TrendCategory
@@ -78,4 +79,5 @@ fun PopulatedTrend.asExternalTrendModel(): TrendCategory {
         items = items.sortedBy { it.itemEntity.position }.map { it.asExternalTrendItemModel() }
     )
 }
+*/
 

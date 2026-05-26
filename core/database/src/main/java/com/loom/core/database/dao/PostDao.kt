@@ -1,5 +1,6 @@
 package com.loom.core.database.dao
 
+/*
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
@@ -20,3 +21,4 @@ interface PostDao {
     @Query("DELETE FROM posts WHERE id = :id")
     suspend fun deletePost(id: String)
 }
+*/

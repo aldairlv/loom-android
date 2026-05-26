@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fd7a6fce583726e0086b0c0e0cde76a8",
+    "identityHash": "298965a68b9adfb48f8f98e01dca486b",
     "entities": [
       {
-        "tableName": "trends",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `object_type` TEXT NOT NULL, `category` TEXT NOT NULL, `count` TEXT NOT NULL, `iconUrl` TEXT NOT NULL, `subType` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "tableName": "user_account_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `user` TEXT NOT NULL, `displayName` TEXT NOT NULL, `bio` TEXT, `city` TEXT, `timezone` TEXT, `canBeFollowed` INTEGER, `avatarUrl` TEXT, `bannerUrl` TEXT, `latitude` REAL, `longitude` REAL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -15,420 +15,56 @@
             "notNull": true
           },
           {
-            "fieldPath": "objectType",
-            "columnName": "object_type",
+            "fieldPath": "user",
+            "columnName": "user",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "category",
-            "columnName": "category",
+            "fieldPath": "displayName",
+            "columnName": "displayName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "count",
-            "columnName": "count",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "iconUrl",
-            "columnName": "iconUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "subType",
-            "columnName": "subType",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "trend_items",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `trend_id` TEXT NOT NULL, `post_id` TEXT NOT NULL, `tag_id` TEXT, `object_type` TEXT NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`id`, `trend_id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "trendId",
-            "columnName": "trend_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "postId",
-            "columnName": "post_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "tagId",
-            "columnName": "tag_id",
+            "fieldPath": "bio",
+            "columnName": "bio",
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "objectType",
-            "columnName": "object_type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "position",
-            "columnName": "position",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id",
-            "trend_id"
-          ]
-        }
-      },
-      {
-        "tableName": "tags",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `isFollowed` INTEGER NOT NULL, PRIMARY KEY(`name`))",
-        "fields": [
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isFollowed",
-            "columnName": "isFollowed",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "name"
-          ]
-        }
-      },
-      {
-        "tableName": "posts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `blog_id` INTEGER NOT NULL, `username` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `tags` TEXT NOT NULL, `likes_count` INTEGER NOT NULL, `reposts_count` INTEGER NOT NULL, `comments_count` INTEGER NOT NULL, `notes_count` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `content` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "blogId",
-            "columnName": "blog_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "username",
-            "columnName": "username",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "timestamp",
-            "columnName": "timestamp",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "tags",
-            "columnName": "tags",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "likesCount",
-            "columnName": "likes_count",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "repostsCount",
-            "columnName": "reposts_count",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "commentsCount",
-            "columnName": "comments_count",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "notesCount",
-            "columnName": "notes_count",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "created_at",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "updatedAt",
-            "columnName": "updated_at",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "content",
-            "columnName": "content",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "timeline_objects",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeline_category` TEXT NOT NULL, `object_type` TEXT NOT NULL, `object_id` TEXT NOT NULL, `stream_global_position` INTEGER NOT NULL, PRIMARY KEY(`timeline_category`, `object_id`, `object_type`))",
-        "fields": [
-          {
-            "fieldPath": "timelineCategory",
-            "columnName": "timeline_category",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "objectType",
-            "columnName": "object_type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "objectId",
-            "columnName": "object_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "streamGlobalPosition",
-            "columnName": "stream_global_position",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "timeline_category",
-            "object_id",
-            "object_type"
-          ]
-        }
-      },
-      {
-        "tableName": "timeline_metadata",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeline_type` TEXT NOT NULL, `cursor` TEXT, `last_updated` INTEGER NOT NULL, PRIMARY KEY(`timeline_type`))",
-        "fields": [
-          {
-            "fieldPath": "timelineType",
-            "columnName": "timeline_type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "cursor",
-            "columnName": "cursor",
+            "fieldPath": "city",
+            "columnName": "city",
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "lastUpdated",
-            "columnName": "last_updated",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "timeline_type"
-          ]
-        }
-      },
-      {
-        "tableName": "carousels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `object_type` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "objectType",
-            "columnName": "object_type",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "carousel_items",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`carousel_id` TEXT NOT NULL, `object_id` TEXT NOT NULL, `object_type` TEXT NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`carousel_id`, `object_id`))",
-        "fields": [
-          {
-            "fieldPath": "carouselId",
-            "columnName": "carousel_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "objectId",
-            "columnName": "object_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "objectType",
-            "columnName": "object_type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "position",
-            "columnName": "position",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "carousel_id",
-            "object_id"
-          ]
-        }
-      },
-      {
-        "tableName": "titles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `text` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "text",
-            "columnName": "text",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        }
-      },
-      {
-        "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `avatar` TEXT NOT NULL, `userViewUrl` TEXT NOT NULL, `canBeFollowed` INTEGER NOT NULL, `canShowBages` INTEGER NOT NULL, `description` TEXT NOT NULL, `followed` INTEGER NOT NULL, `isAdult` INTEGER NOT NULL, `title` TEXT NOT NULL, `uuid` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "username",
-            "columnName": "username",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "avatar",
-            "columnName": "avatar",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userViewUrl",
-            "columnName": "userViewUrl",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "timezone",
+            "columnName": "timezone",
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "canBeFollowed",
             "columnName": "canBeFollowed",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "INTEGER"
           },
           {
-            "fieldPath": "canShowBages",
-            "columnName": "canShowBages",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "avatarUrl",
+            "columnName": "avatarUrl",
+            "affinity": "TEXT"
           },
           {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "bannerUrl",
+            "columnName": "bannerUrl",
+            "affinity": "TEXT"
           },
           {
-            "fieldPath": "followed",
-            "columnName": "followed",
-            "affinity": "INTEGER",
-            "notNull": true
+            "fieldPath": "locationCoords.latitude",
+            "columnName": "latitude",
+            "affinity": "REAL"
           },
           {
-            "fieldPath": "isAdult",
-            "columnName": "isAdult",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "locationCoords.longitude",
+            "columnName": "longitude",
+            "affinity": "REAL"
           }
         ],
         "primaryKey": {
@@ -437,174 +73,11 @@
             "id"
           ]
         }
-      },
-      {
-        "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `uuid` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `date` TEXT NOT NULL, `creatorId` TEXT NOT NULL, `eventViewUrl` TEXT NOT NULL, `poster` TEXT NOT NULL, `joined` INTEGER NOT NULL, `canBeJoined` INTEGER NOT NULL, `isAdultOnly` INTEGER NOT NULL, `numberParticipants` INTEGER NOT NULL, `tags` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`creatorId`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "uuid",
-            "columnName": "uuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "date",
-            "columnName": "date",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "creatorId",
-            "columnName": "creatorId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "eventViewUrl",
-            "columnName": "eventViewUrl",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "poster",
-            "columnName": "poster",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "joined",
-            "columnName": "joined",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "canBeJoined",
-            "columnName": "canBeJoined",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isAdultOnly",
-            "columnName": "isAdultOnly",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "numberParticipants",
-            "columnName": "numberParticipants",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "tags",
-            "columnName": "tags",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_events_creatorId",
-            "unique": false,
-            "columnNames": [
-              "creatorId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_creatorId` ON `${TABLE_NAME}` (`creatorId`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "users",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "creatorId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
-      },
-      {
-        "tableName": "event_participants",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER NOT NULL, `user_id` TEXT NOT NULL, PRIMARY KEY(`event_id`, `user_id`), FOREIGN KEY(`event_id`) REFERENCES `events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`user_id`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "event_id",
-            "columnName": "event_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "user_id",
-            "columnName": "user_id",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "event_id",
-            "user_id"
-          ]
-        },
-        "foreignKeys": [
-          {
-            "table": "events",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "event_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "users",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "user_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fd7a6fce583726e0086b0c0e0cde76a8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '298965a68b9adfb48f8f98e01dca486b')"
     ]
   }
 }

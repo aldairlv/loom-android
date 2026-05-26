@@ -1,5 +1,6 @@
 package com.loom.core.database.dao
 
+/*
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -25,3 +26,4 @@ interface TrendDao {
     @Upsert
     suspend fun upsertTrends(trends: List<TrendEntity>)
 }
+*/

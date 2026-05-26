@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 
@@ -20,4 +21,5 @@ data class TimelineEntity(
     @ColumnInfo(name = "stream_global_position")
     val streamGlobalPosition: Int // Orden que manda el backend durante la sesión
 )
+*/
 

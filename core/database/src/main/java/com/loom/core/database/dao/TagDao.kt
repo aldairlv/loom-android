@@ -1,5 +1,5 @@
 package com.loom.core.database.dao
-
+/*
 import androidx.room.Dao
 import androidx.room.Upsert
 import com.loom.core.database.model.TagEntity
@@ -15,3 +15,4 @@ interface TagDao {
     suspend fun upsertTag(tag: TagEntity)
 
 }
+*/
