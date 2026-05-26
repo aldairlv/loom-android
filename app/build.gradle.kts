@@ -90,4 +90,6 @@ dependencies {
     implementation(project(":feature:home:impl"))
     implementation(project(":feature:post-editor:api"))
     implementation(project(":feature:post-editor:impl"))
+    implementation(project(":feature:profile:api"))
+    implementation(project(":feature:profile:impl"))
 }

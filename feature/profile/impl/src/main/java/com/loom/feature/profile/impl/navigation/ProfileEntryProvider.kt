@@ -1,0 +1,14 @@
+package com.loom.feature.profile.impl.navigation
+
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
+import com.loom.core.navigation.Navigator
+import com.loom.feature.profile.api.navigation.ProfileNavKey
+import com.loom.feature.profile.impl.ProfileScreen
+fun EntryProviderScope<NavKey>.profileEntry(navigator: Navigator) {
+    entry<ProfileNavKey> {
+        ProfileScreen(
+
+        )
+    }
+}
