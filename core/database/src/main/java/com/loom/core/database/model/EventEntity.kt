@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -55,3 +56,4 @@ data class EventParticipantEntity(
     val event_id: Long,
     val user_id: String
 )
+*/

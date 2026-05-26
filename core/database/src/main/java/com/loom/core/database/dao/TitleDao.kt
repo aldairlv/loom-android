@@ -1,4 +1,5 @@
 package com.loom.core.database.dao
+/*
 import androidx.room.Dao
 import androidx.room.Upsert
 import com.loom.core.database.model.TitleEntity
@@ -13,3 +14,4 @@ interface TitleDao {
         upsertTitle(TitleEntity(id, text))
     }
 }
+*/

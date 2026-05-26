@@ -1,5 +1,5 @@
 package com.loom.core.ui
-
+/*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -165,7 +165,7 @@ fun EventCardContent(element: CarouselEventElement) {
         }
     }
 }
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun CarouselCardPreview(
@@ -178,7 +178,7 @@ fun CarouselCardPreview(
         )
     }
 }
-
+*/
 @Composable
 fun UserCardContent(element: CarouselUserElement) {
     val user = element.resource.firstOrNull()
@@ -285,3 +285,5 @@ fun LoomActionButton(text: String, modifier: Modifier = Modifier) {
         Text(text, color = Color.White)
     }
 }
+
+*/

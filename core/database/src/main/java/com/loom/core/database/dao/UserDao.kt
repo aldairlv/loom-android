@@ -1,5 +1,6 @@
 package com.loom.core.database.dao
 
+/*
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -17,3 +18,5 @@ interface UserDao {
     @Upsert
     suspend fun upsertUsers(users: List<UserEntity>)
 }
+*/
+

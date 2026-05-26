@@ -1,6 +1,8 @@
 package com.loom.core.network
 
 import com.loom.core.network.model.NetworkAuthResponse
+import com.loom.core.network.model.NetworkMediaResponse
+import okhttp3.MultipartBody
 import com.loom.core.network.model.NetworkLoginRequest
 import com.loom.core.network.model.NetworkLogoutResponse
 import com.loom.core.network.model.NetworkObjectsResponse
@@ -10,6 +12,11 @@ import com.loom.core.network.model.NetworkRegisterRequest
 import com.loom.core.network.model.NetworkTimelineResponse
 import com.loom.core.network.model.NetworkTokenResponse
 import com.loom.core.network.model.NetworkValidateEmailResponse
+import com.loom.core.network.model.NetworkUserProfile
+
+import com.loom.core.network.model.NetworkPostFeedItem
+import com.loom.core.network.model.NetworkPostCreateRequest
+import com.loom.core.network.model.NetworkPostResponse
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -21,6 +28,8 @@ interface LoomNetworkDataSource {
     suspend fun refreshToken(refreshToken: String): NetworkTokenResponse
 
     suspend fun getPosts(): List<NetworkPost>
+
+    suspend fun createPost(request: NetworkPostCreateRequest): NetworkPostFeedItem
 
     suspend fun getExplore(
         cursor: String? = null
@@ -47,4 +56,14 @@ interface LoomNetworkDataSource {
     suspend fun getPostsFeedTags(
         cursor: String? = null
     ): NetworkPostsFeedResponse
+
+    suspend fun getUserProfile(
+        id: String
+    ): NetworkUserProfile
+
+    suspend fun getMyProfile(): NetworkUserProfile
+
+    suspend fun uploadMedia(
+        file: MultipartBody.Part
+    ): NetworkMediaResponse
 }

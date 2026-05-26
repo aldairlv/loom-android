@@ -19,3 +19,4 @@ data class EventProfile(
     val participants: List<UserProfile>,
     val date: String
 )
+

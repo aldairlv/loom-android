@@ -22,7 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import androidx.tracing.traceAsync
-import com.loom.core.data.repository.ExploreRepository
+//import com.loom.core.data.repository.ExploreRepository
 import com.loom.core.data.repository.UserDataRepository
 import com.loom.sync.initializers.SyncConstraints
 import kotlinx.coroutines.flow.first
@@ -39,8 +39,8 @@ class SyncWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     //private val postRepository: PostRepository,
-    private val timelineRepository: TimelineRepository,
-    private val exploreRepository: ExploreRepository,
+    //private val timelineRepository: TimelineRepository,
+    //private val exploreRepository: ExploreRepository,
     private val userDataRepository: UserDataRepository,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
 
@@ -65,21 +65,22 @@ class SyncWorker @AssistedInject constructor(
             syncSubscriber.subscribe()
 
             // First sync the repositories in parallel
-            val syncedSuccessfully = awaitAll(
+            /*val syncedSuccessfully = awaitAll(
                 async {
                     //postRepository.sync()
-                    timelineRepository.sync()
+                    //timelineRepository.sync()
                     //exploreRepository.sync()
                       },
-            ).all { it }
+            ).all { it }*/
 
 
 
-            if (syncedSuccessfully) {
+           /* if (syncedSuccessfully) {
                 Result.success()
             } else {
                 Result.retry()
-            }
+            }*/
+            Result.success()
         }
     }
 

@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.loom.core.model.data.UserProfile
@@ -33,3 +34,4 @@ fun UserEntity.asExternalModel() = UserProfile(
     uuid = uuid,
     posts = emptyList() // Al ser la entidad básica, no tiene posts cargados
 )
+*/

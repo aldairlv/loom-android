@@ -1,5 +1,5 @@
 package com.loom.core.data.model
-
+/*
 import com.loom.core.database.model.UserEntity
 import com.loom.core.network.model.NetworkUser
 
@@ -17,3 +17,4 @@ fun NetworkUser.asInternalUserEntity() = UserEntity(
     uuid = uuid
 )
 
+*/

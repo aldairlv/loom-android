@@ -1,6 +1,6 @@
 package com.loom.core.database.model
 
-
+/*
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.loom.core.model.data.Carousel
@@ -68,3 +68,4 @@ fun PopulatedCarousel.asExternalCarouselModel() = Carousel(
         .sortedBy { it.itemEntity.position }
         .map { it.asExternalCarouselItemModel() }
 )
+*/

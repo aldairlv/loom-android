@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.loom.core.model.data.TimelineObject
@@ -53,4 +54,5 @@ fun PopulatedTimelineObject.asExternalModel(): TimelineObject {
         else -> throw IllegalArgumentException("Unknown type: ${entity.objectType}")
     }
 }
+*/
 

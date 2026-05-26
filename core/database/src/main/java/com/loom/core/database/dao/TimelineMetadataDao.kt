@@ -1,5 +1,5 @@
 package com.loom.core.database.dao
-
+/*
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
@@ -14,3 +14,4 @@ interface TimelineMetadataDao {
     suspend fun upsertMetadata(metadata: TimelineMetadataEntity)
 
 }
+*/

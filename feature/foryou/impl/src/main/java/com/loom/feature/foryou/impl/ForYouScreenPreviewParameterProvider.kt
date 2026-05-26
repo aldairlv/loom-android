@@ -1,5 +1,5 @@
 package com.loom.feature.foryou.impl
-
+/*
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.loom.core.model.data.Carousel
 import com.loom.core.model.data.CarouselUserElement
@@ -462,3 +462,4 @@ object TimelinePreviewParameterData {
         )
     )
 }
+*/

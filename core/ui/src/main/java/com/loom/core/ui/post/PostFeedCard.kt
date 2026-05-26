@@ -1,11 +1,14 @@
 package com.loom.core.ui.post
 
 import android.content.res.Configuration
+import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,6 +19,7 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +29,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,11 +38,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.PostAuthor
@@ -44,6 +60,8 @@ import com.loom.core.model.data.PostFeedContent
 import com.loom.core.model.data.PostFeedItem
 import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostParent
+import com.loom.core.model.data.LayoutRoot
+import com.loom.core.model.data.LayoutRow
 import kotlinx.datetime.Clock
 
 
@@ -124,30 +142,27 @@ fun PostFeedCard(
             }
 
             // Contents
-            postFeed.contents.sortedBy { it.order }.forEach { content ->
-                when (content.type) {
-                    "text" -> {
-                        content.text?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(vertical = 4.dp)
-                            )
+            val layoutRoot = postFeed.layout.firstOrNull { it.type == "rows" }
+            if (layoutRoot != null) {
+                layoutRoot.display.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        row.blocks.forEach { blockIndex ->
+                            val content = postFeed.contents.getOrNull(blockIndex)
+                            if (content != null) {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    RenderContent(content)
+                                }
+                            }
                         }
                     }
-                    "image" -> {
-                        content.media?.url?.let {
-                            AsyncImage(
-                                model = it,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                    //.clip(MaterialTheme.shapes.medium),
-                                contentScale = ContentScale.FillWidth
-                            )
-                        }
-                    }
+                }
+            } else {
+                // Fallback: simple vertical list
+                postFeed.contents.sortedBy { it.order }.forEach { content ->
+                    RenderContent(content)
                 }
             }
 
@@ -192,6 +207,115 @@ fun PostFeedCard(
                 }
                 IconButton(onClick = onShare, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.Share, contentDescription = "Share")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RenderContent(content: PostFeedContent) {
+    when (content.type) {
+        "text" -> {
+            content.text?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+        "image" -> {
+            content.media?.let { media ->
+                val aspectRatio = if (media.height > 0) media.width.toFloat() / media.height.toFloat() else 1f
+                AsyncImage(
+                    model = media.url,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(aspectRatio)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+        "video" -> {
+            content.media?.let { media ->
+                val aspectRatio = if (media.height > 0) media.width.toFloat() / media.height.toFloat() else 1f
+                val context = LocalContext.current
+
+                val exoPlayer = remember {
+                    ExoPlayer.Builder(context).build().apply {
+                        val mediaItem = MediaItem.fromUri(Uri.parse(media.url))
+                        setMediaItem(mediaItem)
+                        prepare()
+                        playWhenReady = false
+                        repeatMode = Player.REPEAT_MODE_ONE
+                    }
+                }
+
+                var isPlaying by remember { mutableStateOf(false) }
+
+                LaunchedEffect(exoPlayer) {
+                    val listener = object : Player.Listener {
+                        override fun onIsPlayingChanged(playing: Boolean) {
+                            isPlaying = playing
+                        }
+                    }
+                    exoPlayer.addListener(listener)
+                }
+
+                DisposableEffect(Unit) {
+                    onDispose {
+                        exoPlayer.release()
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(aspectRatio)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(Color.Black),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AndroidView(
+                        factory = { ctx ->
+                            PlayerView(ctx).apply {
+                                player = exoPlayer
+                                useController = false
+                                setBackgroundColor(android.graphics.Color.BLACK)
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    if (!isPlaying) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                .clickable {
+                                    exoPlayer.playWhenReady = true
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.PlayArrow,
+                                contentDescription = "Play",
+                                tint = Color.White,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    exoPlayer.playWhenReady = false
+                                }
+                        )
+                    }
                 }
             }
         }
@@ -246,6 +370,15 @@ fun PostFeedCardPreview() {
                     type = "image",
                     width = 1080,
                     height = 720
+                )
+            )
+        ),
+        layout = listOf(
+            LayoutRoot(
+                type = "rows",
+                display = listOf(
+                    LayoutRow(blocks = listOf(0)),
+                    LayoutRow(blocks = listOf(1))
                 )
             )
         ),

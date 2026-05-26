@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
@@ -46,3 +47,4 @@ fun PopulatedEventProfile.asExternalEventProfileModel() = EventProfile(
     tags = event.tags,
     uuid = event.uuid
 )
+*/

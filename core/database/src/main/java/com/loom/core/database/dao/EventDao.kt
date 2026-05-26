@@ -1,5 +1,5 @@
 package com.loom.core.database.dao
-
+/*
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -17,3 +17,4 @@ interface EventDao {
     @Upsert
     suspend fun upsertEvents(events: List<EventEntity>)
 }
+*/

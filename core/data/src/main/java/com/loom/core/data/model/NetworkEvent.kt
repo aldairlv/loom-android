@@ -1,5 +1,5 @@
 package com.loom.core.data.model
-
+/*
 import com.loom.core.database.model.EventEntity
 import com.loom.core.database.model.EventParticipantEntity
 import com.loom.core.network.model.NetworkEvent
@@ -28,3 +28,5 @@ fun NetworkEvent.asParticipantEntities(): List<EventParticipantEntity> {
         )
     }
 }
+
+ */

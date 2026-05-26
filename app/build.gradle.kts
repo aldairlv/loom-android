@@ -88,4 +88,6 @@ dependencies {
     implementation(project(":feature:auth:impl"))
     implementation(project(":feature:home:api"))
     implementation(project(":feature:home:impl"))
+    implementation(project(":feature:post-editor:api"))
+    implementation(project(":feature:post-editor:impl"))
 }
