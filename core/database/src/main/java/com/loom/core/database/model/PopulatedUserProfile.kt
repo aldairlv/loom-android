@@ -1,5 +1,6 @@
 package com.loom.core.database.model
 
+/*
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.loom.core.model.data.UserProfile
@@ -31,3 +32,4 @@ fun PopulatedUserProfile.asExternalUserProfileModel() = UserProfile(
     uuid = user.uuid,
     posts = posts.map { it.asExternalPostModel() }
 )
+*/
