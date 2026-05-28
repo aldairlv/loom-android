@@ -76,6 +76,19 @@ interface LoomNetworkDataSource {
 
     suspend fun getMyProfile(): NetworkUserProfile
 
+    suspend fun updateUserProfile(
+        id: String,
+        displayName: String? = null,
+        bio: String? = null,
+        city: String? = null,
+        timezone: String? = null,
+        canBeFollowed: Boolean? = null,
+        latitude: Double? = null,
+        longitude: Double? = null,
+        avatar: MultipartBody.Part? = null,
+        banner: MultipartBody.Part? = null
+    ): NetworkUserProfile
+
     suspend fun uploadMedia(
         file: MultipartBody.Part
     ): NetworkMediaResponse

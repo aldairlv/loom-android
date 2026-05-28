@@ -34,6 +34,7 @@ import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkFollowingUsersFeedEnvelope
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
 import retrofit2.http.Body
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -122,6 +123,21 @@ private interface RetrofitLoomNetworkApi {
 
     @GET(value = "profiles/profiles/me/")
     suspend fun getMyProfile(): NetworkUserProfile
+
+    @Multipart
+    @PATCH(value = "profiles/profiles/{id}/")
+    suspend fun updateUserProfile(
+        @Path("id") id: String,
+        @Part displayName: MultipartBody.Part? = null,
+        @Part bio: MultipartBody.Part? = null,
+        @Part city: MultipartBody.Part? = null,
+        @Part timezone: MultipartBody.Part? = null,
+        @Part canBeFollowed: MultipartBody.Part? = null,
+        @Part latitude: MultipartBody.Part? = null,
+        @Part longitude: MultipartBody.Part? = null,
+        @Part avatar: MultipartBody.Part? = null,
+        @Part banner: MultipartBody.Part? = null
+    ): NetworkUserProfile
 
     @Multipart
     @POST(value = "assets/media/")
@@ -248,6 +264,35 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun getMyProfile(): NetworkUserProfile =
         networkApi.getMyProfile()
+
+    override suspend fun updateUserProfile(
+        id: String,
+        displayName: String?,
+        bio: String?,
+        city: String?,
+        timezone: String?,
+        canBeFollowed: Boolean?,
+        latitude: Double?,
+        longitude: Double?,
+        avatar: MultipartBody.Part?,
+        banner: MultipartBody.Part?
+    ): NetworkUserProfile = networkApi.updateUserProfile(
+        id = id,
+        displayName = displayName?.let { MultipartBody.Part.createFormData("display_name", it) },
+        bio = bio?.let { MultipartBody.Part.createFormData("bio", it) },
+        city = city?.let { MultipartBody.Part.createFormData("city", it) },
+        timezone = timezone?.let { MultipartBody.Part.createFormData("timezone", it) },
+        canBeFollowed = canBeFollowed?.let {
+            MultipartBody.Part.createFormData(
+                "can_be_followed",
+                it.toString()
+            )
+        },
+        latitude = latitude?.let { MultipartBody.Part.createFormData("latitude", it.toString()) },
+        longitude = longitude?.let { MultipartBody.Part.createFormData("longitude", it.toString()) },
+        avatar = avatar,
+        banner = banner
+    )
 
     override suspend fun uploadMedia(file: MultipartBody.Part): NetworkMediaResponse =
         networkApi.uploadMedia(file)

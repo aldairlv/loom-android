@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.unit)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.material)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.material3)

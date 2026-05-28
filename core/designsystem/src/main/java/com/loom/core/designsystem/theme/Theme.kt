@@ -55,7 +55,7 @@ val DarkDefaultColorScheme = darkColorScheme(
     tertiaryContainer =   Color.Transparent,
     onTertiaryContainer =  Color.Transparent,
     background =   Black,
-    onBackground =  White,
+    /*onBackground =  White,
     surface =   Color.Black,
     onSurface =   Color.Yellow,
     surfaceVariant =   Color.Transparent,
@@ -88,7 +88,7 @@ val DarkDefaultColorScheme = darkColorScheme(
     tertiaryFixed =   Color.Transparent,
     tertiaryFixedDim =  Color.Transparent,
     onTertiaryFixed =  Color.Transparent,
-    onTertiaryFixedVariant =   Color.Transparent,
+    onTertiaryFixedVariant =   Color.Transparent,*/
 )
 
 @Composable
