@@ -3,11 +3,14 @@ package com.loom.core.data.repository
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import com.loom.core.database.LoomDatabase
 import com.loom.core.model.data.VerifyEmailResult
 import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkLoginRequest
 import com.loom.core.network.model.NetworkRegisterErrorResponse
 import com.loom.core.network.model.NetworkRegisterRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import retrofit2.HttpException
@@ -16,6 +19,7 @@ import retrofit2.HttpException
 internal class OfflineFirstAuthRepository @Inject constructor(
     private val network: LoomNetworkDataSource,
     private val userDataRepository: UserDataRepository,
+    private val database: LoomDatabase,
     private val json: Json,
 ): AuthRepository {
     override suspend fun login(email: String, password: String): Result<Unit> {
@@ -79,6 +83,20 @@ internal class OfflineFirstAuthRepository @Inject constructor(
             Result.failure(Exception(errorMsg))
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun logout(): Result<Unit> = withContext(Dispatchers.IO) {
+        return@withContext try {
+            network.logout()
+            userDataRepository.clearTokens()
+            database.clearAllTables()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            // Even if network fails, we clear local data
+            userDataRepository.clearTokens()
+            database.clearAllTables()
+            Result.success(Unit)
         }
     }
 

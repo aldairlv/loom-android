@@ -53,7 +53,7 @@ import com.loom.core.database.model.EventParticipantEntity
     exportSchema = true
 )
 @TypeConverters(InstantConverter::class)
-internal abstract class LoomDatabase : RoomDatabase() {
+abstract class LoomDatabase : RoomDatabase() {
     /*
     abstract fun trendDao(): TrendDao
     abstract fun tagDao(): TagDao
