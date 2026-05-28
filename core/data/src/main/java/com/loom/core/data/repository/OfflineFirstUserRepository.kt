@@ -41,6 +41,7 @@ internal class OfflineFirstUserRepository @Inject constructor(
 private fun NetworkUserProfile.asExternalModel() = UserAccountProfile(
     id = id,
     user = user,
+    username = username,
     displayName = display_name,
     bio = bio,
     city = city,
