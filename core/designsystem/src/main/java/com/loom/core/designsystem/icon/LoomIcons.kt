@@ -27,8 +27,10 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 
 
@@ -88,6 +90,9 @@ object LoomIcons {
 
     val Palette = Icons.Rounded.ColorLens
     val PaletteBorder = Icons.Outlined.ColorLens
+
+    val GlobalSettings = Icons.Rounded.Settings
+    val GlobalSettingsBorder = Icons.Outlined.Settings
 
     // Dentro de tu object LoomIcons
 
