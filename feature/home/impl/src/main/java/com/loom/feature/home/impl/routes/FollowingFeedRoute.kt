@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +24,9 @@ import com.loom.core.ui.post.feedPosts
 
 
 @Composable
-fun FollowingRoute(
+fun FollowingFeedRoute(
     modifier: Modifier = Modifier,
-    viewModel: FollowingViewModel = hiltViewModel()
+    viewModel: FollowingFeedViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -42,7 +43,7 @@ fun FollowingRoute(
 
 @Composable
 internal fun FollowingRoute(
-    uiState: FollowingUiState,
+    uiState: FollowingFeedUiState,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
     onRepost: (String) -> Unit,
@@ -52,51 +53,53 @@ internal fun FollowingRoute(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
-            is FollowingUiState.Loading -> {
+            is FollowingFeedUiState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-            is FollowingUiState.Success -> {
-                val listState = rememberLazyListState()
-                val shouldLoadMore = remember {
-                    derivedStateOf {
-                        val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-                        lastVisibleItemIndex >= listState.layoutInfo.totalItemsCount - 3
+            is FollowingFeedUiState.Success -> {
+                key("home_following") {
+                    val listState = rememberLazyListState()
+                    val shouldLoadMore = remember {
+                        derivedStateOf {
+                            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                            lastVisibleItemIndex >= listState.layoutInfo.totalItemsCount - 3
+                        }
                     }
-                }
 
-                LaunchedEffect(shouldLoadMore.value) {
-                    if (shouldLoadMore.value) {
-                        onLoadMore()
+                    LaunchedEffect(shouldLoadMore.value) {
+                        if (shouldLoadMore.value) {
+                            onLoadMore()
+                        }
                     }
-                }
 
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    feedPosts(
-                        posts = uiState.posts,
-                        onClickLike = onClickLike,
-                        onComment = onComment,
-                        onRepost = onRepost,
-                        onShare = onShare
-                    )
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        feedPosts(
+                            posts = uiState.posts,
+                            onClickLike = onClickLike,
+                            onComment = onComment,
+                            onRepost = onRepost,
+                            onShare = onShare
+                        )
 
-                    if (uiState.isFetchingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        if (uiState.isFetchingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                }
                             }
                         }
                     }
                 }
             }
-            is FollowingUiState.Error -> {
+            is FollowingFeedUiState.Error -> {
                 Text(
                     text = "Error loading following feed",
                     modifier = Modifier.align(Alignment.Center)

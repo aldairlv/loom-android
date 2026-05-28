@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,41 +57,43 @@ internal fun ForYouRoute(
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is ForYouUiState.Success -> {
-                val listState = rememberLazyListState()
-                val shouldLoadMore = remember {
-                    derivedStateOf {
-                        val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-                        lastVisibleItemIndex >= listState.layoutInfo.totalItemsCount - 3
+                key("home_foryou") {
+                    val listState = rememberLazyListState()
+                    val shouldLoadMore = remember {
+                        derivedStateOf {
+                            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                            lastVisibleItemIndex >= listState.layoutInfo.totalItemsCount - 3
+                        }
                     }
-                }
 
-                LaunchedEffect(shouldLoadMore.value) {
-                    if (shouldLoadMore.value) {
-                        onLoadMore()
+                    LaunchedEffect(shouldLoadMore.value) {
+                        if (shouldLoadMore.value) {
+                            onLoadMore()
+                        }
                     }
-                }
 
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    feedPosts(
-                        posts = uiState.posts,
-                        onClickLike = onClickLike,
-                        onComment = onComment,
-                        onRepost = onRepost,
-                        onShare = onShare
-                    )
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        feedPosts(
+                            posts = uiState.posts,
+                            onClickLike = onClickLike,
+                            onComment = onComment,
+                            onRepost = onRepost,
+                            onShare = onShare
+                        )
 
-                    if (uiState.isFetchingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        if (uiState.isFetchingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                }
                             }
                         }
                     }
