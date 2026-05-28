@@ -25,7 +25,9 @@ import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.runtime.Composable
 
@@ -83,6 +85,9 @@ object LoomIcons {
 
     val Email = Icons.Rounded.Email
     val EmailBorder = Icons.Outlined.Email
+
+    val Palette = Icons.Rounded.ColorLens
+    val PaletteBorder = Icons.Outlined.ColorLens
 
     // Dentro de tu object LoomIcons
 

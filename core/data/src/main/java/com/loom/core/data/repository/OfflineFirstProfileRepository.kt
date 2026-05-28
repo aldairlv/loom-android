@@ -24,6 +24,9 @@ import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkPostMedia
 import com.loom.core.network.model.NetworkPostParent
 import com.loom.core.network.model.NetworkUserProfile
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import retrofit2.HttpException
@@ -35,6 +38,62 @@ internal class OfflineFirstProfileRepository @Inject constructor(
     override suspend fun getMyProfile(): Result<UserAccountProfile> {
         return try {
             val networkResponse = network.getMyProfile()
+            Result.Success(networkResponse.asExternalModel())
+        } catch (e: Exception) {
+            val message = when (e) {
+                is HttpException -> {
+                    val errorBody = try {
+                        e.response()?.errorBody()?.string() ?: ""
+                    } catch (ex: Exception) {
+                        ""
+                    }
+                    "Error ${e.code()}: $errorBody"
+                }
+                else -> e.message ?: "Unknown error"
+            }
+            Result.Error(Exception(message, e))
+        }
+    }
+
+    override suspend fun updateProfile(
+        id: String,
+        displayName: String?,
+        bio: String?,
+        city: String?,
+        timezone: String?,
+        canBeFollowed: Boolean?,
+        latitude: Double?,
+        longitude: Double?,
+        avatar: ByteArray?,
+        banner: ByteArray?
+    ): Result<UserAccountProfile> {
+        return try {
+            val avatarPart = avatar?.let {
+                MultipartBody.Part.createFormData(
+                    "avatar",
+                    "avatar.jpg",
+                    it.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                )
+            }
+            val bannerPart = banner?.let {
+                MultipartBody.Part.createFormData(
+                    "banner",
+                    "banner.jpg",
+                    it.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                )
+            }
+            val networkResponse = network.updateUserProfile(
+                id = id,
+                displayName = displayName,
+                bio = bio,
+                city = city,
+                timezone = timezone,
+                canBeFollowed = canBeFollowed,
+                latitude = latitude,
+                longitude = longitude,
+                avatar = avatarPart,
+                banner = bannerPart
+            )
             Result.Success(networkResponse.asExternalModel())
         } catch (e: Exception) {
             val message = when (e) {
