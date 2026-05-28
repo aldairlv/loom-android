@@ -3,6 +3,7 @@ package com.loom.core.model.data
 data class UserAccountProfile(
     val id: String,
     val user: String,
+    val username: String,
     val displayName: String,
     val bio: String?,
     val city: String?,

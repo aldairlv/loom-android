@@ -1,7 +1,29 @@
 package com.loom.core.network.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data class NetworkPostsFeedEnvelope(
+    val response: NetworkPostsFeedData
+)
+
+@Serializable
+data class NetworkPostsFeedData(
+    val feed: NetworkPostsFeedContent
+)
+
+@Serializable
+data class NetworkPostsFeedContent(
+    val elements: List<NetworkPostFeedItem>,
+    @SerialName("queryParams") val queryParams: NetworkQueryParams? = null
+)
+
+@Serializable
+data class NetworkQueryParams(
+    val cursor: String? = null
+)
 
 @Serializable
 data class NetworkPostsFeedResponse(
