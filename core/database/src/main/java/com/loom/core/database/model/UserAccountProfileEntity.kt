@@ -10,6 +10,7 @@ import com.loom.core.model.data.UserAccountProfile
 data class UserAccountProfileEntity(
     @PrimaryKey val id: String,
     val user: String,
+    val username: String,
     val displayName: String,
     val bio: String?,
     val city: String?,
@@ -28,6 +29,7 @@ data class LocationCoordsEntity(
 fun UserAccountProfileEntity.asExternalModel() = UserAccountProfile(
     id = id,
     user = user,
+    username = username,
     displayName = displayName,
     bio = bio,
     city = city,
@@ -46,6 +48,7 @@ fun UserAccountProfileEntity.asExternalModel() = UserAccountProfile(
 fun UserAccountProfile.asEntity() = UserAccountProfileEntity(
     id = id,
     user = user,
+    username = username,
     displayName = displayName,
     bio = bio,
     city = city,
