@@ -8,9 +8,11 @@ import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.OfflineFirstAuthRepository
 //import com.loom.core.data.repository.OfflineFirstExploreRepository
 import com.loom.core.data.repository.OfflineFirstHomeRepository
+import com.loom.core.data.repository.OfflineFirstProfileRepository
 //import com.loom.core.data.repository.OfflineFirstTimelineRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
 import com.loom.core.data.repository.OfflineFirstUserRepository
+import com.loom.core.data.repository.ProfileRepository
 //import com.loom.core.data.repository.PostRepository
 import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.data.repository.UserRepository
@@ -68,5 +70,10 @@ abstract class DataModule {
     internal abstract fun bindsUserRepository(
         userRepository: OfflineFirstUserRepository
     ): UserRepository
+
+    @Binds
+    internal abstract fun bindsProfileRepository(
+        profileRepository: OfflineFirstProfileRepository
+    ): ProfileRepository
 
 }

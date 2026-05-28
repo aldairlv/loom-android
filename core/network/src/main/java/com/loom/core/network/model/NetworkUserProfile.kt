@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class NetworkUserProfile(
     val id: String,
     val user: String,
+    val username: String,
     val display_name: String,
     val bio: String? = null,
     val city: String? = null,

@@ -50,6 +50,7 @@ import com.loom.feature.auth.impl.navigation.passwordInputEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
+import com.loom.feature.profile.impl.navigation.profileEntry
 
 
 @Composable
@@ -118,6 +119,7 @@ internal fun LoomApp(
         homeEntry(navigator)
         exploreEntry(navigator)
         createPostEntry(navigator)
+        profileEntry(navigator)
     }
 
     val isLoggedIn = sessionState is SessionState.LoggedIn

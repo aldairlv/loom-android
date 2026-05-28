@@ -15,22 +15,22 @@ import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 
-sealed interface FollowingUiState {
-    data object Loading : FollowingUiState
+sealed interface FollowingFeedUiState {
+    data object Loading : FollowingFeedUiState
     data class Success(
         val posts: List<PostFeedItem>,
         val isFetchingMore: Boolean = false
-    ) : FollowingUiState
-    data object Error : FollowingUiState
+    ) : FollowingFeedUiState
+    data object Error : FollowingFeedUiState
 }
 
 @HiltViewModel
-class FollowingViewModel @Inject constructor(
+class FollowingFeedViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
 ): ViewModel() {
 
-    private val _uiState = MutableStateFlow<FollowingUiState>(FollowingUiState.Loading)
-    val uiState: StateFlow<FollowingUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<FollowingFeedUiState>(FollowingFeedUiState.Loading)
+    val uiState: StateFlow<FollowingFeedUiState> = _uiState.asStateFlow()
 
     private var currentCursor: String? = null
     private val allPosts = mutableListOf<PostFeedItem>()
@@ -44,12 +44,12 @@ class FollowingViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (!isLoadMore) {
-                _uiState.value = FollowingUiState.Loading
+                _uiState.value = FollowingFeedUiState.Loading
                 allPosts.clear()
                 currentCursor = null
             } else {
                 val current = _uiState.value
-                if (current is FollowingUiState.Success) {
+                if (current is FollowingFeedUiState.Success) {
                     _uiState.value = current.copy(isFetchingMore = true)
                 }
             }
@@ -73,21 +73,21 @@ class FollowingViewModel @Inject constructor(
                 val newPosts = result.posts.filter { newPost -> allPosts.none { it.id == newPost.id } }
                 allPosts.addAll(newPosts)
 
-                _uiState.value = FollowingUiState.Success(
+                _uiState.value = FollowingFeedUiState.Success(
                     posts = allPosts.toList(),
                     isFetchingMore = false
                 )
                 Log.d("LOOM_DEBUG", "FollowingViewModel: State updated to Success. Total posts: ${allPosts.size}")
             } catch (e: Exception) {
                 Log.e("LOOM_DEBUG", "FollowingViewModel: Error fetching posts", e)
-                _uiState.value = FollowingUiState.Error
+                _uiState.value = FollowingFeedUiState.Error
             }
         }
     }
 
     fun loadMore() {
         val state = _uiState.value
-        if (state is FollowingUiState.Success && !state.isFetchingMore && currentCursor != null) {
+        if (state is FollowingFeedUiState.Success && !state.isFetchingMore && currentCursor != null) {
             fetchPosts(isLoadMore = true)
         }
     }

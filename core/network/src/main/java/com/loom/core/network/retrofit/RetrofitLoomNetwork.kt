@@ -21,6 +21,7 @@ import com.loom.core.network.model.NetworkLoginRequest
 import com.loom.core.network.model.NetworkLogoutResponse
 import com.loom.core.network.model.NetworkObjectsResponse
 import com.loom.core.network.model.NetworkPostsFeedResponse
+import com.loom.core.network.model.NetworkPostsFeedEnvelope
 import com.loom.core.network.model.NetworkRefreshRequest
 import com.loom.core.network.model.NetworkRegisterRequest
 import com.loom.core.network.model.NetworkTimelineResponse
@@ -30,6 +31,8 @@ import com.loom.core.network.model.NetworkValidateEmailRequest
 import com.loom.core.network.model.NetworkValidateEmailResponse
 import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostFeedItem
+import com.loom.core.network.model.NetworkFollowingUsersFeedEnvelope
+import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -85,17 +88,32 @@ private interface RetrofitLoomNetworkApi {
     @GET(value = "posts/posts/recommend/")
     suspend fun getPostsFeedForYou(
         @Query("cursor") cursor: String?
-    ): NetworkPostsFeedResponse
+    ): NetworkPostsFeedEnvelope
 
     @GET(value = "posts/posts/following/")
     suspend fun getPostsFeedFollowing(
         @Query("cursor") cursor: String?
-    ): NetworkPostsFeedResponse
+    ): NetworkPostsFeedEnvelope
 
     @GET(value = "posts/posts/tags/")
     suspend fun getPostsFeedTags(
         @Query("cursor") cursor: String?
-    ): NetworkPostsFeedResponse
+    ): NetworkPostsFeedEnvelope
+
+    @GET(value = "posts/posts/me/")
+    suspend fun getPostsFeedMe(
+        @Query("cursor") cursor: String?
+    ): NetworkPostsFeedEnvelope
+
+    @GET(value = "posts/posts/liked/")
+    suspend fun getPostsFeedLiked(
+        @Query("cursor") cursor: String?
+    ): NetworkPostsFeedEnvelope
+
+    @GET(value = "relationships/following/")
+    suspend fun getFollowingUsers(
+        @Query("cursor") cursor: String?
+    ): NetworkFollowingUsersFeedEnvelope
 
     @GET(value = "profiles/profiles/{id}/")
     suspend fun getUserProfile(
@@ -172,14 +190,58 @@ internal class RetrofitLoomNetwork @Inject constructor(
     }
 
 
-    override suspend fun getPostsFeedForYou(cursor: String?): NetworkPostsFeedResponse =
-        networkApi.getPostsFeedForYou(cursor)
+    override suspend fun getPostsFeedForYou(cursor: String?): NetworkPostsFeedResponse {
+        val result = networkApi.getPostsFeedForYou(cursor)
+        return NetworkPostsFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            previous = null,
+            results = result.response.feed.elements
+        )
+    }
 
-    override suspend fun getPostsFeedFollowing(cursor: String?): NetworkPostsFeedResponse =
-        networkApi.getPostsFeedFollowing(cursor)
+    override suspend fun getPostsFeedFollowing(cursor: String?): NetworkPostsFeedResponse {
+        val result = networkApi.getPostsFeedFollowing(cursor)
+        return NetworkPostsFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            previous = null,
+            results = result.response.feed.elements
+        )
+    }
 
-    override suspend fun getPostsFeedTags(cursor: String?): NetworkPostsFeedResponse =
-        networkApi.getPostsFeedTags(cursor)
+    override suspend fun getPostsFeedTags(cursor: String?): NetworkPostsFeedResponse {
+        val result = networkApi.getPostsFeedTags(cursor)
+        return NetworkPostsFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            previous = null,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getPostsFeedMe(cursor: String?): NetworkPostsFeedResponse {
+        val result = networkApi.getPostsFeedMe(cursor)
+        return NetworkPostsFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            previous = null,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getPostsFeedLiked(cursor: String?): NetworkPostsFeedResponse {
+        val result = networkApi.getPostsFeedLiked(cursor)
+        return NetworkPostsFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            previous = null,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getFollowingUsers(cursor: String?): NetworkFollowingUsersFeedResponse {
+        val result = networkApi.getFollowingUsers(cursor)
+        return NetworkFollowingUsersFeedResponse(
+            next = result.response.feed.queryParams?.cursor,
+            results = result.response.feed.elements
+        )
+    }
 
     override suspend fun getUserProfile(id: String): NetworkUserProfile =
         networkApi.getUserProfile(id)

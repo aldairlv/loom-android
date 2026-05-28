@@ -10,6 +10,7 @@ import com.loom.feature.auth.api.navigation.LandingNavKey
 import com.loom.feature.auth.api.navigation.EmailInputNavKey
 import com.loom.feature.auth.api.navigation.PasswordInputNavKey
 import com.loom.feature.home.api.navigation.HomeNavKey
+import com.loom.feature.profile.api.navigation.ProfileNavKey
 import com.loom.feature.home.api.R as homeR
 /**
  * Type for the top level navigation items in the Loom application.
@@ -60,6 +61,7 @@ val ACTIVITY = TopLevelNavItem(
 val TOP_LEVEL_NAV_ITEMS = mapOf(
     HomeNavKey to HOME,
     ExploreNavKey to EXPLORE,
+    ProfileNavKey to PROFILE,
 )
 
 
