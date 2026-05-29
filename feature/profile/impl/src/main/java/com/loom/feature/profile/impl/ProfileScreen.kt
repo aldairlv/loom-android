@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     onCreateClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val tabs by viewModel.tabs.collectAsStateWithLifecycle()
@@ -109,7 +110,8 @@ fun ProfileScreen(
         },
         onBannerClick = {
             bannerPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
+        },
+        onSettingsClick = onSettingsClick
     )
 }
 
@@ -132,6 +134,7 @@ internal fun ProfileScreen(
     onCancelClick: () -> Unit,
     onAvatarClick: () -> Unit = {},
     onBannerClick: () -> Unit = {},
+    onSettingsClick: () -> Unit,
     tabContent: @Composable (ProfileTab) -> Unit = { ProfileTabPage(it) },
 ) {
     val headerState = rememberTopAppBarState()
@@ -209,7 +212,8 @@ internal fun ProfileScreen(
                                 draftAvatarUri = draftAvatarUri,
                                 onAvatarClick = { showPhotoOptions = PhotoType.AVATAR },
                                 draftBannerUri = draftBannerUri,
-                                onBannerClick = { showPhotoOptions = PhotoType.BANNER }
+                                onBannerClick = { showPhotoOptions = PhotoType.BANNER },
+                                onSettingsClick = onSettingsClick
                             )
                         }
                         is ProfileUiState.Error -> {
@@ -303,6 +307,7 @@ fun ProfileScreenPreview() {
                 onCancelClick = {},
                 onAvatarClick = {},
                 onBannerClick = {},
+                onSettingsClick = {},
                 tabContent = { tab ->
                     Box(
                         modifier = Modifier.fillMaxSize(),

@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(project(":feature:profile:api"))
     implementation(project(":feature:post-editor:api"))
+    implementation(project(":feature:settings:api"))
     implementation(project(":core:navigation"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:model"))

@@ -51,6 +51,10 @@ import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
 import com.loom.feature.profile.impl.navigation.profileEntry
+import com.loom.feature.settings.api.navigation.AccountSettingsNavKey
+import com.loom.feature.settings.api.navigation.SettingsNavKey
+import com.loom.feature.settings.impl.navigation.accountSettingsEntry
+import com.loom.feature.settings.impl.navigation.settingsEntry
 
 
 @Composable
@@ -120,13 +124,17 @@ internal fun LoomApp(
         exploreEntry(navigator)
         createPostEntry(navigator)
         profileEntry(navigator)
+
+        // Settings
+        settingsEntry(navigator)
+        accountSettingsEntry(navigator)
     }
 
     val isLoggedIn = sessionState is SessionState.LoggedIn
     val currentKey = appState.navigationState.currentKey
 
     if (isLoggedIn) {
-        if (currentKey == CreatePostNavKey){
+        if (currentKey == CreatePostNavKey || currentKey == SettingsNavKey || currentKey == AccountSettingsNavKey){
             NavDisplay(
                 entries = appState.navigationState.toEntries(entryProvider),
                 onBack = { navigator.goBack() },

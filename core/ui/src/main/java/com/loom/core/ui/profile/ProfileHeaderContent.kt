@@ -74,6 +74,7 @@ fun ProfileHeaderContent(
     onAvatarClick: () -> Unit = {},
     draftBannerUri: Uri? = null,
     onBannerClick: () -> Unit = {},
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
@@ -171,6 +172,12 @@ fun ProfileHeaderContent(
                         Icon(
                             imageVector = LoomIcons.Palette,
                             contentDescription = "Editar Perfil"
+                        )
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(
+                            imageVector = LoomIcons.GlobalSettings,
+                            contentDescription = "Setup Account"
                         )
                     }
                 }
@@ -352,7 +359,8 @@ fun ProfileHeaderContentPreview() {
             draftDisplayName = "John Doe",
             onDisplayNameChange = {},
             draftBio = "Android Developer | UI Enthusiast",
-            onBioChange = {}
+            onBioChange = {},
+            onSettingsClick = {}
         )
     }
 }
@@ -382,7 +390,8 @@ fun ProfileHeaderContentEditPreview() {
             draftDisplayName = "John Doe",
             onDisplayNameChange = {},
             draftBio = "Android Developer | UI Enthusiast",
-            onBioChange = {}
+            onBioChange = {},
+            onSettingsClick = {}
         )
     }
 }
