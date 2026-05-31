@@ -62,6 +62,8 @@ import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostParent
 import com.loom.core.model.data.LayoutRoot
 import com.loom.core.model.data.LayoutRow
+import com.loom.core.model.data.PostInteractions
+import com.loom.core.model.data.PostStats
 import kotlinx.datetime.Clock
 
 
@@ -141,6 +143,48 @@ fun PostFeedCard(
                 }
             }
 
+            // Trail
+            if (postFeed.trail.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                            MaterialTheme.shapes.small
+                        )
+                        .padding(8.dp)
+                ) {
+                    postFeed.trail.forEach { trailItem ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AsyncImage(
+                                model = trailItem.author.avatarUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = trailItem.author.displayName,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        // Simple preview of trail content (first text if exists)
+                        trailItem.contents.firstOrNull { it.type == "text" }?.text?.let {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(start = 28.dp, top = 2.dp, bottom = 4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
             // Contents
             val layoutRoot = postFeed.layout.firstOrNull { it.type == "rows" }
             if (layoutRoot != null) {
@@ -196,14 +240,37 @@ fun PostFeedCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onComment, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.ChatBubbleOutline, contentDescription = "Comment")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onComment) {
+                        Icon(Icons.Default.ChatBubbleOutline, contentDescription = "Comment")
+                    }
+                    postFeed.stats?.commentsCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
-                IconButton(onClick = onRepost, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Repeat, contentDescription = "Repost")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onRepost) {
+                        Icon(
+                            Icons.Default.Repeat,
+                            contentDescription = "Repost",
+                            tint = if (postFeed.interactions?.reposted == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    postFeed.stats?.repostsCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
-                IconButton(onClick = onClickLike, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.FavoriteBorder, contentDescription = "Like")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onClickLike) {
+                        Icon(
+                            imageVector = if (postFeed.interactions?.liked == true) Icons.Default.FavoriteBorder else Icons.Default.FavoriteBorder, // TODO: Use filled icon for liked
+                            contentDescription = "Like",
+                            tint = if (postFeed.interactions?.liked == true) Color.Red else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    postFeed.stats?.likesCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
                 IconButton(onClick = onShare, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.Share, contentDescription = "Share")
@@ -382,6 +449,8 @@ fun PostFeedCardPreview() {
                 )
             )
         ),
+        interactions = PostInteractions(liked = false, reposted = false, commented = false),
+        stats = PostStats(likesCount = 10, repostsCount = 5, commentsCount = 2),
         createdAt = Clock.System.now(),
         updatedAt = Clock.System.now(),
         publishedAt = Clock.System.now()

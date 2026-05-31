@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.loom.core.ui.post.feedPosts
+import com.loom.core.ui.feed.feedObjects
 
 
 @Composable
@@ -76,8 +76,8 @@ internal fun ForYouRoute(
                         state = listState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        feedPosts(
-                            posts = uiState.posts,
+                        feedObjects(
+                            objects = uiState.objects,
                             onClickLike = onClickLike,
                             onComment = onComment,
                             onRepost = onRepost,

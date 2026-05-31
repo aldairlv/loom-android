@@ -9,5 +9,6 @@ data class NetworkObjectTitle(
     override val objectType: String,
     override val id: String,
     override val streamGlobalPosition: Int,
+    override val streamSessionId: String? = null,
     val text: String
 ) : NetworkObject

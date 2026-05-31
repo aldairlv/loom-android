@@ -14,7 +14,7 @@ import com.loom.core.network.model.NetworkTokenResponse
 import com.loom.core.network.model.NetworkValidateEmailResponse
 import com.loom.core.network.model.NetworkUserProfile
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
-
+import com.loom.core.network.model.NetworkFeedObjectResponse
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostResponse
@@ -49,6 +49,10 @@ interface LoomNetworkDataSource {
     suspend fun getPostsFeedForYou(
         cursor: String? = null
     ): NetworkPostsFeedResponse
+
+    suspend fun getFeedObjectsForYou(
+        cursor: String? = null
+    ): NetworkFeedObjectResponse
 
     suspend fun getPostsFeedFollowing(
         cursor: String? = null

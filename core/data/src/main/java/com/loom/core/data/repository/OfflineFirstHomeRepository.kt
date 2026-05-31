@@ -1,9 +1,13 @@
 package com.loom.core.data.repository
 
 import android.util.Log
+import com.loom.core.model.data.FeedObject
+//import com.loom.core.model.data.FeedObjectsResult
 import com.loom.core.model.data.PostAuthor
 import com.loom.core.model.data.PostFeedContent
 import com.loom.core.model.data.PostFeedItem
+import com.loom.core.model.data.PostInteractions
+import com.loom.core.model.data.PostStats
 import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostParent
 import com.loom.core.model.data.PostsFeedResult
@@ -17,7 +21,11 @@ import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkContentInput
 import com.loom.core.network.model.NetworkLayoutRoot
 import com.loom.core.network.model.NetworkLayoutRow
+import com.loom.core.network.model.NetworkObject
+import com.loom.core.network.model.NetworkObjectPost
 import com.loom.core.network.model.NetworkPostAuthor
+import com.loom.core.network.model.NetworkPostInteractions
+import com.loom.core.network.model.NetworkPostStats
 import com.loom.core.network.model.NetworkPostContent
 import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostFeedItem
@@ -40,6 +48,14 @@ internal class OfflineFirstHomeRepository @Inject constructor(
         val networkResponse = network.getPostsFeedForYou(cursor)
         return PostsFeedResult(
             posts = networkResponse.results.map { it.asExternalModel() },
+            nextCursor = networkResponse.next
+        )
+    }
+
+    override suspend fun getFeedObjectsForYou(cursor: String?): FeedObjectsResult {
+        val networkResponse = network.getFeedObjectsForYou(cursor)
+        return FeedObjectsResult(
+            objects = networkResponse.results.mapNotNull { it.asExternalModel() },
             nextCursor = networkResponse.next
         )
     }
@@ -144,10 +160,38 @@ private fun NetworkPostFeedItem.asExternalModel(): PostFeedItem = PostFeedItem(
     tags = tags,
     contents = contents.map { it.asExternalModel() },
     layout = layout.map { it.asExternalModel() },
+    interactions = interactions?.asExternalModel(),
+    stats = stats?.asExternalModel(),
     createdAt = created_at.toInstantOrNow(),
     updatedAt = updated_at.toInstantOrNow(),
     publishedAt = published_at?.toInstantOrNull()
 )
+
+private fun NetworkObject.asExternalModel(): FeedObject? {
+    return when (this) {
+        is NetworkObjectPost -> FeedObject.PostFeedObject(
+            post = PostFeedItem(
+                id = id,
+                author = author.asExternalModel(),
+                parent = parent?.asExternalModel(),
+                root = root?.asExternalModel(),
+                trail = trail.map { it.asExternalModel() },
+                status = status,
+                tags = tags,
+                contents = contents.map { it.asExternalModel() },
+                layout = layout.map { it.asExternalModel() },
+                interactions = interactions?.asExternalModel(),
+                stats = stats?.asExternalModel(),
+                createdAt = created_at.toInstantOrNow(),
+                updatedAt = updated_at.toInstantOrNow(),
+                publishedAt = published_at?.toInstantOrNull()
+            ),
+            streamGlobalPosition = streamGlobalPosition,
+            streamSessionId = streamSessionId
+        )
+        else -> null // Handle other types as they are implemented
+    }
+}
 
 private fun String.toInstantOrNow(): Instant {
     return try {
@@ -168,7 +212,20 @@ private fun String.toInstantOrNull(): Instant? {
 private fun NetworkPostAuthor.asExternalModel() = PostAuthor(
     id = id,
     displayName = display_name,
-    avatarUrl = avatar_url ?: ""
+    avatarUrl = avatar_url ?: "",
+    isFollowed = is_followed
+)
+
+private fun NetworkPostInteractions.asExternalModel() = PostInteractions(
+    liked = liked,
+    reposted = reposted,
+    commented = commented
+)
+
+private fun NetworkPostStats.asExternalModel() = PostStats(
+    likesCount = likes_count,
+    repostsCount = reposts_count,
+    commentsCount = comments_count
 )
 
 private fun NetworkPostParent.asExternalModel() = PostParent(

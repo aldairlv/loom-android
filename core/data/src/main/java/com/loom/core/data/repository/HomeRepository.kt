@@ -1,11 +1,18 @@
 package com.loom.core.data.repository
 
+import com.loom.core.model.data.FeedObject
 import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostsFeedResult
 import com.loom.core.model.data.RowModel
 
+data class FeedObjectsResult(
+    val objects: List<FeedObject>,
+    val nextCursor: String?
+)
+
 interface HomeRepository {
     suspend fun getPostsFeedForYou(cursor: String? = null): PostsFeedResult
+    suspend fun getFeedObjectsForYou(cursor: String? = null): FeedObjectsResult
     suspend fun getPostsFeedFollowing(cursor: String? = null): PostsFeedResult
     suspend fun getPostsFeedTags(cursor: String? = null): PostsFeedResult
 

@@ -3,7 +3,7 @@ package com.loom.feature.home.impl.routes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.loom.core.data.repository.HomeRepository
-import com.loom.core.model.data.PostFeedItem
+import com.loom.core.model.data.FeedObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 sealed interface ForYouUiState {
     data object Loading : ForYouUiState
     data class Success(
-        val posts: List<PostFeedItem>,
+        val objects: List<FeedObject>,
         val isFetchingMore: Boolean = false
     ) : ForYouUiState
     data object Error : ForYouUiState
@@ -32,7 +32,7 @@ class ForYouViewModel @Inject constructor(
     val uiState: StateFlow<ForYouUiState> = _uiState.asStateFlow()
 
     private var currentCursor: String? = null
-    private val allPosts = mutableListOf<PostFeedItem>()
+    private val allObjects = mutableListOf<FeedObject>()
 
     init {
         fetchPosts()
@@ -44,7 +44,7 @@ class ForYouViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isLoadMore) {
                 _uiState.value = ForYouUiState.Loading
-                allPosts.clear()
+                allObjects.clear()
                 currentCursor = null
             } else {
                 val current = _uiState.value
@@ -64,16 +64,16 @@ class ForYouViewModel @Inject constructor(
                     }
                 }
 
-                val result = homeRepository.getPostsFeedForYou(cursorToPass)
+                val result = homeRepository.getFeedObjectsForYou(cursorToPass)
 
                 currentCursor = result.nextCursor
 
                 // Avoid duplicates just in case
-                val newPosts = result.posts.filter { newPost -> allPosts.none { it.id == newPost.id } }
-                allPosts.addAll(newPosts)
+                val newObjects = result.objects.filter { newObj -> allObjects.none { it.id == newObj.id } }
+                allObjects.addAll(newObjects)
 
                 _uiState.value = ForYouUiState.Success(
-                    posts = allPosts.toList(),
+                    objects = allObjects.toList(),
                     isFetchingMore = false
                 )
             } catch (e: Exception) {

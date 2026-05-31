@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkPostsFeedEnvelope(
+    val meta: NetworkMeta? = null,
     val response: NetworkPostsFeedData
 )
 
@@ -43,6 +44,9 @@ data class NetworkPostFeedItem(
     val tags: List<String> = emptyList(),
     val contents: List<NetworkPostContent> = emptyList(),
     val layout: List<NetworkLayoutRoot> = emptyList(),
+    val interactions: NetworkPostInteractions? = null,
+    val stats: NetworkPostStats? = null,
+    val is_deleted: Boolean = false,
     val created_at: String = "",
     val updated_at: String = "",
     val published_at: String? = null
@@ -52,7 +56,22 @@ data class NetworkPostFeedItem(
 data class NetworkPostAuthor(
     val id: String,
     val display_name: String,
-    val avatar_url: String? = null
+    val avatar_url: String? = null,
+    val is_followed: Boolean = false
+)
+
+@Serializable
+data class NetworkPostInteractions(
+    val liked: Boolean,
+    val reposted: Boolean,
+    val commented: Boolean
+)
+
+@Serializable
+data class NetworkPostStats(
+    val likes_count: Int,
+    val reposts_count: Int,
+    val comments_count: Int
 )
 
 @Serializable

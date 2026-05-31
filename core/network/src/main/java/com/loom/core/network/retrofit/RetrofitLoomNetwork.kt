@@ -33,6 +33,8 @@ import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkFollowingUsersFeedEnvelope
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
+import com.loom.core.network.model.NetworkFeedObjectEnvelope
+import com.loom.core.network.model.NetworkFeedObjectResponse
 import retrofit2.http.Body
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -61,10 +63,10 @@ private interface RetrofitLoomNetworkApi {
         @Body request: NetworkRefreshRequest
     ): NetworkTokenResponse
 
-    @GET(value = "posts/posts/")
+    @GET(value = "posts/")
     suspend fun getPosts(): List<NetworkPost>
 
-    @POST(value = "posts/posts/")
+    @POST(value = "posts/")
     suspend fun createPost(
         @Body request: NetworkPostCreateRequest
     ): NetworkPostFeedItem
@@ -86,27 +88,32 @@ private interface RetrofitLoomNetworkApi {
     ): NetworkValidateEmailResponse
 
 
-    @GET(value = "posts/posts/recommend/")
+    @GET(value = "posts/recommend/")
     suspend fun getPostsFeedForYou(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/following/")
+    @GET(value = "feeds/for-you/")
+    suspend fun getFeedObjectsForYou(
+        @Query("cursor") cursor: String?
+    ): NetworkFeedObjectEnvelope
+
+    @GET(value = "posts/following/")
     suspend fun getPostsFeedFollowing(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/tags/")
+    @GET(value = "posts/tags/")
     suspend fun getPostsFeedTags(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/me/")
+    @GET(value = "posts/me/")
     suspend fun getPostsFeedMe(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/liked/")
+    @GET(value = "posts/liked/")
     suspend fun getPostsFeedLiked(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
@@ -211,6 +218,14 @@ internal class RetrofitLoomNetwork @Inject constructor(
         return NetworkPostsFeedResponse(
             next = result.response.feed.queryParams?.cursor,
             previous = null,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getFeedObjectsForYou(cursor: String?): NetworkFeedObjectResponse {
+        val result = networkApi.getFeedObjectsForYou(cursor)
+        return NetworkFeedObjectResponse(
+            next = result.response.feed.queryParams?.cursor,
             results = result.response.feed.elements
         )
     }

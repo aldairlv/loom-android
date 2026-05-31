@@ -14,6 +14,8 @@ data class PostFeedItem(
     val tags: List<String>,
     val contents: List<PostFeedContent>,
     val layout: List<LayoutRoot> = emptyList(),
+    val interactions: PostInteractions? = null,
+    val stats: PostStats? = null,
     val createdAt: Instant,
     val updatedAt: Instant,
     val publishedAt: Instant? = null
@@ -23,7 +25,22 @@ data class PostFeedItem(
 data class PostAuthor(
     val id: String,
     val displayName: String,
-    val avatarUrl: String
+    val avatarUrl: String,
+    val isFollowed: Boolean = false
+)
+
+@Serializable
+data class PostInteractions(
+    val liked: Boolean,
+    val reposted: Boolean,
+    val commented: Boolean
+)
+
+@Serializable
+data class PostStats(
+    val likesCount: Int,
+    val repostsCount: Int,
+    val commentsCount: Int
 )
 
 @Serializable
