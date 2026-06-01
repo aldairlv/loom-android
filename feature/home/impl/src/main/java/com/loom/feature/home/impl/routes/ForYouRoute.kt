@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.loom.core.ui.comment.CommentBottomSheet
 import com.loom.core.ui.feed.feedObjects
 
 
@@ -33,6 +34,9 @@ fun ForYouRoute(
     viewModel: ForYouViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val selectedPostId by viewModel.selectedPostId.collectAsStateWithLifecycle()
+    val comments by viewModel.comments.collectAsStateWithLifecycle()
+    val isFetchingComments by viewModel.isFetchingComments.collectAsStateWithLifecycle()
 
     ForYouRoute(
         uiState = uiState,
@@ -46,6 +50,18 @@ fun ForYouRoute(
         onRefresh = { viewModel.fetchPosts(isLoadMore = false) },
         modifier = modifier
     )
+
+    selectedPostId?.let { postId ->
+        CommentBottomSheet(
+            postId = postId,
+            comments = comments,
+            onDismissRequest = viewModel::dismissComments,
+            onSendComment = viewModel::sendComment,
+            isFetchingMore = isFetchingComments,
+            onRefresh = { viewModel.onComment(postId) },
+            onLoadMore = viewModel::loadMoreComments
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

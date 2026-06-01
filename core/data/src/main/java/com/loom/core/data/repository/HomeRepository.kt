@@ -1,5 +1,7 @@
 package com.loom.core.data.repository
 
+import com.loom.core.model.data.Comment
+import com.loom.core.model.data.CommentFeed
 import com.loom.core.model.data.FeedObject
 import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostsFeedResult
@@ -41,4 +43,9 @@ interface HomeRepository {
     suspend fun toggleLike(postId: String, isLiked: Boolean)
 
     suspend fun toggleFollow(profileId: String, isFollowed: Boolean)
+
+    suspend fun getComments(postId: String, cursor: String? = null): CommentFeed
+    suspend fun createComment(postId: String, text: String): Comment
+    suspend fun createReply(postId: String, commentId: String, text: String): Comment
+    suspend fun deleteComment(postId: String, commentId: String)
 }

@@ -1,6 +1,8 @@
 package com.loom.core.data.repository
 
 import android.util.Log
+import com.loom.core.model.data.Comment
+import com.loom.core.model.data.CommentFeed
 import com.loom.core.model.data.FeedObject
 import com.loom.core.model.data.PostAuthor
 import com.loom.core.model.data.PostFeedContent
@@ -40,6 +42,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import com.loom.core.network.model.NetworkMediaResponse
+import com.loom.core.network.model.NetworkComment
+import com.loom.core.network.model.NetworkCommentResponse
 import android.webkit.MimeTypeMap
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -253,6 +257,26 @@ internal class OfflineFirstHomeRepository @Inject constructor(
             throw e
         }
     }
+
+    override suspend fun getComments(postId: String, cursor: String?): CommentFeed {
+        val networkResponse = network.getComments(postId, cursor)
+        return CommentFeed(
+            nextCursor = networkResponse.next,
+            comments = networkResponse.results.map { it.asExternalModel() }
+        )
+    }
+
+    override suspend fun createComment(postId: String, text: String): Comment {
+        return network.createComment(postId, text).asExternalModel()
+    }
+
+    override suspend fun createReply(postId: String, commentId: String, text: String): Comment {
+        return network.createReply(postId, commentId, text).asExternalModel()
+    }
+
+    override suspend fun deleteComment(postId: String, commentId: String) {
+        network.deleteComment(postId, commentId)
+    }
 }
 
 private fun NetworkMediaResponse.asExternalModel() = PostMedia(
@@ -371,4 +395,18 @@ private fun NetworkLayoutRoot.asExternalModel() = LayoutRoot(
 
 private fun NetworkLayoutRow.asExternalModel() = LayoutRow(
     blocks = blocks
+)
+
+private fun NetworkComment.asExternalModel(): Comment = Comment(
+    id = id,
+    profileId = profile,
+    parentId = parent,
+    rootId = root,
+    text = text,
+    depth = depth,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    isDeleted = isDeleted,
+    replies = replies.map { it.asExternalModel() },
+    postId = post
 )

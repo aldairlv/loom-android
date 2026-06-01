@@ -20,6 +20,8 @@ import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostResponse
 import com.loom.core.network.model.NetworkLikeResponse
 import com.loom.core.network.model.NetworkFollowResponse
+import com.loom.core.network.model.NetworkComment
+import com.loom.core.network.model.NetworkCommentResponse
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -104,4 +106,9 @@ interface LoomNetworkDataSource {
 
     suspend fun followUser(profileId: String): NetworkFollowResponse
     suspend fun unfollowUser(profileId: String)
+
+    suspend fun getComments(postId: String, cursor: String? = null): NetworkCommentResponse
+    suspend fun createComment(postId: String, text: String): NetworkComment
+    suspend fun createReply(postId: String, commentId: String, text: String): NetworkComment
+    suspend fun deleteComment(postId: String, commentId: String)
 }

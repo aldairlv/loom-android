@@ -37,6 +37,10 @@ import com.loom.core.network.model.NetworkFeedObjectEnvelope
 import com.loom.core.network.model.NetworkFeedObjectResponse
 import com.loom.core.network.model.NetworkLikeResponse
 import com.loom.core.network.model.NetworkFollowResponse
+import com.loom.core.network.model.NetworkComment
+import com.loom.core.network.model.NetworkCommentRequest
+import com.loom.core.network.model.NetworkCommentEnvelope
+import com.loom.core.network.model.NetworkCommentResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PATCH
@@ -173,6 +177,31 @@ private interface RetrofitLoomNetworkApi {
     @DELETE(value = "users/{id}/followers/")
     suspend fun unfollowUser(
         @Path("id") id: String
+    )
+
+    @GET(value = "posts/{id}/comments/")
+    suspend fun getComments(
+        @Path("id") id: String,
+        @Query("cursor") cursor: String?
+    ): NetworkCommentEnvelope
+
+    @POST(value = "posts/{id}/comments/")
+    suspend fun createComment(
+        @Path("id") id: String,
+        @Body request: NetworkCommentRequest
+    ): NetworkComment
+
+    @POST(value = "posts/{id}/comments/{comment_id}/")
+    suspend fun createReply(
+        @Path("id") id: String,
+        @Path("comment_id") commentId: String,
+        @Body request: NetworkCommentRequest
+    ): NetworkComment
+
+    @DELETE(value = "posts/{id}/comments/{comment_id}/")
+    suspend fun deleteComment(
+        @Path("id") id: String,
+        @Path("comment_id") commentId: String
     )
 }
 
@@ -352,5 +381,22 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun unfollowUser(profileId: String) =
         networkApi.unfollowUser(profileId)
+
+    override suspend fun getComments(postId: String, cursor: String?): NetworkCommentResponse {
+        val result = networkApi.getComments(postId, cursor)
+        return NetworkCommentResponse(
+            next = result.response.comments.queryParams?.cursor,
+            results = result.response.comments.elements
+        )
+    }
+
+    override suspend fun createComment(postId: String, text: String): NetworkComment =
+        networkApi.createComment(postId, NetworkCommentRequest(text))
+
+    override suspend fun createReply(postId: String, commentId: String, text: String): NetworkComment =
+        networkApi.createReply(postId, commentId, NetworkCommentRequest(text))
+
+    override suspend fun deleteComment(postId: String, commentId: String) =
+        networkApi.deleteComment(postId, commentId)
 
 }
