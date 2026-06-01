@@ -16,6 +16,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.ui.tooling.preview.Preview
+import com.loom.core.designsystem.theme.LoomTheme
+import kotlinx.datetime.Clock
 
 @Composable
 fun CommentItem(
@@ -91,5 +94,44 @@ fun CommentItem(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommentItemPreview() {
+    LoomTheme {
+        CommentItem(
+            comment = Comment(
+                id = "1",
+                profileId = "user123",
+                text = "Este es un comentario de prueba muy interesante.",
+                depth = 0,
+                createdAt = Clock.System.now(),
+                updatedAt = Clock.System.now(),
+                isDeleted = false
+            ),
+            onReplyClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommentItemReplyPreview() {
+    LoomTheme {
+        CommentItem(
+            comment = Comment(
+                id = "2",
+                profileId = "user456",
+                text = "Tienes toda la razón, ¡gracias por compartir!",
+                depth = 1,
+                createdAt = Clock.System.now(),
+                updatedAt = Clock.System.now(),
+                isDeleted = false
+            ),
+            onReplyClick = {},
+            depth = 1
+        )
     }
 }

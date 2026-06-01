@@ -9,20 +9,23 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.loom.core.model.data.Comment
+import androidx.compose.ui.tooling.preview.Preview
+import com.loom.core.designsystem.theme.LoomTheme
+import kotlinx.datetime.Clock
 import kotlinx.coroutines.launch
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -41,16 +44,38 @@ fun CommentBottomSheet(
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    val scope = rememberCoroutineScope()
-    var showRealInput by remember { mutableStateOf(false) }
-    var replyToComment by remember { mutableStateOf<Comment?>(null) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        modifier = modifier.fillMaxHeight(0.9f), // A bit more than half
+        modifier = modifier.fillMaxHeight(0.9f),
         dragHandle = null
     ) {
+        CommentBottomSheetContent(
+            comments = comments,
+            onDismissRequest = onDismissRequest,
+            onSendComment = onSendComment,
+            isFetchingMore = isFetchingMore,
+            onRefresh = onRefresh,
+            onLoadMore = onLoadMore
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommentBottomSheetContent(
+    comments: List<Comment>,
+    onDismissRequest: () -> Unit,
+    onSendComment: (String, String?) -> Unit,
+    isFetchingMore: Boolean = false,
+    onRefresh: () -> Unit = {},
+    onLoadMore: () -> Unit = {},
+) {
+    var showRealInput by remember { mutableStateOf(false) }
+    var replyToComment by remember { mutableStateOf<Comment?>(null) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Header
             Row(
@@ -73,15 +98,17 @@ fun CommentBottomSheet(
             // Comments List
             Box(modifier = Modifier.weight(1f)) {
                 val listState = rememberLazyListState()
-                val shouldLoadMore = remember {
+                val shouldLoadMore by remember {
                     derivedStateOf {
-                        val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-                        lastVisibleItemIndex >= listState.layoutInfo.totalItemsCount - 3
+                        val layoutInfo = listState.layoutInfo
+                        val totalItemsCount = layoutInfo.totalItemsCount
+                        val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                        lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0
                     }
                 }
 
-                LaunchedEffect(shouldLoadMore.value) {
-                    if (shouldLoadMore.value) {
+                LaunchedEffect(shouldLoadMore) {
+                    if (shouldLoadMore) {
                         onLoadMore()
                     }
                 }
@@ -98,7 +125,7 @@ fun CommentBottomSheet(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp) // Space for fake input
+                        contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(comments, key = { it.id }) { comment ->
                             CommentThread(
@@ -191,14 +218,14 @@ fun RealCommentInput(
 ) {
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val isPreview = LocalInspectionMode.current
 
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        if (!isPreview) {
+            focusRequester.requestFocus()
+        }
     }
 
-    // Use a Dialog or a full-screen overlay to catch clicks outside and handle IME
-    // Or just a Box that sits at the bottom with imePadding
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -210,7 +237,7 @@ fun RealCommentInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
-                .clickable(enabled = false) {} // Prevent dismissal when clicking the input area
+                .clickable(enabled = false) {}
                 .imePadding()
                 .padding(16.dp)
         ) {
@@ -242,12 +269,58 @@ fun RealCommentInput(
                     enabled = text.isNotBlank()
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Send,
+                        imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Enviar",
                         tint = if (text.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommentBottomSheetPreview() {
+    val fakeComments = listOf(
+        Comment(
+            id = "1",
+            profileId = "user1",
+            text = "¡Qué gran post! Me encanta el contenido.",
+            depth = 0,
+            createdAt = Clock.System.now(),
+            updatedAt = Clock.System.now(),
+            isDeleted = false,
+            replies = listOf(
+                Comment(
+                    id = "2",
+                    profileId = "user2",
+                    text = "Totalmente de acuerdo.",
+                    depth = 1,
+                    createdAt = Clock.System.now(),
+                    updatedAt = Clock.System.now(),
+                    isDeleted = false
+                )
+            )
+        ),
+        Comment(
+            id = "3",
+            profileId = "user3",
+            text = "Interesante perspectiva, aunque no comparto todo.",
+            depth = 0,
+            createdAt = Clock.System.now(),
+            updatedAt = Clock.System.now(),
+            isDeleted = false
+        )
+    )
+
+    LoomTheme {
+        Surface(modifier = Modifier.fillMaxSize()) {
+            CommentBottomSheetContent(
+                comments = fakeComments,
+                onDismissRequest = {},
+                onSendComment = { _, _ -> }
+            )
         }
     }
 }
