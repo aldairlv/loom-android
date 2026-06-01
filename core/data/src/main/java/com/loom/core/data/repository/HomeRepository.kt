@@ -4,6 +4,7 @@ import com.loom.core.model.data.FeedObject
 import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostsFeedResult
 import com.loom.core.model.data.RowModel
+import kotlinx.coroutines.flow.Flow
 
 data class FeedObjectsResult(
     val objects: List<FeedObject>,
@@ -11,8 +12,9 @@ data class FeedObjectsResult(
 )
 
 interface HomeRepository {
+    fun getFeedObjectsForYouFlow(): Flow<List<FeedObject>>
     suspend fun getPostsFeedForYou(cursor: String? = null): PostsFeedResult
-    suspend fun getFeedObjectsForYou(cursor: String? = null): FeedObjectsResult
+    suspend fun getFeedObjectsForYou(cursor: String? = null, isRefresh: Boolean = false): FeedObjectsResult
     suspend fun getPostsFeedFollowing(cursor: String? = null): PostsFeedResult
     suspend fun getPostsFeedTags(cursor: String? = null): PostsFeedResult
 
@@ -25,6 +27,18 @@ interface HomeRepository {
     suspend fun createPost(
         status: String,
         tags: List<String>,
-        rows: List<RowModel>
+        rows: List<RowModel>,
+        parentId: String? = null,
+        rootId: String? = null
     )
+
+    suspend fun quickRepost(
+        postId: String,
+        parentId: String?,
+        rootId: String?
+    )
+
+    suspend fun toggleLike(postId: String, isLiked: Boolean)
+
+    suspend fun toggleFollow(profileId: String, isFollowed: Boolean)
 }

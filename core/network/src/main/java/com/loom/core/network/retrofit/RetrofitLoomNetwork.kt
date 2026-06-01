@@ -35,7 +35,10 @@ import com.loom.core.network.model.NetworkFollowingUsersFeedEnvelope
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
 import com.loom.core.network.model.NetworkFeedObjectEnvelope
 import com.loom.core.network.model.NetworkFeedObjectResponse
+import com.loom.core.network.model.NetworkLikeResponse
+import com.loom.core.network.model.NetworkFollowResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -151,6 +154,26 @@ private interface RetrofitLoomNetworkApi {
     suspend fun uploadMedia(
         @Part file: MultipartBody.Part
     ): NetworkMediaResponse
+
+    @POST(value = "posts/{id}/likes/")
+    suspend fun likePost(
+        @Path("id") id: String
+    ): NetworkLikeResponse
+
+    @DELETE(value = "posts/{id}/likes/")
+    suspend fun unlikePost(
+        @Path("id") id: String
+    )
+
+    @POST(value = "users/{id}/followers/")
+    suspend fun followUser(
+        @Path("id") id: String
+    ): NetworkFollowResponse
+
+    @DELETE(value = "users/{id}/followers/")
+    suspend fun unfollowUser(
+        @Path("id") id: String
+    )
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -224,6 +247,12 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun getFeedObjectsForYou(cursor: String?): NetworkFeedObjectResponse {
         val result = networkApi.getFeedObjectsForYou(cursor)
+        android.util.Log.d("LOOM_DATA_FLOW", "Network Response (ForYou): Found ${result.response.feed.elements.size} elements")
+        result.response.feed.elements.forEachIndexed { index, networkObject ->
+            if (networkObject is com.loom.core.network.model.NetworkObjectPost) {
+                android.util.Log.d("LOOM_DATA_FLOW", "Network Post [$index]: id=${networkObject.id}, hasRoot=${networkObject.root != null}, rootContentSize=${networkObject.root?.contents?.size}")
+            }
+        }
         return NetworkFeedObjectResponse(
             next = result.response.feed.queryParams?.cursor,
             results = result.response.feed.elements
@@ -311,5 +340,17 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun uploadMedia(file: MultipartBody.Part): NetworkMediaResponse =
         networkApi.uploadMedia(file)
+
+    override suspend fun likePost(id: String): NetworkLikeResponse =
+        networkApi.likePost(id)
+
+    override suspend fun unlikePost(id: String) =
+        networkApi.unlikePost(id)
+
+    override suspend fun followUser(profileId: String): NetworkFollowResponse =
+        networkApi.followUser(profileId)
+
+    override suspend fun unfollowUser(profileId: String) =
+        networkApi.unfollowUser(profileId)
 
 }

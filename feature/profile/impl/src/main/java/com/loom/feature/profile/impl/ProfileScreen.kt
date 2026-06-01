@@ -62,6 +62,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     onCreateClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onRepostWithComment: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val tabs by viewModel.tabs.collectAsStateWithLifecycle()
@@ -111,7 +112,10 @@ fun ProfileScreen(
         onBannerClick = {
             bannerPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
-        onSettingsClick = onSettingsClick
+        onSettingsClick = onSettingsClick,
+        tabContent = { tab ->
+            ProfileTabPage(tab = tab, onRepostWithComment = onRepostWithComment)
+        }
     )
 }
 

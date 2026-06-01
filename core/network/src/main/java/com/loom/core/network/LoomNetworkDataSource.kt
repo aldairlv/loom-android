@@ -18,6 +18,8 @@ import com.loom.core.network.model.NetworkFeedObjectResponse
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostResponse
+import com.loom.core.network.model.NetworkLikeResponse
+import com.loom.core.network.model.NetworkFollowResponse
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -96,4 +98,10 @@ interface LoomNetworkDataSource {
     suspend fun uploadMedia(
         file: MultipartBody.Part
     ): NetworkMediaResponse
+
+    suspend fun likePost(id: String): NetworkLikeResponse
+    suspend fun unlikePost(id: String)
+
+    suspend fun followUser(profileId: String): NetworkFollowResponse
+    suspend fun unfollowUser(profileId: String)
 }
