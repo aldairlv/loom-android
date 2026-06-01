@@ -1,9 +1,8 @@
 package com.loom.core.database.model
 
-/*
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.loom.core.model.data.TimelineObject
+import com.loom.core.model.data.FeedObject
 import com.loom.core.model.enum.TimelineObjectType
 
 data class PopulatedTimelineObject(
@@ -16,6 +15,7 @@ data class PopulatedTimelineObject(
     )
     val post: PostEntity? = null,
 
+    /*
     @Relation(
         parentColumn = "object_id",
         entityColumn = "id"
@@ -34,14 +34,17 @@ data class PopulatedTimelineObject(
         parentColumn = "object_id",
         entityColumn = "id"
     )
-    val trend: PopulatedTrend? = null // <--- Agregar esto
+    val trend: PopulatedTrend? = null
+    */
 )
 
+/*
 fun PopulatedTimelineObject.asExternalModel(): TimelineObject {
     return when (entity.objectType) {
         TimelineObjectType.POST.value -> TimelineObject.PostObject(
             content = post?.asExternalPostModel() ?: throw IllegalStateException("Post data missing")
         )
+        /*
         TimelineObjectType.TITLE.value -> TimelineObject.TitleObject(
             content = title?.asExternalTitleModel() ?: throw IllegalStateException("Title data missing")
         )
@@ -51,8 +54,21 @@ fun PopulatedTimelineObject.asExternalModel(): TimelineObject {
         TimelineObjectType.TREND.value -> TimelineObject.TrendObject(
             content = trend?.asExternalTrendModel() ?: throw IllegalStateException("Trend data missing")
         )
+        */
         else -> throw IllegalArgumentException("Unknown type: ${entity.objectType}")
     }
 }
 */
 
+fun PopulatedTimelineObject.asFeedObjectModel(): FeedObject? {
+    return when (entity.objectType) {
+        TimelineObjectType.POST.value -> post?.let {
+            FeedObject.PostFeedObject(
+                post = it.asExternalPostModel(),
+                streamGlobalPosition = entity.streamGlobalPosition,
+                streamSessionId = entity.streamSessionId
+            )
+        }
+        else -> null
+    }
+}

@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -26,6 +29,7 @@ import com.loom.core.ui.feed.feedObjects
 @Composable
 fun ForYouRoute(
     modifier: Modifier = Modifier,
+    onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: ForYouViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -34,21 +38,28 @@ fun ForYouRoute(
         uiState = uiState,
         onClickLike = viewModel::onClickLike,
         onComment = viewModel::onComment,
-        onRepost = viewModel::onRepost,
+        onQuickRepost = viewModel::onQuickRepost,
+        onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,
+        onFollowClick = viewModel::onFollowClick,
         onLoadMore = viewModel::loadMore,
+        onRefresh = { viewModel.fetchPosts(isLoadMore = false) },
         modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ForYouRoute(
     uiState: ForYouUiState,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
-    onRepost: (String) -> Unit,
+    onQuickRepost: (String) -> Unit,
+    onCommentRepost: (com.loom.core.model.data.PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
+    onFollowClick: (String, String, Boolean) -> Unit,
     onLoadMore: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -72,27 +83,36 @@ internal fun ForYouRoute(
                         }
                     }
 
-                    LazyColumn(
-                        state = listState,
+                    PullToRefreshBox(
+                        state = rememberPullToRefreshState(),
+                        isRefreshing = uiState.isFetchingMore && listState.firstVisibleItemIndex == 0,
+                        onRefresh = onRefresh,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        feedObjects(
-                            objects = uiState.objects,
-                            onClickLike = onClickLike,
-                            onComment = onComment,
-                            onRepost = onRepost,
-                            onShare = onShare
-                        )
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            feedObjects(
+                                objects = uiState.objects,
+                                onClickLike = onClickLike,
+                                onComment = onComment,
+                                onQuickRepost = onQuickRepost,
+                                onCommentRepost = onCommentRepost,
+                                onShare = onShare,
+                                onFollowClick = onFollowClick
+                            )
 
-                        if (uiState.isFetchingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                            if (uiState.isFetchingMore && listState.firstVisibleItemIndex != 0) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                                    }
                                 }
                             }
                         }

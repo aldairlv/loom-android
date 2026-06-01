@@ -8,10 +8,11 @@ import com.loom.feature.profile.impl.routes.PostsRoute
 @Composable
 fun ProfileTabPage(
     tab: ProfileTab,
+    onRepostWithComment: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
 ) {
     when (tab) {
-        ProfileTab.Posts -> PostsRoute()
-        ProfileTab.Likes -> LikesRoute()
+        ProfileTab.Posts -> PostsRoute(onCommentRepostClick = onRepostWithComment)
+        ProfileTab.Likes -> LikesRoute(onCommentRepostClick = onRepostWithComment)
         ProfileTab.FollowingUsers -> FollowingUsersRoute()
     }
 }

@@ -88,14 +88,45 @@ class TagsViewModel @Inject constructor(
     }
 
     fun onClickLike(postId: String) {
-        // TODO
+        viewModelScope.launch {
+            val currentState = uiState.value
+            if (currentState is TagsUiState.Success) {
+                val post = currentState.posts.find { it.id == postId }
+                val isLiked = post?.interactions?.liked ?: false
+                try {
+                    homeRepository.toggleLike(postId, isLiked)
+                } catch (e: Exception) {
+                    // Error handled in repository (rollback)
+                }
+            }
+        }
     }
 
     fun onComment(postId: String) {
         // TODO
     }
 
-    fun onRepost(postId: String) {
+    fun onQuickRepost(postId: String) {
+        viewModelScope.launch {
+            val currentState = uiState.value
+            if (currentState is TagsUiState.Success) {
+                val post = currentState.posts.find { it.id == postId }
+                post?.let {
+                    try {
+                        homeRepository.quickRepost(
+                            postId = it.id,
+                            parentId = it.id,
+                            rootId = it.root?.id ?: it.id
+                        )
+                    } catch (e: Exception) {
+                        // Error handling
+                    }
+                }
+            }
+        }
+    }
+
+    fun onCommentRepost(postId: String) {
         // TODO
     }
 

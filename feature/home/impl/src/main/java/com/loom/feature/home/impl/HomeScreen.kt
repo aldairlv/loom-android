@@ -29,6 +29,7 @@ import com.loom.core.ui.tabs.TabsSettingsSheet
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onCreateClick: () -> Unit,
+    onRepostWithComment: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val tabs by viewModel.tabs.collectAsStateWithLifecycle()
@@ -36,8 +37,10 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         HomeScreen(
             tabs = tabs,
-            onToggleTab = viewModel::toggleTab
-
+            onToggleTab = viewModel::toggleTab,
+            tabContent = { tab ->
+                HomeTabPage(tab = tab, onRepostWithComment = onRepostWithComment)
+            }
         )
         DraggableCreatePostButton(
             onClick = onCreateClick

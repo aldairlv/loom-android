@@ -12,6 +12,7 @@ data class NetworkObjectPost(
     override val streamSessionId: String? = null,
     val author: NetworkPostAuthor,
     val parent: NetworkPostParent? = null,
+    @SerialName("root_post")
     val root: NetworkPostParent? = null,
     val trail: List<NetworkPostFeedItem> = emptyList(),
     val status: String = "",
