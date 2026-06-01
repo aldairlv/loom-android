@@ -53,13 +53,20 @@ import androidx.compose.ui.layout.positionInWindow
 fun PostEditorScreen(
     modifier: Modifier = Modifier,
     onClose: () -> Unit,
+    repostPost: com.loom.core.model.data.PostFeedItem? = null,
     viewModel: CreatePostViewModel = hiltViewModel()
 ) {
     val userProfile by viewModel.userProfile.collectAsStateWithLifecycle()
 
+    LaunchedEffect(repostPost) {
+        android.util.Log.d("LOOM_REPOST_DEBUG", "PostEditorScreen (Wrapper): LaunchedEffect triggered. repostPostID=${repostPost?.id}")
+        viewModel.onRepostPostChange(repostPost)
+    }
+
     PostEditorScreen(
         userProfile = userProfile,
         onClose = onClose,
+        repostPost = viewModel.repostPost,
         uiEvent = viewModel.uiEvent,
         rowsState = viewModel.rowsState,
         selectedTags = viewModel.selectedTags,
@@ -86,6 +93,7 @@ fun PostEditorScreen(
 internal fun PostEditorScreen(
     modifier: Modifier = Modifier,
     userProfile: UserAccountProfile?,
+    repostPost: com.loom.core.model.data.PostFeedItem? = null,
     uiEvent: SharedFlow<UiEvent>,
     rowsState: List<RowModel>,
     selectedTags: List<String>,
@@ -240,8 +248,14 @@ internal fun PostEditorScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // En el caso que sea una reposteo con comentario
+            // habria que llamar a  PostFeedContentBody con los datos del post
+            // y debajo tendria la posibilidad de añadir contenido nuevo
+            // y para crear el post hay que pasarle el parent id del post y root id y el contenido nuevo que hayamos agreagado
+            // entonces probablemente tenga que ser el primer item del lazycolumn pero no modificable osea uno aparte, y
             EditorScreenContent(
                 rows = rowsState,
+                repostPost = repostPost,
                 pendingFocusBlockId = pendingFocusBlockId,
                 onFocusConsumed = consumeFocusRequest,
                 onDrop = { blockId, origenId, destinoId, targetBlockId ->

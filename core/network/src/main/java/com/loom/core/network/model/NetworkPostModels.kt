@@ -11,7 +11,8 @@ data class NetworkPostCreateRequest(
     val status: String,
     val tags: List<String>,
     @SerialName("contents_input") val contentsInput: List<NetworkContentInput>,
-    val layout: List<NetworkLayoutRoot>
+    val layout: List<NetworkLayoutRoot>,
+    @SerialName("show_trailing") val showTrailing: Boolean = true
 )
 
 @Serializable

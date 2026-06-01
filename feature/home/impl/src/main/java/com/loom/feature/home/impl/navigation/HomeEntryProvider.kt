@@ -11,7 +11,10 @@ fun EntryProviderScope<NavKey>.homeEntry(navigator: Navigator) {
     entry<HomeNavKey> {
         HomeScreen(
             onCreateClick = {
-                navigator.navigate(CreatePostNavKey)
+                navigator.navigate(CreatePostNavKey())
+            },
+            onRepostWithComment = { post ->
+                navigator.navigate(CreatePostNavKey(repostPost = post))
             }
         )
     }
