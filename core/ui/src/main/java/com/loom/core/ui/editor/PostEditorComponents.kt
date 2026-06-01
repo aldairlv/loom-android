@@ -88,6 +88,8 @@ import com.loom.core.model.data.ImageBlock
 import com.loom.core.model.data.TextBlock
 import com.loom.core.model.data.VideoBlock
 import com.loom.core.model.data.RowModel
+import com.loom.core.ui.post.PostFeedContentBody
+import com.loom.core.model.data.PostFeedItem
 
 @Composable
 fun BlockComponent(
@@ -553,6 +555,7 @@ fun RowComponent(
 @Composable
 fun EditorScreenContent(
     rows: List<RowModel>,
+    repostPost: PostFeedItem? = null,
     pendingFocusBlockId: String? = null,
     onFocusConsumed: () -> Unit = {},
     onDrop: (blockId: String, origenId: String, destinoId: String, targetBlockId: String?) -> Unit,
@@ -569,9 +572,10 @@ fun EditorScreenContent(
     LaunchedEffect(pendingFocusBlockId) {
         if (pendingFocusBlockId != null) {
             val index = rows.indexOfFirst { row -> row.blocks.any { it.id == pendingFocusBlockId } }
+            val scrollIndex = if (repostPost != null) index + 1 else index
             if (index != -1) {
-                Log.d("EDITOR_DEBUG", "SCROLL: Persiguiendo foco -> Scroll hacia índice $index")
-                listState.animateScrollToItem(index)
+                Log.d("EDITOR_DEBUG", "SCROLL: Persiguiendo foco -> Scroll hacia índice $scrollIndex")
+                listState.animateScrollToItem(scrollIndex)
             }
         }
     }
@@ -600,6 +604,30 @@ fun EditorScreenContent(
                 )
             }
     ) {
+        if (repostPost != null) {
+            android.util.Log.d("LOOM_REPOST_DEBUG", "EditorScreenContent: repostPost is NOT null. ID=${repostPost.id}")
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.White.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(8.dp)
+                ) {
+                    PostFeedContentBody(postFeed = repostPost)
+                }
+            }
+        } else {
+            android.util.Log.d("LOOM_REPOST_DEBUG", "EditorScreenContent: repostPost is null")
+        }
+
+        // creo si es un repost con comentario tendria que ser un item aqui una columna
+        // con borde oscuro difuminado para diferencia que no es un contenido nuevo.
+        // dentro de esa columna se llamaria a PostFeedContentBody para renderizar el post
         items(
             items = rows,
             key = { row -> row.id }
