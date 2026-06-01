@@ -1,6 +1,5 @@
 package com.loom.core.database.model
 
-/*
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,6 +8,8 @@ import com.loom.core.model.data.PostFeedContent
 import com.loom.core.model.data.PostFeedItem
 import com.loom.core.model.data.PostParent
 import com.loom.core.model.data.LayoutRoot
+import com.loom.core.model.data.PostInteractions
+import com.loom.core.model.data.PostStats
 import kotlinx.datetime.Instant
 
 @Entity(tableName = "posts")
@@ -23,6 +24,8 @@ data class PostEntity(
     val tags: List<String>,
     val contents: List<PostFeedContent>,
     val layout: List<LayoutRoot>,
+    val interactions: PostInteractions? = null,
+    val stats: PostStats? = null,
     @ColumnInfo(name = "created_at")
     val createdAt: Instant,
     @ColumnInfo(name = "updated_at")
@@ -42,6 +45,8 @@ fun PostEntity.asExternalPostModel() = PostFeedItem(
     tags = tags,
     contents = contents,
     layout = layout,
+    interactions = interactions,
+    stats = stats,
     createdAt = createdAt,
     updatedAt = updatedAt,
     publishedAt = publishedAt
@@ -57,8 +62,9 @@ fun PostFeedItem.asEntity() = PostEntity(
     tags = tags,
     contents = contents,
     layout = layout,
+    interactions = interactions,
+    stats = stats,
     createdAt = createdAt,
     updatedAt = updatedAt,
     publishedAt = publishedAt
 )
-*/

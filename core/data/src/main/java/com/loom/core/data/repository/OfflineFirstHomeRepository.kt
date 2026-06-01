@@ -2,7 +2,6 @@ package com.loom.core.data.repository
 
 import android.util.Log
 import com.loom.core.model.data.FeedObject
-//import com.loom.core.model.data.FeedObjectsResult
 import com.loom.core.model.data.PostAuthor
 import com.loom.core.model.data.PostFeedContent
 import com.loom.core.model.data.PostFeedItem
@@ -17,6 +16,11 @@ import com.loom.core.model.data.ImageBlock
 import com.loom.core.model.data.VideoBlock
 import com.loom.core.model.data.LayoutRoot
 import com.loom.core.model.data.LayoutRow
+import com.loom.core.database.dao.PostDao
+import com.loom.core.database.dao.TimelineDao
+import com.loom.core.database.model.TimelineEntity
+import com.loom.core.database.model.asEntity
+import com.loom.core.database.model.asFeedObjectModel
 import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkContentInput
 import com.loom.core.network.model.NetworkLayoutRoot
@@ -31,6 +35,8 @@ import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkPostMedia
 import com.loom.core.network.model.NetworkPostParent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import com.loom.core.network.model.NetworkMediaResponse
@@ -42,7 +48,15 @@ import javax.inject.Inject
 
 internal class OfflineFirstHomeRepository @Inject constructor(
     private val network: LoomNetworkDataSource,
+    private val postDao: PostDao,
+    private val timelineDao: TimelineDao,
 ) : HomeRepository {
+
+    override fun getFeedObjectsForYouFlow(): Flow<List<FeedObject>> {
+        return timelineDao.getTimeline("for_you").map { populatedObjects ->
+            populatedObjects.mapNotNull { it.asFeedObjectModel() }
+        }
+    }
 
     override suspend fun getPostsFeedForYou(cursor: String?): PostsFeedResult {
         val networkResponse = network.getPostsFeedForYou(cursor)
@@ -52,10 +66,39 @@ internal class OfflineFirstHomeRepository @Inject constructor(
         )
     }
 
-    override suspend fun getFeedObjectsForYou(cursor: String?): FeedObjectsResult {
+    override suspend fun getFeedObjectsForYou(cursor: String?, isRefresh: Boolean): FeedObjectsResult {
+        if (isRefresh) {
+            timelineDao.clearTimelineObjects("for_you")
+        }
+
         val networkResponse = network.getFeedObjectsForYou(cursor)
+        val feedObjects = networkResponse.results.mapNotNull { it.asExternalModel() }
+
+        Log.d("LOOM_DATA_FLOW", "Repository: Mapped ${feedObjects.size} objects. Checking for Root content...")
+        feedObjects.forEachIndexed { index, feedObject ->
+            if (feedObject is FeedObject.PostFeedObject) {
+                val post = feedObject.post
+                Log.d("LOOM_DATA_FLOW", "Repository Post [$index]: id=${post.id}, rootId=${post.root?.id}, rootContentSize=${post.root?.contents?.size ?: 0}")
+            }
+        }
+
+        // Save to DB
+        val postEntities = feedObjects.filterIsInstance<FeedObject.PostFeedObject>().map { it.post.asEntity() }
+        postDao.upsertPosts(postEntities)
+
+        val timelineEntities = networkResponse.results.map { networkObj ->
+            TimelineEntity(
+                timelineCategory = "for_you",
+                objectType = networkObj.objectType,
+                objectId = networkObj.id,
+                streamGlobalPosition = networkObj.streamGlobalPosition,
+                streamSessionId = networkObj.streamSessionId
+            )
+        }
+        timelineDao.upsertTimelineObjects(timelineEntities)
+
         return FeedObjectsResult(
-            objects = networkResponse.results.mapNotNull { it.asExternalModel() },
+            objects = feedObjects,
             nextCursor = networkResponse.next
         )
     }
@@ -106,7 +149,9 @@ internal class OfflineFirstHomeRepository @Inject constructor(
     override suspend fun createPost(
         status: String,
         tags: List<String>,
-        rows: List<RowModel>
+        rows: List<RowModel>,
+        parentId: String?,
+        rootId: String?
     ) {
         val contentsInput = mutableListOf<NetworkContentInput>()
         val layoutDisplay = mutableListOf<NetworkLayoutRow>()
@@ -132,13 +177,81 @@ internal class OfflineFirstHomeRepository @Inject constructor(
         }
 
         val request = NetworkPostCreateRequest(
+            parentId = parentId,
+            rootId = rootId,
             status = status,
             tags = tags,
             contentsInput = contentsInput,
-            layout = listOf(NetworkLayoutRoot(type = "rows", display = layoutDisplay))
+            layout = listOf(NetworkLayoutRoot(type = "rows", display = layoutDisplay)),
+            showTrailing = true
         )
 
         network.createPost(request)
+    }
+
+    override suspend fun quickRepost(postId: String, parentId: String?, rootId: String?) {
+        val request = NetworkPostCreateRequest(
+            parentId = parentId ?: postId,
+            rootId = rootId ?: postId,
+            status = "published",
+            tags = emptyList(),
+            contentsInput = emptyList(),
+            layout = emptyList(),
+            showTrailing = true
+        )
+        network.createPost(request)
+    }
+
+    override suspend fun toggleLike(postId: String, isLiked: Boolean) {
+        // Optimistic update
+        val localPost = postDao.getPost(postId)
+        if (localPost != null) {
+            val currentInteractions = localPost.interactions ?: PostInteractions(false, false, false)
+            val currentStats = localPost.stats ?: PostStats(0, 0, 0)
+            
+            val newInteractions = currentInteractions.copy(liked = !isLiked)
+            val newStats = currentStats.copy(
+                likesCount = if (isLiked) (currentStats.likesCount - 1).coerceAtLeast(0) 
+                             else currentStats.likesCount + 1
+            )
+            
+            postDao.upsertPost(localPost.copy(interactions = newInteractions, stats = newStats))
+        }
+
+        try {
+            if (isLiked) {
+                network.unlikePost(postId)
+            } else {
+                network.likePost(postId)
+            }
+        } catch (e: Exception) {
+            // Rollback on error
+            if (localPost != null) {
+                postDao.upsertPost(localPost)
+            }
+            throw e
+        }
+    }
+
+    override suspend fun toggleFollow(profileId: String, isFollowed: Boolean) {
+        try {
+            if (isFollowed) {
+                network.unfollowUser(profileId)
+            } else {
+                network.followUser(profileId)
+            }
+            
+            // After successful network call, update all posts from this author in the DB
+            val allPosts = postDao.getAllPosts()
+            val updatedPosts = allPosts.filter { it.author.id == profileId }.map { post ->
+                post.copy(author = post.author.copy(isFollowed = !isFollowed))
+            }
+            if (updatedPosts.isNotEmpty()) {
+                postDao.upsertPosts(updatedPosts)
+            }
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }
 
