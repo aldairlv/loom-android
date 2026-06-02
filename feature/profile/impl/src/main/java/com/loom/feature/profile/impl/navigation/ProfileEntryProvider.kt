@@ -12,10 +12,13 @@ fun EntryProviderScope<NavKey>.profileEntry(navigator: Navigator) {
     entry<ProfileNavKey> {
         ProfileScreen(
             onCreateClick = {
-                navigator.navigate(CreatePostNavKey)
+                navigator.navigate(CreatePostNavKey())
             },
             onSettingsClick = {
                 navigator.navigate(SettingsNavKey)
+            },
+            onRepostWithComment = { post ->
+                navigator.navigate(CreatePostNavKey(repostPost = post))
             }
         )
     }

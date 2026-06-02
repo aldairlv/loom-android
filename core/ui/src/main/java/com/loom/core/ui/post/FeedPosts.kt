@@ -9,8 +9,10 @@ fun LazyListScope.feedPosts(
     posts: List<PostFeedItem>,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
-    onRepost: (String) -> Unit,
+    onQuickRepost: (String) -> Unit,
+    onCommentRepost: (PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
+    onFollowClick: (String, String, Boolean) -> Unit = { _, _, _ -> },
 ) {
     items(
         items = posts,
@@ -20,8 +22,10 @@ fun LazyListScope.feedPosts(
             postFeed = post,
             onClickLike = { onClickLike(post.id) },
             onComment = { onComment(post.id) },
-            onRepost = { onRepost(post.id) },
-            onShare = { onShare(post.id) }
+            onQuickRepost = { onQuickRepost(post.id) },
+            onCommentRepost = onCommentRepost,
+            onShare = { onShare(post.id) },
+            onFollowClick = { onFollowClick(post.id, post.author.id, post.author.isFollowed) }
         )
     }
 }

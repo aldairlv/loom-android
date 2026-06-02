@@ -33,7 +33,16 @@ import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkFollowingUsersFeedEnvelope
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
+import com.loom.core.network.model.NetworkFeedObjectEnvelope
+import com.loom.core.network.model.NetworkFeedObjectResponse
+import com.loom.core.network.model.NetworkLikeResponse
+import com.loom.core.network.model.NetworkFollowResponse
+import com.loom.core.network.model.NetworkComment
+import com.loom.core.network.model.NetworkCommentRequest
+import com.loom.core.network.model.NetworkCommentEnvelope
+import com.loom.core.network.model.NetworkCommentResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -61,10 +70,10 @@ private interface RetrofitLoomNetworkApi {
         @Body request: NetworkRefreshRequest
     ): NetworkTokenResponse
 
-    @GET(value = "posts/posts/")
+    @GET(value = "posts/")
     suspend fun getPosts(): List<NetworkPost>
 
-    @POST(value = "posts/posts/")
+    @POST(value = "posts/")
     suspend fun createPost(
         @Body request: NetworkPostCreateRequest
     ): NetworkPostFeedItem
@@ -86,27 +95,32 @@ private interface RetrofitLoomNetworkApi {
     ): NetworkValidateEmailResponse
 
 
-    @GET(value = "posts/posts/recommend/")
+    @GET(value = "posts/recommend/")
     suspend fun getPostsFeedForYou(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/following/")
+    @GET(value = "feeds/for-you/")
+    suspend fun getFeedObjectsForYou(
+        @Query("cursor") cursor: String?
+    ): NetworkFeedObjectEnvelope
+
+    @GET(value = "posts/following/")
     suspend fun getPostsFeedFollowing(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/tags/")
+    @GET(value = "posts/tags/")
     suspend fun getPostsFeedTags(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/me/")
+    @GET(value = "posts/me/")
     suspend fun getPostsFeedMe(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
 
-    @GET(value = "posts/posts/liked/")
+    @GET(value = "posts/liked/")
     suspend fun getPostsFeedLiked(
         @Query("cursor") cursor: String?
     ): NetworkPostsFeedEnvelope
@@ -144,6 +158,51 @@ private interface RetrofitLoomNetworkApi {
     suspend fun uploadMedia(
         @Part file: MultipartBody.Part
     ): NetworkMediaResponse
+
+    @POST(value = "posts/{id}/likes/")
+    suspend fun likePost(
+        @Path("id") id: String
+    ): NetworkLikeResponse
+
+    @DELETE(value = "posts/{id}/likes/")
+    suspend fun unlikePost(
+        @Path("id") id: String
+    )
+
+    @POST(value = "users/{id}/followers/")
+    suspend fun followUser(
+        @Path("id") id: String
+    ): NetworkFollowResponse
+
+    @DELETE(value = "users/{id}/followers/")
+    suspend fun unfollowUser(
+        @Path("id") id: String
+    )
+
+    @GET(value = "posts/{id}/comments/")
+    suspend fun getComments(
+        @Path("id") id: String,
+        @Query("cursor") cursor: String?
+    ): NetworkCommentEnvelope
+
+    @POST(value = "posts/{id}/comments/")
+    suspend fun createComment(
+        @Path("id") id: String,
+        @Body request: NetworkCommentRequest
+    ): NetworkComment
+
+    @POST(value = "posts/{id}/comments/{comment_id}/")
+    suspend fun createReply(
+        @Path("id") id: String,
+        @Path("comment_id") commentId: String,
+        @Body request: NetworkCommentRequest
+    ): NetworkComment
+
+    @DELETE(value = "posts/{id}/comments/{comment_id}/")
+    suspend fun deleteComment(
+        @Path("id") id: String,
+        @Path("comment_id") commentId: String
+    )
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -211,6 +270,20 @@ internal class RetrofitLoomNetwork @Inject constructor(
         return NetworkPostsFeedResponse(
             next = result.response.feed.queryParams?.cursor,
             previous = null,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getFeedObjectsForYou(cursor: String?): NetworkFeedObjectResponse {
+        val result = networkApi.getFeedObjectsForYou(cursor)
+        android.util.Log.d("LOOM_DATA_FLOW", "Network Response (ForYou): Found ${result.response.feed.elements.size} elements")
+        result.response.feed.elements.forEachIndexed { index, networkObject ->
+            if (networkObject is com.loom.core.network.model.NetworkObjectPost) {
+                android.util.Log.d("LOOM_DATA_FLOW", "Network Post [$index]: id=${networkObject.id}, hasRoot=${networkObject.root != null}, rootContentSize=${networkObject.root?.contents?.size}")
+            }
+        }
+        return NetworkFeedObjectResponse(
+            next = result.response.feed.queryParams?.cursor,
             results = result.response.feed.elements
         )
     }
@@ -296,5 +369,34 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun uploadMedia(file: MultipartBody.Part): NetworkMediaResponse =
         networkApi.uploadMedia(file)
+
+    override suspend fun likePost(id: String): NetworkLikeResponse =
+        networkApi.likePost(id)
+
+    override suspend fun unlikePost(id: String) =
+        networkApi.unlikePost(id)
+
+    override suspend fun followUser(profileId: String): NetworkFollowResponse =
+        networkApi.followUser(profileId)
+
+    override suspend fun unfollowUser(profileId: String) =
+        networkApi.unfollowUser(profileId)
+
+    override suspend fun getComments(postId: String, cursor: String?): NetworkCommentResponse {
+        val result = networkApi.getComments(postId, cursor)
+        return NetworkCommentResponse(
+            next = result.response.comments.queryParams?.cursor,
+            results = result.response.comments.elements
+        )
+    }
+
+    override suspend fun createComment(postId: String, text: String): NetworkComment =
+        networkApi.createComment(postId, NetworkCommentRequest(text))
+
+    override suspend fun createReply(postId: String, commentId: String, text: String): NetworkComment =
+        networkApi.createReply(postId, commentId, NetworkCommentRequest(text))
+
+    override suspend fun deleteComment(postId: String, commentId: String) =
+        networkApi.deleteComment(postId, commentId)
 
 }

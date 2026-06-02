@@ -16,18 +16,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -54,6 +62,8 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
+import com.loom.core.common.util.toRelativeTimeSpan
+import com.loom.core.designsystem.icon.LoomIcons
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.PostAuthor
 import com.loom.core.model.data.PostFeedContent
@@ -62,18 +72,58 @@ import com.loom.core.model.data.PostMedia
 import com.loom.core.model.data.PostParent
 import com.loom.core.model.data.LayoutRoot
 import com.loom.core.model.data.LayoutRow
+import com.loom.core.model.data.PostInteractions
+import com.loom.core.model.data.PostStats
 import kotlinx.datetime.Clock
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostFeedCard(
     postFeed: PostFeedItem,
     onClickLike: () -> Unit,
     onComment: () -> Unit,
-    onRepost: () -> Unit,
+    onQuickRepost: () -> Unit,
+    onCommentRepost: (com.loom.core.model.data.PostFeedItem) -> Unit,
     onShare: () -> Unit,
+    onFollowClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    androidx.compose.runtime.LaunchedEffect(postFeed.id) {
+        android.util.Log.d("LOOM_DATA_FLOW", "UI PostFeedCard: id=${postFeed.id}, hasRoot=${postFeed.root != null}, rootContentSize=${postFeed.root?.contents?.size ?: 0}")
+    }
+    var showRepostSheet by remember { mutableStateOf(false) }
+
+    if (showRepostSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showRepostSheet = false },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
+            ) {
+                ListItem(
+                    headlineContent = { Text("Reposteo rápido") },
+                    leadingContent = { Icon(Icons.Default.Repeat, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        onQuickRepost()
+                        showRepostSheet = false
+                    }
+                )
+                ListItem(
+                    headlineContent = { Text("Repostear con comentario") },
+                    leadingContent = { Icon(Icons.Default.Edit, contentDescription = null) },
+                    modifier = Modifier.clickable {
+                        onCommentRepost(postFeed)
+                        showRepostSheet = false
+                    }
+                )
+            }
+        }
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -82,7 +132,12 @@ fun PostFeedCard(
     ) {
         Column(modifier = Modifier.padding(vertical = 12.dp)) {
             // Header: Author Info
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+            ) {
                 AsyncImage(
                     model = postFeed.author.avatarUrl,
                     contentDescription = null,
@@ -92,19 +147,37 @@ fun PostFeedCard(
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = postFeed.author.displayName,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    // Smart cast fix with local variable
+
+                    val timeSpan = postFeed.publishedAt?.toRelativeTimeSpan() ?: postFeed.createdAt.toRelativeTimeSpan()
                     val parent = postFeed.parent
-                    if (parent != null) {
+                    val root = postFeed.root
+
+                    if (parent != null && root != null) {
                         Text(
-                            text = "Reposteado de ${parent.author.displayName}",
+                            text = if (parent.author.id == root.author.id) "Reposteado • $timeSpan" else "Ha reposteado a ${parent.author.displayName} • $timeSpan",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
+                        )
+                    } else {
+                        Text(
+                            text = timeSpan,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                }
+                if (!postFeed.author.isFollowed) {
+                    TextButton(onClick = onFollowClick) {
+                        Text(
+                            text = "Seguir",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -116,62 +189,16 @@ fun PostFeedCard(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            // Root author if different from parent
-            val root = postFeed.root
-            val parent = postFeed.parent
-            if (root != null && root.id != parent?.id) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    AsyncImage(
-                        model = root.author.avatarUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = root.author.displayName,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+            PostFeedContentBody(postFeed = postFeed)
 
-            // Contents
-            val layoutRoot = postFeed.layout.firstOrNull { it.type == "rows" }
-            if (layoutRoot != null) {
-                layoutRoot.display.forEach { row ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        row.blocks.forEach { blockIndex ->
-                            val content = postFeed.contents.getOrNull(blockIndex)
-                            if (content != null) {
-                                Box(modifier = Modifier.weight(1f)) {
-                                    RenderContent(content)
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Fallback: simple vertical list
-                postFeed.contents.sortedBy { it.order }.forEach { content ->
-                    RenderContent(content)
-                }
-            }
+
 
             // Tags
             if (postFeed.tags.isNotEmpty()) {
                 var expanded by remember { mutableStateOf(false) }
                 val tagsText = postFeed.tags.joinToString(" ") { "#$it" }
 
-                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                     Text(
                         text = tagsText,
                         style = MaterialTheme.typography.bodyMedium,
@@ -196,18 +223,208 @@ fun PostFeedCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onComment, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.ChatBubbleOutline, contentDescription = "Comment")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onComment) {
+                        Icon(
+                            imageVector = if (postFeed.interactions?.commented == true) LoomIcons.Comment else LoomIcons.CommentBorder,
+                            contentDescription = "Comment",
+                            tint = if (postFeed.interactions?.commented == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    postFeed.stats?.commentsCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
-                IconButton(onClick = onRepost, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.Repeat, contentDescription = "Repost")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = { showRepostSheet = true }) {
+                        Icon(
+                            imageVector = if (postFeed.interactions?.reposted == true) LoomIcons.Repost else LoomIcons.RepostBorder,
+                            contentDescription = "Repost",
+                            tint = if (postFeed.interactions?.reposted == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    postFeed.stats?.repostsCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
-                IconButton(onClick = onClickLike, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Default.FavoriteBorder, contentDescription = "Like")
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onClickLike) {
+                        Icon(
+                            imageVector = if (postFeed.interactions?.liked == true) LoomIcons.Like else LoomIcons.LikeBorder,
+                            contentDescription = "Like",
+                            tint = if (postFeed.interactions?.liked == true) Color.Red else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    postFeed.stats?.likesCount?.let {
+                        if (it > 0) Text(text = it.toString(), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
                 IconButton(onClick = onShare, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Default.Share, contentDescription = "Share")
                 }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun PostFeedContentBody(
+    postFeed: PostFeedItem,
+    modifier: Modifier = Modifier
+) {
+    android.util.Log.d("LOOM_REPOST_DEBUG", "PostFeedContentBody: Rendering. ID=${postFeed.id}, root=${postFeed.root != null}, contentsSize=${postFeed.contents.size}")
+    val root = postFeed.root
+    val parent = postFeed.parent
+
+    Column(modifier = modifier) {
+        // Root content
+        if (root != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 8.dp)
+                ) {
+                    AsyncImage(
+                        model = root.author.avatarUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = root.author.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                PostLayoutContent(
+                    contents = root.contents ?: emptyList(),
+                    layout = root.layout
+                )
+            }
+        }
+
+        // Trail
+        if (postFeed.trail.isNotEmpty()) {
+            Column {
+                postFeed.trail.forEach { trailItem ->
+                    Column(
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AsyncImage(
+                                model = trailItem.author.avatarUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = trailItem.author.displayName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        PostLayoutContent(
+                            contents = trailItem.contents,
+                            layout = trailItem.layout,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Main content (if repost, show reposter's content, else show post content)
+        if (parent != null && root != null && !postFeed.contents.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 8.dp)
+                ) {
+                    AsyncImage(
+                        model = postFeed.author.avatarUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = postFeed.author.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                PostLayoutContent(
+                    contents = postFeed.contents ?: emptyList(),
+                    layout = postFeed.layout
+                )
+            }
+        } else {
+            PostLayoutContent(
+                contents = postFeed.contents,
+                layout = postFeed.layout
+            )
+        }
+    }
+}
+
+@Composable
+private fun PostLayoutContent(
+    contents: List<PostFeedContent>,
+    layout: List<LayoutRoot>?,
+    modifier: Modifier = Modifier
+) {
+    val layoutRoot = layout?.firstOrNull { it.type == "rows" }
+    if (layoutRoot != null) {
+        Column(modifier = modifier) {
+            layoutRoot.display.forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    row.blocks.forEach { blockIndex ->
+                        val content = contents.getOrNull(blockIndex)
+                        if (content != null) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                RenderContent(content)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        // Fallback: simple vertical list
+        Column(modifier = modifier) {
+            contents.sortedBy { it.order }.forEach { content ->
+                RenderContent(content)
             }
         }
     }
@@ -221,7 +438,7 @@ private fun RenderContent(content: PostFeedContent) {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
             }
         }
@@ -322,80 +539,152 @@ private fun RenderContent(content: PostFeedContent) {
     }
 }
 
-@Preview(name = "Light Mode", showBackground = true)
-@Preview(name = "Dark Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Normal Post", showBackground = true)
 @Composable
 fun PostFeedCardPreview() {
-    val fakePost = PostFeedItem(
-        id = "1",
-        author = PostAuthor(
-            id = "author1",
-            displayName = "Aldair",
-            avatarUrl = "https://example.com/avatar.jpg"
-        ),
-        parent = PostParent(
-            id = "parent1",
-            author = PostAuthor(
-                id = "author2",
-                displayName = "Jane Doe",
-                avatarUrl = "https://example.com/avatar2.jpg"
-            )
-        ),
-        root = PostParent(
-            id = "root1",
-            author = PostAuthor(
-                id = "author3",
-                displayName = "Root Author",
-                avatarUrl = "https://example.com/avatar3.jpg"
-            )
-        ),
-        status = "published",
-        tags = listOf("android", "compose", "kotlin", "ui", "development"),
-        contents = listOf(
-            PostFeedContent(
-                id = 1,
-                type = "text",
-                order = 0,
-                text = "¡Hola! Este es un post de prueba para el feed de Loom. ¿Qué les parece el diseño?",
-                media = null
-            ),
-            PostFeedContent(
-                id = 2,
-                type = "image",
-                order = 1,
-                text = null,
-                media = PostMedia(
-                    id = "media1",
-                    url = "https://http.cat/200",
-                    type = "image",
-                    width = 1080,
-                    height = 720
-                )
-            )
-        ),
-        layout = listOf(
-            LayoutRoot(
-                type = "rows",
-                display = listOf(
-                    LayoutRow(blocks = listOf(0)),
-                    LayoutRow(blocks = listOf(1))
-                )
-            )
-        ),
-        createdAt = Clock.System.now(),
-        updatedAt = Clock.System.now(),
-        publishedAt = Clock.System.now()
-    )
-
+    val fakePost = createFakePost()
     LoomTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             PostFeedCard(
                 postFeed = fakePost,
                 onClickLike = {},
                 onComment = {},
-                onRepost = {},
-                onShare = {}
+                onQuickRepost = {},
+                onCommentRepost = { _ -> },
+                onShare = {},
+                onFollowClick = {}
             )
         }
     }
+}
+
+@Preview(name = "Liked Post", showBackground = true)
+@Composable
+fun PostFeedCardLikedPreview() {
+    val fakePost = createFakePost(
+        interactions = PostInteractions(liked = true, reposted = false, commented = false)
+    )
+    LoomTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PostFeedCard(fakePost, {}, {}, {}, { _ -> }, {}, {})
+        }
+    }
+}
+
+@Preview(name = "With Trail", showBackground = true)
+@Composable
+fun PostFeedCardTrailPreview() {
+    val root = PostParent(
+        id = "root1",
+        author = PostAuthor("rootAuth", "Original Author", ""),
+        contents = listOf(PostFeedContent(id = 99, type = "text", order = 0, text = "Contenido original"))
+    )
+    val parent = PostParent(
+        id = "parent1",
+        author = PostAuthor("parentAuth", "Intermediate Reposter", "")
+    )
+
+    val trailItem = createFakePost(
+        id = "trail1",
+        author = PostAuthor("a2", "Trail Author", ""),
+        contents = listOf(PostFeedContent(id = 10, type = "text", order = 0, text = "Este es un item del trail"))
+    )
+    val trailItem2 = createFakePost(
+        id = "trail2",
+        author = PostAuthor("a3", "Trail Author3", ""),
+        contents = listOf(PostFeedContent(id = 11, type = "text", order = 1, text = "Este es un item del trail2"))
+    )
+    val fakePost = createFakePost(
+        parent = parent,
+        root = root,
+        trail = listOf(trailItem, trailItem2)
+    )
+    LoomTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PostFeedCard(fakePost, {}, {}, {}, { _ -> }, {}, {})
+        }
+    }
+}
+
+@Preview(name = "Same Parent and Root", showBackground = true)
+@Composable
+fun PostFeedCardSameParentRootPreview() {
+    val rootAuthor = PostAuthor("rootAuth", "Original Author", "")
+    val root = PostParent(
+        id = "root1",
+        author = rootAuthor,
+        contents = listOf(PostFeedContent(id = 99, type = "text", order = 0, text = "Contenido original"))
+    )
+    val fakePost = createFakePost(
+        parent = root,
+        root = root
+    )
+    LoomTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PostFeedCard(fakePost, {}, {}, {}, { _ -> }, {}, {})
+        }
+    }
+}
+
+@Preview(name = "Different Parent and Root", showBackground = true)
+@Composable
+fun PostFeedCardDifferentParentRootPreview() {
+    val root = PostParent(
+        id = "root1",
+        author = PostAuthor("rootAuth", "Original Author", ""),
+        contents = listOf(PostFeedContent(id = 99, type = "text", order = 0, text = "Contenido original"))
+    )
+    val parent = PostParent(
+        id = "parent1",
+        author = PostAuthor("parentAuth", "Intermediate Reposter", "")
+    )
+    val fakePost = createFakePost(
+        parent = parent,
+        root = root
+    )
+    LoomTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PostFeedCard(fakePost, {}, {}, {}, { _ -> }, {}, {})
+        }
+    }
+}
+
+private fun createFakePost(
+    id: String = "1",
+    author: PostAuthor = PostAuthor("author1", "Aldair", "https://http.cat/images/400.jpg"),
+    parent: PostParent? = null,
+    root: PostParent? = null,
+    trail: List<PostFeedItem> = emptyList(),
+    interactions: PostInteractions? = PostInteractions(liked = false, reposted = false, commented = false),
+    contents: List<PostFeedContent> = listOf(
+        PostFeedContent(
+            id = 1,
+            type = "text",
+            order = 0,
+            text = "¡Hola! Este es un post de prueba para el feed de Loom.",
+            media = null
+        )
+    )
+): PostFeedItem {
+    return PostFeedItem(
+        id = id,
+        author = author,
+        parent = parent,
+        root = root,
+        trail = trail,
+        status = "published",
+        tags = listOf("android", "compose", "kotlin"),
+        contents = contents,
+        layout = listOf(
+            LayoutRoot(
+                type = "rows",
+                display = listOf(LayoutRow(blocks = contents.indices.toList()))
+            )
+        ),
+        interactions = interactions,
+        stats = PostStats(likesCount = 10, repostsCount = 5, commentsCount = 2),
+        createdAt = Clock.System.now(),
+        updatedAt = Clock.System.now(),
+        publishedAt = Clock.System.now()
+    )
 }

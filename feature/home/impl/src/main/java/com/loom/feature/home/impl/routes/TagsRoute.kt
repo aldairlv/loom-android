@@ -26,6 +26,8 @@ import com.loom.core.ui.post.feedPosts
 @Composable
 fun TagsRoute(
     modifier: Modifier = Modifier,
+    onCommentClick: (String) -> Unit = {},
+    onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: TagsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -33,8 +35,9 @@ fun TagsRoute(
     TagsRoute(
         uiState = uiState,
         onClickLike = viewModel::onClickLike,
-        onComment = viewModel::onComment,
-        onRepost = viewModel::onRepost,
+        onComment = onCommentClick,
+        onQuickRepost = viewModel::onQuickRepost,
+        onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,
         onLoadMore = viewModel::loadMore,
         modifier = modifier
@@ -46,7 +49,8 @@ internal fun TagsRoute(
     uiState: TagsUiState,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
-    onRepost: (String) -> Unit,
+    onQuickRepost: (String) -> Unit,
+    onCommentRepost: (com.loom.core.model.data.PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
     onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
@@ -80,7 +84,8 @@ internal fun TagsRoute(
                             posts = uiState.posts,
                             onClickLike = onClickLike,
                             onComment = onComment,
-                            onRepost = onRepost,
+                            onQuickRepost = onQuickRepost,
+                            onCommentRepost = onCommentRepost,
                             onShare = onShare
                         )
 

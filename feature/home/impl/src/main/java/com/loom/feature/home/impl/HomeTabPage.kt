@@ -8,14 +8,25 @@ import com.loom.feature.home.impl.routes.TagsRoute
 @Composable
 fun HomeTabPage(
     tab: HomeTab,
+    onCommentClick: (String) -> Unit = {},
+    onRepostWithComment: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
 ) {
 
     when (tab) {
-        HomeTab.ForYou -> ForYouRoute()
+        HomeTab.ForYou -> ForYouRoute(
+            onCommentClick = onCommentClick,
+            onCommentRepostClick = onRepostWithComment
+        )
 
-        HomeTab.Following -> FollowingFeedRoute()
+        HomeTab.Following -> FollowingFeedRoute(
+            onCommentClick = onCommentClick,
+            onCommentRepostClick = onRepostWithComment
+        )
 
-        HomeTab.Tags -> TagsRoute()
+        HomeTab.Tags -> TagsRoute(
+            onCommentClick = onCommentClick,
+            onCommentRepostClick = onRepostWithComment
+        )
 
     }
 }

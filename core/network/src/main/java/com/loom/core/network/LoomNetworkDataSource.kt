@@ -14,10 +14,14 @@ import com.loom.core.network.model.NetworkTokenResponse
 import com.loom.core.network.model.NetworkValidateEmailResponse
 import com.loom.core.network.model.NetworkUserProfile
 import com.loom.core.network.model.NetworkFollowingUsersFeedResponse
-
+import com.loom.core.network.model.NetworkFeedObjectResponse
 import com.loom.core.network.model.NetworkPostFeedItem
 import com.loom.core.network.model.NetworkPostCreateRequest
 import com.loom.core.network.model.NetworkPostResponse
+import com.loom.core.network.model.NetworkLikeResponse
+import com.loom.core.network.model.NetworkFollowResponse
+import com.loom.core.network.model.NetworkComment
+import com.loom.core.network.model.NetworkCommentResponse
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -49,6 +53,10 @@ interface LoomNetworkDataSource {
     suspend fun getPostsFeedForYou(
         cursor: String? = null
     ): NetworkPostsFeedResponse
+
+    suspend fun getFeedObjectsForYou(
+        cursor: String? = null
+    ): NetworkFeedObjectResponse
 
     suspend fun getPostsFeedFollowing(
         cursor: String? = null
@@ -92,4 +100,15 @@ interface LoomNetworkDataSource {
     suspend fun uploadMedia(
         file: MultipartBody.Part
     ): NetworkMediaResponse
+
+    suspend fun likePost(id: String): NetworkLikeResponse
+    suspend fun unlikePost(id: String)
+
+    suspend fun followUser(profileId: String): NetworkFollowResponse
+    suspend fun unfollowUser(profileId: String)
+
+    suspend fun getComments(postId: String, cursor: String? = null): NetworkCommentResponse
+    suspend fun createComment(postId: String, text: String): NetworkComment
+    suspend fun createReply(postId: String, commentId: String, text: String): NetworkComment
+    suspend fun deleteComment(postId: String, commentId: String)
 }

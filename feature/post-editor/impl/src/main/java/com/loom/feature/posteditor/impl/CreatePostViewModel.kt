@@ -17,6 +17,7 @@ import com.loom.core.model.data.ImageBlock
 import com.loom.core.model.data.RowModel
 import com.loom.core.model.data.TextBlock
 import com.loom.core.model.data.UiEvent
+import com.loom.core.model.data.PostFeedItem
 import com.loom.core.model.data.UserAccountProfile
 import com.loom.core.model.data.VideoBlock
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,12 +31,21 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
     private val userRepository: UserRepository,
     private val userDataRepository: UserDataRepository,
 ) : ViewModel() {
+
+    var repostPost by mutableStateOf<PostFeedItem?>(null)
+        private set
+
+    fun onRepostPostChange(post: PostFeedItem?) {
+        android.util.Log.d("LOOM_REPOST_DEBUG", "ViewModel: onRepostPostChange called. PostID=${post?.id}")
+        repostPost = post
+    }
 
     val userProfile: StateFlow<UserAccountProfile?> = userDataRepository.userData
         .map { it.userId }
@@ -296,7 +306,9 @@ class CreatePostViewModel @Inject constructor(
                 homeRepository.createPost(
                     status = status,
                     tags = selectedTags,
-                    rows = rowsState
+                    rows = rowsState,
+                    parentId = repostPost?.id,
+                    rootId = repostPost?.root?.id ?: repostPost?.id
                 )
                 resetEditor()
                 onSuccess()
@@ -313,7 +325,9 @@ class CreatePostViewModel @Inject constructor(
                 homeRepository.createPost(
                     status = "draft",
                     tags = selectedTags,
-                    rows = rowsState
+                    rows = rowsState,
+                    parentId = repostPost?.id,
+                    rootId = repostPost?.root?.id ?: repostPost?.id
                 )
                 resetEditor()
                 onSuccess()

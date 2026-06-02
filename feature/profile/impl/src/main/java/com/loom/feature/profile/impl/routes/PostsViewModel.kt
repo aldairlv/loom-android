@@ -3,6 +3,7 @@ package com.loom.feature.profile.impl.routes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.loom.core.common.result.Result
+import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.ProfileRepository
 import com.loom.core.model.data.PostFeedItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,7 @@ sealed interface PostsUiState {
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
+    private val homeRepository: HomeRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow<PostsUiState>(PostsUiState.Loading)
     val uiState: StateFlow<PostsUiState> = _uiState.asStateFlow()
@@ -106,15 +108,46 @@ class PostsViewModel @Inject constructor(
     }
 
     fun onClickLike(postId: String) {
-        // TODO: Implement like functionality
+        viewModelScope.launch {
+            val currentState = uiState.value
+            if (currentState is PostsUiState.Success) {
+                val post = currentState.posts.find { it.id == postId }
+                val isLiked = post?.interactions?.liked ?: false
+                try {
+                    homeRepository.toggleLike(postId, isLiked)
+                } catch (e: Exception) {
+                    // Error handled in repository (rollback)
+                }
+            }
+        }
     }
 
     fun onComment(postId: String) {
         // TODO: Implement comment functionality
     }
 
-    fun onRepost(postId: String) {
-        // TODO: Implement repost functionality
+    fun onQuickRepost(postId: String) {
+        viewModelScope.launch {
+            val currentState = uiState.value
+            if (currentState is PostsUiState.Success) {
+                val post = currentState.posts.find { it.id == postId }
+                post?.let {
+                    try {
+                        homeRepository.quickRepost(
+                            postId = it.id,
+                            parentId = it.id,
+                            rootId = it.root?.id ?: it.id
+                        )
+                    } catch (e: Exception) {
+                        // Error handling
+                    }
+                }
+            }
+        }
+    }
+
+    fun onCommentRepost(postId: String) {
+        // TODO: Implement repost with comment functionality
     }
 
     fun onShare(postId: String) {

@@ -11,6 +11,7 @@ class NetworkObjectTrend (
     override val objectType: String,
     override val id: String,
     override val streamGlobalPosition: Int,
+    override val streamSessionId: String? = null,
     val category: String,
     val count: String,
     val iconUrl: String,

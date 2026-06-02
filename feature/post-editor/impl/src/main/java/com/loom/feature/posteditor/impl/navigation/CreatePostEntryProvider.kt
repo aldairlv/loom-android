@@ -7,8 +7,9 @@ import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.PostEditorScreen
 
 fun EntryProviderScope<NavKey>.createPostEntry(navigator: Navigator) {
-    entry<CreatePostNavKey> {
+    entry<CreatePostNavKey> { key ->
         PostEditorScreen(
+            repostPost = key.repostPost,
             onClose = { navigator.goBack() }
         )
     }

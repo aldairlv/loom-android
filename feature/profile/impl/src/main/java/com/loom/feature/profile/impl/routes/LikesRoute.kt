@@ -35,6 +35,7 @@ import com.loom.core.ui.post.feedPosts
 @Composable
 fun LikesRoute(
     modifier: Modifier = Modifier,
+    onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: LikesViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -53,7 +54,8 @@ fun LikesRoute(
             uiState = uiState,
             onClickLike = viewModel::onClickLike,
             onComment = viewModel::onComment,
-            onRepost = viewModel::onRepost,
+            onQuickRepost = viewModel::onQuickRepost,
+            onCommentRepost = onCommentRepostClick,
             onShare = viewModel::onShare,
             onLoadMore = viewModel::loadMore,
         )
@@ -66,7 +68,8 @@ internal fun LikesRoute(
     uiState: LikesUiState,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
-    onRepost: (String) -> Unit,
+    onQuickRepost: (String) -> Unit,
+    onCommentRepost: (com.loom.core.model.data.PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
     onLoadMore: () -> Unit,
 ) {
@@ -116,7 +119,8 @@ internal fun LikesRoute(
                             posts = uiState.posts,
                             onClickLike = onClickLike,
                             onComment = onComment,
-                            onRepost = onRepost,
+                            onQuickRepost = onQuickRepost,
+                            onCommentRepost = onCommentRepost,
                             onShare = onShare
                         )
 
