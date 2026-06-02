@@ -2,6 +2,7 @@ package com.loom.core.network.serialization.polymorphic
 
 import com.loom.core.network.model.NetworkObject
 import com.loom.core.network.model.NetworkObjectCarousel
+import com.loom.core.network.model.NetworkObjectEvent
 import com.loom.core.network.model.NetworkObjectPost
 import com.loom.core.network.model.NetworkObjectTitle
 import com.loom.core.network.model.NetworkObjectTrend
@@ -28,6 +29,7 @@ object NetworkObjectSerializer :
             "title" -> NetworkObjectTitle.serializer()
             "carousel" -> NetworkObjectCarousel.serializer()
             "trend" -> NetworkObjectTrend.serializer()
+            "event" -> NetworkObjectEvent.serializer()
             else -> error("Unknown type: $type")
         }
     }

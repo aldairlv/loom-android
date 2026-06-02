@@ -1,21 +1,18 @@
 package com.loom.core.data.di
 
-//import com.loom.core.data.repository.OfflineFirstPostRepository
 import com.loom.core.data.repository.AuthRepository
 import com.loom.core.data.repository.DataTokenManager
-//import com.loom.core.data.repository.ExploreRepository
+import com.loom.core.data.repository.EventsRepository
 import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.OfflineFirstAuthRepository
-//import com.loom.core.data.repository.OfflineFirstExploreRepository
+import com.loom.core.data.repository.OfflineFirstEventsRepository
 import com.loom.core.data.repository.OfflineFirstHomeRepository
 import com.loom.core.data.repository.OfflineFirstProfileRepository
 import com.loom.core.data.repository.OfflineFirstSettingsRepository
-//import com.loom.core.data.repository.OfflineFirstTimelineRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
 import com.loom.core.data.repository.OfflineFirstUserRepository
 import com.loom.core.data.repository.ProfileRepository
 import com.loom.core.data.repository.SettingsRepository
-//import com.loom.core.data.repository.PostRepository
 import com.loom.core.data.repository.TimelineRepository
 import com.loom.core.data.repository.UserRepository
 import com.loom.core.data.repository.UserDataRepository
@@ -30,18 +27,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
-
-/*
-    @Binds
-    internal abstract fun bindsExploreRepository(
-        exploreRepository: OfflineFirstExploreRepository
-    ): ExploreRepository
-
-    @Binds
-    internal abstract fun bindsTimelineRepository(
-        timelineRepository: OfflineFirstTimelineRepository
-    ): TimelineRepository
-*/
 
     @Binds
     internal abstract fun bindsNetworkMonitor(
@@ -67,6 +52,11 @@ abstract class DataModule {
     internal abstract fun bindsHomeRepository(
         eventsFeedRepository: OfflineFirstHomeRepository
     ): HomeRepository
+
+    @Binds
+    internal abstract fun bindsEventsRepository(
+        eventsRepository: OfflineFirstEventsRepository
+    ): EventsRepository
 
     @Binds
     internal abstract fun bindsUserRepository(

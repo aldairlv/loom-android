@@ -58,6 +58,10 @@ interface LoomNetworkDataSource {
         cursor: String? = null
     ): NetworkFeedObjectResponse
 
+    suspend fun getFeedEventsSoon(
+        cursor: String? = null
+    ): NetworkFeedObjectResponse
+
     suspend fun getPostsFeedFollowing(
         cursor: String? = null
     ): NetworkPostsFeedResponse

@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -22,6 +21,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.ui.feed.feedObjects
+import com.loom.core.ui.tabs.TabItem
+import com.loom.core.ui.tabs.TabsBar
+import com.loom.core.ui.tabs.TabsSettingsSheet
+import com.loom.feature.events.impl.routes.SoonRoute
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -31,8 +34,12 @@ fun EventsScreen(
     viewModel: EventsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val tabs by viewModel.tabs.collectAsStateWithLifecycle()
+
     EventsScreen(
         uiState = uiState,
+        tabs = tabs,
+        onToggleTab = viewModel::toggleTab,
         onClickLike = viewModel::onClickLike,
         onQuickRepost = viewModel::onQuickRepost,
         onShare = viewModel::onShare,
@@ -45,6 +52,8 @@ fun EventsScreen(
 @Composable
 internal fun EventsScreen(
     uiState: EventsUiState,
+    tabs: List<TabItem>,
+    onToggleTab: (String, Boolean) -> Unit,
     onClickLike: (String) -> Unit,
     onQuickRepost: (String) -> Unit,
     onShare: (String) -> Unit,
@@ -52,10 +61,11 @@ internal fun EventsScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val tabs = listOf("Próximos", "Hoy", "Mañana", "Fin de semana")
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val visibleTabs = remember(tabs) { tabs.filter { it.enabled } }
+    val pagerState = rememberPagerState(pageCount = { visibleTabs.size })
     val coroutineScope = rememberCoroutineScope()
     var topBarHeight by remember { mutableFloatStateOf(0f) }
+    var showSettings by remember { mutableStateOf(false) }
 
     LaunchedEffect(topBarHeight) {
         if (topBarHeight > 0f) {
@@ -91,29 +101,12 @@ internal fun EventsScreen(
                         )
                     }
 
-                    // Tabs Row
-                    SecondaryTabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        containerColor = Color.Transparent,
-                        divider = {}
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        pagerState.animateScrollToPage(index)
-                                    }
-                                },
-                                text = {
-                                    Text(
-                                        text = title,
-                                        style = MaterialTheme.typography.titleSmall
-                                    )
-                                }
-                            )
-                        }
-                    }
+                    // Tabs Bar
+                    TabsBar(
+                        tabs = visibleTabs,
+                        pagerState = pagerState,
+                        onSettingsClick = { showSettings = true }
+                    )
                 }
             }
         }
@@ -123,15 +116,27 @@ internal fun EventsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding())
-        ) { _ ->
-            EventsPage(
-                uiState = uiState,
-                onClickLike = onClickLike,
-                onQuickRepost = onQuickRepost,
-                onShare = onShare,
-                onFollowClick = onFollowClick
-            )
+        ) { page ->
+            val tab = visibleTabs[page]
+            when (tab.key) {
+                "upcoming" -> SoonRoute()
+                else -> EventsPage(
+                    uiState = uiState,
+                    onClickLike = onClickLike,
+                    onQuickRepost = onQuickRepost,
+                    onShare = onShare,
+                    onFollowClick = onFollowClick
+                )
+            }
         }
+    }
+
+    if (showSettings) {
+        TabsSettingsSheet(
+            tabs = tabs,
+            onDismiss = { showSettings = false },
+            onToggleTab = onToggleTab
+        )
     }
 }
 
@@ -178,6 +183,11 @@ fun EventsScreenPreview() {
     LoomTheme {
         EventsScreen(
             uiState = EventsUiState.Success(emptyList()),
+            tabs = listOf(
+                TabItem("upcoming", "Próximos"),
+                TabItem("today", "Hoy"),
+            ),
+            onToggleTab = { _, _ -> },
             onClickLike = {},
             onQuickRepost = {},
             onShare = {},

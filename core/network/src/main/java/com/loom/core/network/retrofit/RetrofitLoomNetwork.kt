@@ -105,6 +105,11 @@ private interface RetrofitLoomNetworkApi {
         @Query("cursor") cursor: String?
     ): NetworkFeedObjectEnvelope
 
+    @GET(value = "feeds/soon/")
+    suspend fun getFeedEventsSoon(
+        @Query("cursor") cursor: String?
+    ): NetworkFeedObjectEnvelope
+
     @GET(value = "posts/following/")
     suspend fun getPostsFeedFollowing(
         @Query("cursor") cursor: String?
@@ -282,6 +287,14 @@ internal class RetrofitLoomNetwork @Inject constructor(
                 android.util.Log.d("LOOM_DATA_FLOW", "Network Post [$index]: id=${networkObject.id}, hasRoot=${networkObject.root != null}, rootContentSize=${networkObject.root?.contents?.size}")
             }
         }
+        return NetworkFeedObjectResponse(
+            next = result.response.feed.queryParams?.cursor,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getFeedEventsSoon(cursor: String?): NetworkFeedObjectResponse {
+        val result = networkApi.getFeedEventsSoon(cursor)
         return NetworkFeedObjectResponse(
             next = result.response.feed.queryParams?.cursor,
             results = result.response.feed.elements

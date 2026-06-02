@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import com.loom.core.model.data.FeedObject
 import com.loom.core.model.data.PostFeedItem
+import com.loom.core.ui.event.EventFeedCard
 import com.loom.core.ui.post.PostFeedCard
 
 fun LazyListScope.feedObjects(
@@ -37,7 +38,21 @@ fun LazyListScope.feedObjects(
                     }
                 )
             }
-            // Future objects like Carousel or Title can be added here
+            is FeedObject.EventFeedObject -> {
+                EventFeedCard(
+                    eventFeed = feedObject.event,
+                    onClickLike = { onClickLike(feedObject.event.id) },
+                    onComment = { onComment(feedObject.event.id) },
+                    onShare = { onShare(feedObject.event.id) },
+                    onFollowClick = {
+                        onFollowClick(
+                            feedObject.event.id,
+                            "", // authorId not directly in EventCreator for now
+                            false
+                        )
+                    }
+                )
+            }
         }
     }
 }
