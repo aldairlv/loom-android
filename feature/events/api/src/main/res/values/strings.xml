@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_events_api_title">Events</string>
+    <string name="feature_events_api_loading">Cargando feed...</string>
+    <string name="feature_events_api_error">Error al cargar el feed.</string>
+</resources>
