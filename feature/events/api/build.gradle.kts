@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.loom.feature.explore.api"
+    namespace = "com.loom.feature.events.api"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -17,20 +17,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
 }
 
 dependencies {

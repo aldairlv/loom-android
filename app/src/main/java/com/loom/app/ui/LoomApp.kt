@@ -49,6 +49,7 @@ import com.loom.feature.auth.impl.navigation.emailInputEntry
 import com.loom.feature.auth.impl.navigation.passwordInputEntry
 import com.loom.feature.comments.api.navigation.CommentsNavKey
 import com.loom.feature.comments.impl.navigation.commentsEntry
+import com.loom.feature.events.impl.navigation.eventsEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
@@ -127,6 +128,7 @@ internal fun LoomApp(
         createPostEntry(navigator)
         profileEntry(navigator)
         commentsEntry(navigator)
+        eventsEntry(navigator)
 
         // Settings
         settingsEntry(navigator)
