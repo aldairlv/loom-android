@@ -42,8 +42,14 @@ class SoonViewModel @Inject constructor(
         if (isLoadMore && currentCursor == null) return
 
         viewModelScope.launch {
-            if (isLoadMore) isFetchingMore.value = true
-            else _uiState.value = SoonUiState.Loading
+            if (isLoadMore || allObjects.isNotEmpty()) {
+                isFetchingMore.value = true
+                if (uiState.value is SoonUiState.Success) {
+                    _uiState.value = (uiState.value as SoonUiState.Success).copy(isFetchingMore = true)
+                }
+            } else {
+                _uiState.value = SoonUiState.Loading
+            }
 
             try {
                 val cursorToPass = currentCursor?.let {

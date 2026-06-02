@@ -16,9 +16,18 @@ data class NetworkObjectEvent(
     @SerialName("event_data")
     val eventData: NetworkEventData,
     @SerialName("friends_attending")
-    val friendsAttending: List<String> = emptyList(),
-    val distance: Double? = null
+    val friendsAttending: List<NetworkFriendAttending> = emptyList(),
+    val distance: String? = null
 ) : NetworkObject
+
+@Serializable
+data class NetworkFriendAttending(
+    val id: String,
+    @SerialName("display_name")
+    val displayName: String,
+    @SerialName("avatar_url")
+    val avatarUrl: String?
+)
 
 @Serializable
 data class NetworkEventCreator(

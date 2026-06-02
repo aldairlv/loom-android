@@ -1,5 +1,6 @@
 package com.loom.core.ui.event
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.loom.core.model.data.EventFeedItem
 import com.loom.core.designsystem.icon.LoomIcons
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun EventFeedCard(
@@ -28,6 +32,12 @@ fun EventFeedCard(
     onFollowClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val eventDate = remember(eventFeed.eventData.startTime) {
+        val dateTime = eventFeed.eventData.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
+        val monthName = dateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }
+        "${dateTime.dayOfMonth} $monthName"
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -65,17 +75,34 @@ fun EventFeedCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Event Image
-            eventFeed.eventData.assets.firstOrNull()?.let { asset ->
-                AsyncImage(
-                    model = asset.url,
-                    contentDescription = null,
+            // Event Image & Date Overlay
+            Box {
+                eventFeed.eventData.assets.firstOrNull()?.let { asset ->
+                    AsyncImage(
+                        model = asset.url,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                
+                Surface(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                        .padding(8.dp)
+                        .align(Alignment.TopEnd),
+                    shape = RoundedCornerShape(4.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+                ) {
+                    Text(
+                        text = eventDate,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -95,7 +122,7 @@ fun EventFeedCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Location and Category
+            // Location, Distance and Category
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
@@ -105,15 +132,52 @@ fun EventFeedCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = eventFeed.eventData.location.name,
+                    text = "${eventFeed.eventData.location.name}${eventFeed.distance?.let { " • $it" } ?: ""}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 SuggestionChip(
                     onClick = { },
                     label = { Text(eventFeed.eventData.category) }
                 )
+            }
+
+            // Friends Attending
+            if (eventFeed.friendsAttending.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.width((eventFeed.friendsAttending.take(3).size * 16 + 8).dp)) {
+                        eventFeed.friendsAttending.take(3).forEachIndexed { index, friend ->
+                            AsyncImage(
+                                model = friend.avatarUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(start = (index * 16).dp)
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                    val othersCount = eventFeed.eventData.rsvpCount - eventFeed.friendsAttending.size
+                    if (othersCount > 0) {
+                        Text(
+                            text = "y $othersCount usuarios más",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    } else if (eventFeed.friendsAttending.size > 0) {
+                        Text(
+                            text = if (eventFeed.friendsAttending.size == 1) "asiste" else "asisten",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

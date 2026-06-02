@@ -6,12 +6,14 @@ import com.loom.core.model.data.EventData
 import com.loom.core.model.data.EventFeedItem
 import com.loom.core.model.data.EventLocation
 import com.loom.core.model.data.FeedObject
+import com.loom.core.model.data.FriendAttending
 import com.loom.core.model.data.PostMedia
 import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkEventCoordinates
 import com.loom.core.network.model.NetworkEventCreator
 import com.loom.core.network.model.NetworkEventData
 import com.loom.core.network.model.NetworkEventLocation
+import com.loom.core.network.model.NetworkFriendAttending
 import com.loom.core.network.model.NetworkObject
 import com.loom.core.network.model.NetworkObjectEvent
 import com.loom.core.network.model.NetworkPostMedia
@@ -42,7 +44,7 @@ private fun NetworkObject.asExternalModel(): FeedObject? {
                 tags = tags,
                 creator = creator.asExternalModel(),
                 eventData = eventData.asExternalModel(),
-                friendsAttending = friendsAttending,
+                friendsAttending = friendsAttending.map { it.asExternalModel() },
                 distance = distance
             ),
             streamGlobalPosition = streamGlobalPosition,
@@ -53,6 +55,12 @@ private fun NetworkObject.asExternalModel(): FeedObject? {
 }
 
 private fun NetworkEventCreator.asExternalModel() = EventCreator(
+    displayName = displayName,
+    avatarUrl = avatarUrl
+)
+
+private fun NetworkFriendAttending.asExternalModel() = FriendAttending(
+    id = id,
     displayName = displayName,
     avatarUrl = avatarUrl
 )

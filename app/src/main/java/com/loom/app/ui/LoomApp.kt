@@ -55,8 +55,10 @@ import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
 import com.loom.feature.profile.impl.navigation.profileEntry
 import com.loom.feature.settings.api.navigation.AccountSettingsNavKey
+import com.loom.feature.settings.api.navigation.LocationNavKey
 import com.loom.feature.settings.api.navigation.SettingsNavKey
 import com.loom.feature.settings.impl.navigation.accountSettingsEntry
+import com.loom.feature.settings.impl.navigation.locationEntry
 import com.loom.feature.settings.impl.navigation.settingsEntry
 
 
@@ -133,6 +135,7 @@ internal fun LoomApp(
         // Settings
         settingsEntry(navigator)
         accountSettingsEntry(navigator)
+        locationEntry(navigator)
     }
 
     val isLoggedIn = sessionState is SessionState.LoggedIn
@@ -142,7 +145,8 @@ internal fun LoomApp(
         if (currentKey is CreatePostNavKey ||
             currentKey is SettingsNavKey ||
             currentKey is AccountSettingsNavKey ||
-            currentKey is CommentsNavKey
+            currentKey is CommentsNavKey ||
+            currentKey is LocationNavKey
         ){
             NavDisplay(
                 entries = appState.navigationState.toEntries(entryProvider),

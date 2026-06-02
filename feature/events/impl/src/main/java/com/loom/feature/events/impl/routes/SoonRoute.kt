@@ -42,9 +42,13 @@ fun SoonRoute(
                     }
                 }
 
+                val isAtTop by remember {
+                    derivedStateOf { listState.firstVisibleItemIndex == 0 }
+                }
+
                 PullToRefreshBox(
                     state = rememberPullToRefreshState(),
-                    isRefreshing = false, // Add refreshing state if needed
+                    isRefreshing = state.isFetchingMore && isAtTop,
                     onRefresh = { viewModel.fetchSoonEvents(isLoadMore = false) },
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -62,7 +66,7 @@ fun SoonRoute(
                             onFollowClick = viewModel::onFollowClick
                         )
 
-                        if (state.isFetchingMore) {
+                        if (state.isFetchingMore && listState.firstVisibleItemIndex != 0) {
                             item {
                                 Box(
                                     modifier = Modifier

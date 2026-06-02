@@ -45,13 +45,15 @@ import com.loom.core.designsystem.theme.LoomTheme
 fun AccountSettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onLocationClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AccountSettingsScreen(
         uiState = uiState,
         onBackClick = onBackClick,
+        onLocationClick = onLocationClick,
         onOptimizeVideosChanged = viewModel::onOptimizeVideosChanged,
         onDisableDoubleTapLikeChanged = viewModel::onDisableDoubleTapLikeChanged,
         onLogout = viewModel::logout,
@@ -64,6 +66,7 @@ fun AccountSettingsScreen(
 internal fun AccountSettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
+    onLocationClick: () -> Unit,
     onOptimizeVideosChanged: (Boolean) -> Unit,
     onDisableDoubleTapLikeChanged: (Boolean) -> Unit,
     onLogout: () -> Unit,
@@ -112,6 +115,13 @@ internal fun AccountSettingsScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            item {
+                SettingsRow(
+                    title = "Location",
+                    subtitle = uiState.profile?.city ?: "No configurada",
+                    onClick = { onLocationClick() }
+                )
+            }
             item {
                 SettingsRow(
                     title = "Correo electrónico",
@@ -402,6 +412,7 @@ fun AccountSettingsScreenPreview() {
         AccountSettingsScreen(
             uiState = SettingsUiState(),
             onBackClick = {},
+            onLocationClick = {},
             onOptimizeVideosChanged = {},
             onDisableDoubleTapLikeChanged = {},
             onLogout = {}

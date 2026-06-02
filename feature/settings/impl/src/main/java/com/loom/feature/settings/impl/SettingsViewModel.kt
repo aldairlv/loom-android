@@ -66,6 +66,21 @@ class SettingsViewModel @Inject constructor(
         _uiState.update { it.copy(disableDoubleTapLike = disable) }
     }
 
+    fun updateLocation(latitude: Double, longitude: Double, city: String?) {
+        val profileId = uiState.value.profile?.id ?: return
+        viewModelScope.launch {
+            val result = profileRepository.updateProfile(
+                id = profileId,
+                latitude = latitude,
+                longitude = longitude,
+                city = city
+            )
+            if (result is Result.Success) {
+                _uiState.update { it.copy(profile = result.data) }
+            }
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()

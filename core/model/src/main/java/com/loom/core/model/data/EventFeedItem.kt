@@ -10,8 +10,15 @@ data class EventFeedItem(
     val tags: List<String>,
     val creator: EventCreator,
     val eventData: EventData,
-    val friendsAttending: List<String> = emptyList(),
-    val distance: Double? = null
+    val friendsAttending: List<FriendAttending> = emptyList(),
+    val distance: String? = null
+)
+
+@Serializable
+data class FriendAttending(
+    val id: String,
+    val displayName: String,
+    val avatarUrl: String?
 )
 
 @Serializable
