@@ -26,6 +26,7 @@ import com.loom.core.ui.post.feedPosts
 @Composable
 fun FollowingFeedRoute(
     modifier: Modifier = Modifier,
+    onCommentClick: (String) -> Unit = {},
     onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: FollowingFeedViewModel = hiltViewModel()
 ) {
@@ -34,7 +35,7 @@ fun FollowingFeedRoute(
     FollowingRoute(
         uiState = uiState,
         onClickLike = viewModel::onClickLike,
-        onComment = viewModel::onComment,
+        onComment = onCommentClick,
         onQuickRepost = viewModel::onQuickRepost,
         onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,

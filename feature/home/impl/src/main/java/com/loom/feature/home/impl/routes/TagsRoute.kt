@@ -26,6 +26,7 @@ import com.loom.core.ui.post.feedPosts
 @Composable
 fun TagsRoute(
     modifier: Modifier = Modifier,
+    onCommentClick: (String) -> Unit = {},
     onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: TagsViewModel = hiltViewModel()
 ) {
@@ -34,7 +35,7 @@ fun TagsRoute(
     TagsRoute(
         uiState = uiState,
         onClickLike = viewModel::onClickLike,
-        onComment = viewModel::onComment,
+        onComment = onCommentClick,
         onQuickRepost = viewModel::onQuickRepost,
         onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,

@@ -35,17 +35,6 @@ class ForYouViewModel @Inject constructor(
     private val isFetchingMore = MutableStateFlow(false)
     private val isError = MutableStateFlow(false)
 
-    private val _selectedPostId = MutableStateFlow<String?>(null)
-    val selectedPostId = _selectedPostId.asStateFlow()
-
-    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
-    val comments = _comments.asStateFlow()
-
-    private val _isFetchingComments = MutableStateFlow(false)
-    val isFetchingComments = _isFetchingComments.asStateFlow()
-
-    private var currentCommentsCursor: String? = null
-
     val uiState: StateFlow<ForYouUiState> = combine(
         homeRepository.getFeedObjectsForYouFlow(),
         isFetchingMore,
@@ -125,61 +114,23 @@ class ForYouViewModel @Inject constructor(
     }
 
     fun onComment(postId: String) {
-        _selectedPostId.value = postId
-        currentCommentsCursor = null
-        _comments.value = emptyList()
-        fetchComments(postId)
+        // Now handled by navigation
     }
 
     fun dismissComments() {
-        _selectedPostId.value = null
-        _comments.value = emptyList()
-        currentCommentsCursor = null
+        // Now handled by navigation
     }
 
     private fun fetchComments(postId: String, isLoadMore: Boolean = false) {
-        if (isLoadMore && currentCommentsCursor == null) return
-
-        viewModelScope.launch {
-            _isFetchingComments.value = true
-            try {
-                val result = homeRepository.getComments(postId, currentCommentsCursor)
-                if (isLoadMore) {
-                    _comments.value = _comments.value + result.comments
-                } else {
-                    _comments.value = result.comments
-                }
-                currentCommentsCursor = result.nextCursor
-            } catch (e: Exception) {
-                // Log error
-            } finally {
-                _isFetchingComments.value = false
-            }
-        }
+        // Now handled in CommentsViewModel
     }
 
     fun loadMoreComments() {
-        val postId = _selectedPostId.value ?: return
-        if (!_isFetchingComments.value) {
-            fetchComments(postId, isLoadMore = true)
-        }
+        // Now handled in CommentsViewModel
     }
 
     fun sendComment(text: String, parentId: String?) {
-        val postId = _selectedPostId.value ?: return
-        viewModelScope.launch {
-            try {
-                if (parentId == null) {
-                    homeRepository.createComment(postId, text)
-                } else {
-                    homeRepository.createReply(postId, parentId, text)
-                }
-                // Refresh comments after posting
-                fetchComments(postId)
-            } catch (e: Exception) {
-                // Handle error
-            }
-        }
+        // Now handled in CommentsViewModel
     }
 
     fun onQuickRepost(postId: String) {

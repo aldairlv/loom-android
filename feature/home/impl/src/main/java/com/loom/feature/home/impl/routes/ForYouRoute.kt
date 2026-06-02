@@ -23,25 +23,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.loom.core.ui.comment.CommentBottomSheet
 import com.loom.core.ui.feed.feedObjects
 
 
 @Composable
 fun ForYouRoute(
     modifier: Modifier = Modifier,
+    onCommentClick: (String) -> Unit = {},
     onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
     viewModel: ForYouViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedPostId by viewModel.selectedPostId.collectAsStateWithLifecycle()
-    val comments by viewModel.comments.collectAsStateWithLifecycle()
-    val isFetchingComments by viewModel.isFetchingComments.collectAsStateWithLifecycle()
 
     ForYouRoute(
         uiState = uiState,
         onClickLike = viewModel::onClickLike,
-        onComment = viewModel::onComment,
+        onComment = onCommentClick,
         onQuickRepost = viewModel::onQuickRepost,
         onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,
@@ -50,18 +47,6 @@ fun ForYouRoute(
         onRefresh = { viewModel.fetchPosts(isLoadMore = false) },
         modifier = modifier
     )
-
-    selectedPostId?.let { postId ->
-        CommentBottomSheet(
-            postId = postId,
-            comments = comments,
-            onDismissRequest = viewModel::dismissComments,
-            onSendComment = viewModel::sendComment,
-            isFetchingMore = isFetchingComments,
-            onRefresh = { viewModel.onComment(postId) },
-            onLoadMore = viewModel::loadMoreComments
-        )
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,9 +84,13 @@ internal fun ForYouRoute(
                         }
                     }
 
+                    val isAtTop by remember {
+                        derivedStateOf { listState.firstVisibleItemIndex == 0 }
+                    }
+
                     PullToRefreshBox(
                         state = rememberPullToRefreshState(),
-                        isRefreshing = uiState.isFetchingMore && listState.firstVisibleItemIndex == 0,
+                        isRefreshing = uiState.isFetchingMore && isAtTop,
                         onRefresh = onRefresh,
                         modifier = Modifier.fillMaxSize()
                     ) {

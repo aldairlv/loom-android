@@ -47,6 +47,8 @@ import com.loom.feature.explore.impl.navigation.exploreEntry
 import com.loom.feature.auth.impl.navigation.landingEntry
 import com.loom.feature.auth.impl.navigation.emailInputEntry
 import com.loom.feature.auth.impl.navigation.passwordInputEntry
+import com.loom.feature.comments.api.navigation.CommentsNavKey
+import com.loom.feature.comments.impl.navigation.commentsEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
@@ -124,6 +126,7 @@ internal fun LoomApp(
         exploreEntry(navigator)
         createPostEntry(navigator)
         profileEntry(navigator)
+        commentsEntry(navigator)
 
         // Settings
         settingsEntry(navigator)
@@ -134,7 +137,11 @@ internal fun LoomApp(
     val currentKey = appState.navigationState.currentKey
 
     if (isLoggedIn) {
-        if (currentKey == CreatePostNavKey || currentKey == SettingsNavKey || currentKey == AccountSettingsNavKey){
+        if (currentKey is CreatePostNavKey ||
+            currentKey is SettingsNavKey ||
+            currentKey is AccountSettingsNavKey ||
+            currentKey is CommentsNavKey
+        ){
             NavDisplay(
                 entries = appState.navigationState.toEntries(entryProvider),
                 onBack = { navigator.goBack() },

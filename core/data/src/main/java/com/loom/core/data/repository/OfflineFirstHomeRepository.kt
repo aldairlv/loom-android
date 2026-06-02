@@ -399,7 +399,7 @@ private fun NetworkLayoutRow.asExternalModel() = LayoutRow(
 
 private fun NetworkComment.asExternalModel(): Comment = Comment(
     id = id,
-    profileId = profile,
+    author = author.asExternalModel(),
     parentId = parent,
     rootId = root,
     text = text,

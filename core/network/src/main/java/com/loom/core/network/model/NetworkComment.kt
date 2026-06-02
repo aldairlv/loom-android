@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NetworkComment(
     val id: String,
-    val profile: String,
+    val author: NetworkPostAuthor,
     val parent: String? = null,
     val root: String? = null,
     val text: String,

@@ -62,6 +62,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
+import com.loom.core.common.util.toRelativeTimeSpan
 import com.loom.core.designsystem.icon.LoomIcons
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.model.data.PostAuthor
@@ -152,12 +153,20 @@ fun PostFeedCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    // Smart cast fix with local variable
+
+                    val timeSpan = postFeed.publishedAt?.toRelativeTimeSpan() ?: postFeed.createdAt.toRelativeTimeSpan()
                     val parent = postFeed.parent
                     val root = postFeed.root
+
                     if (parent != null && root != null) {
                         Text(
-                            text = if(parent.author.id == root.author.id) "Reposteado" else "Ha reposteado a ${parent.author.displayName}",
+                            text = if (parent.author.id == root.author.id) "Reposteado • $timeSpan" else "Ha reposteado a ${parent.author.displayName} • $timeSpan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                    } else {
+                        Text(
+                            text = timeSpan,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )

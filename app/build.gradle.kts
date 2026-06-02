@@ -94,4 +94,6 @@ dependencies {
     implementation(project(":feature:profile:impl"))
     implementation(project(":feature:settings:api"))
     implementation(project(":feature:settings:impl"))
+    implementation(project(":feature:comments:api"))
+    implementation(project(":feature:comments:impl"))
 }

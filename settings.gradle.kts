@@ -61,3 +61,7 @@ include(":feature:profile:impl")
 include(":feature:settings")
 include(":feature:settings:api")
 include(":feature:settings:impl")
+
+include(":feature:comments")
+include(":feature:comments:api")
+include(":feature:comments:impl")

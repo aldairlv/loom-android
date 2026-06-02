@@ -23,13 +23,11 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.loom.core.model.data.Comment
+import com.loom.core.model.data.PostAuthor
 import androidx.compose.ui.tooling.preview.Preview
 import com.loom.core.designsystem.theme.LoomTheme
 import kotlinx.datetime.Clock
 import kotlinx.coroutines.launch
-
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,16 +37,15 @@ fun CommentBottomSheet(
     onDismissRequest: () -> Unit,
     onSendComment: (String, String?) -> Unit, // text, parentId
     isFetchingMore: Boolean = false,
-    onRefresh: () -> Unit = {},
     onLoadMore: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        modifier = modifier.fillMaxHeight(0.9f),
+        modifier = modifier.fillMaxHeight(0.75f),
         dragHandle = null
     ) {
         CommentBottomSheetContent(
@@ -56,7 +53,6 @@ fun CommentBottomSheet(
             onDismissRequest = onDismissRequest,
             onSendComment = onSendComment,
             isFetchingMore = isFetchingMore,
-            onRefresh = onRefresh,
             onLoadMore = onLoadMore
         )
     }
@@ -69,7 +65,6 @@ fun CommentBottomSheetContent(
     onDismissRequest: () -> Unit,
     onSendComment: (String, String?) -> Unit,
     isFetchingMore: Boolean = false,
-    onRefresh: () -> Unit = {},
     onLoadMore: () -> Unit = {},
 ) {
     var showRealInput by remember { mutableStateOf(false) }
@@ -96,7 +91,7 @@ fun CommentBottomSheetContent(
             }
 
             // Comments List
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.weight(1f).background(Color.Gray)) {
                 val listState = rememberLazyListState()
                 val shouldLoadMore by remember {
                     derivedStateOf {
@@ -113,62 +108,54 @@ fun CommentBottomSheetContent(
                     }
                 }
 
-                val isAtTop by remember {
-                    derivedStateOf { listState.firstVisibleItemIndex == 0 }
-                }
-
-                PullToRefreshBox(
-                    state = rememberPullToRefreshState(),
-                    isRefreshing = isFetchingMore && isAtTop,
-                    onRefresh = onRefresh
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    //contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    ) {
-                        items(comments, key = { it.id }) { comment ->
-                            CommentThread(
-                                comment = comment,
-                                onReplyClick = { 
-                                    replyToComment = it
-                                    showRealInput = true
-                                }
-                            )
-                        }
+                    items(comments, key = { it.id }) { comment ->
+                        CommentThread(
+                            comment = comment,
+                            onReplyClick = { 
+                                replyToComment = it
+                                showRealInput = true
+                            }
+                        )
+                    }
 
-                        if (isFetchingMore && listState.firstVisibleItemIndex != 0) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                                }
+                    if (isFetchingMore && listState.firstVisibleItemIndex != 0) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             }
                         }
                     }
                 }
             }
-
+            Row(){
             // Fake Input Bar
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showRealInput = true }
-                    .padding(16.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                Text(
-                    text = "Añade un comentario...",
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showRealInput = true }
+                        .padding(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(24.dp)
+                ) {
+                    Text(
+                        text = "Añade un comentario...",
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
+
         }
 
         if (showRealInput) {
@@ -243,7 +230,7 @@ fun RealCommentInput(
         ) {
             if (replyTo != null) {
                 Text(
-                    text = "Respondiendo a Usuario ${replyTo.profileId.take(5)}",
+                    text = "Respondiendo a Usuario ${replyTo.author.displayName}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -285,7 +272,7 @@ fun CommentBottomSheetPreview() {
     val fakeComments = listOf(
         Comment(
             id = "1",
-            profileId = "user1",
+            author = PostAuthor("user1", "Usuario 1", ""),
             text = "¡Qué gran post! Me encanta el contenido.",
             depth = 0,
             createdAt = Clock.System.now(),
@@ -294,7 +281,7 @@ fun CommentBottomSheetPreview() {
             replies = listOf(
                 Comment(
                     id = "2",
-                    profileId = "user2",
+                    author = PostAuthor("user2", "Usuario 2", ""),
                     text = "Totalmente de acuerdo.",
                     depth = 1,
                     createdAt = Clock.System.now(),
@@ -305,7 +292,7 @@ fun CommentBottomSheetPreview() {
         ),
         Comment(
             id = "3",
-            profileId = "user3",
+            author = PostAuthor("user3", "Usuario 3", ""),
             text = "Interesante perspectiva, aunque no comparto todo.",
             depth = 0,
             createdAt = Clock.System.now(),
