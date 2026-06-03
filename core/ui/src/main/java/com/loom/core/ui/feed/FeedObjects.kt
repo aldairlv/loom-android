@@ -11,10 +11,13 @@ fun LazyListScope.feedObjects(
     objects: List<FeedObject>,
     onClickLike: (String) -> Unit,
     onComment: (String) -> Unit,
+    onJoin: (String) -> Unit = {},
+    onBookmark: (String) -> Unit = {},
     onQuickRepost: (String) -> Unit,
     onCommentRepost: (PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
     onFollowClick: (String, String, Boolean) -> Unit, // postId, authorId, isFollowed
+    onEventClick: (String) -> Unit = {},
 ) {
     items(
         items = objects,
@@ -43,6 +46,8 @@ fun LazyListScope.feedObjects(
                     eventFeed = feedObject.event,
                     onClickLike = { onClickLike(feedObject.event.id) },
                     onComment = { onComment(feedObject.event.id) },
+                    onJoin = { onJoin(feedObject.event.id) },
+                    onBookmark = { onBookmark(feedObject.event.id) },
                     onShare = { onShare(feedObject.event.id) },
                     onFollowClick = {
                         onFollowClick(
@@ -50,7 +55,8 @@ fun LazyListScope.feedObjects(
                             "", // authorId not directly in EventCreator for now
                             false
                         )
-                    }
+                    },
+                    onEventClick = onEventClick
                 )
             }
         }

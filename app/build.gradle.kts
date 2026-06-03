@@ -98,4 +98,6 @@ dependencies {
     implementation(project(":feature:comments:impl"))
     implementation(project(":feature:events:api"))
     implementation(project(":feature:events:impl"))
+    implementation(project(":feature:event-detail:api"))
+    implementation(project(":feature:event-detail:impl"))
 }

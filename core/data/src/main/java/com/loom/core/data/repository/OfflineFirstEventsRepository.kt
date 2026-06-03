@@ -33,6 +33,15 @@ internal class OfflineFirstEventsRepository @Inject constructor(
             nextCursor = networkResponse.next
         )
     }
+
+    override suspend fun getEvent(id: String): EventFeedItem? {
+        val networkResponse = network.getEvent(id)
+        val eventObject = networkResponse.results.firstOrNull() as? NetworkObjectEvent
+        return if (eventObject != null) {
+            val feedObject = eventObject.asExternalModel() as? FeedObject.EventFeedObject
+            feedObject?.event
+        } else null
+    }
 }
 
 private fun NetworkObject.asExternalModel(): FeedObject? {
@@ -68,10 +77,12 @@ private fun NetworkFriendAttending.asExternalModel() = FriendAttending(
 private fun NetworkEventData.asExternalModel() = EventData(
     title = title,
     description = description,
+    thumbnailUrl = thumbnailUrl,
     assets = assets.map { it.asExternalModel() },
     startTime = Instant.parse(startTime),
-    endTime = Instant.parse(endTime),
-    location = location.asExternalModel(),
+    endTime = endTime?.let { Instant.parse(it) },
+    timezone = timezone,
+    location = location?.asExternalModel(),
     rsvpCount = rsvpCount,
     maxAttendees = maxAttendees,
     isOnline = isOnline,

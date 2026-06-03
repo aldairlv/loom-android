@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 data class EventFeedItem(
     val id: String,
     val timestamp: Long,
-    val tags: List<String>,
+    val tags: List<String> = emptyList(),
     val creator: EventCreator,
     val eventData: EventData,
     val friendsAttending: List<FriendAttending> = emptyList(),
-    val distance: String? = null
+    val distance: Double? = null
 )
 
 @Serializable
@@ -30,25 +30,27 @@ data class EventCreator(
 @Serializable
 data class EventData(
     val title: String,
-    val description: String,
-    val assets: List<PostMedia>,
+    val description: String? = null,
+    val thumbnailUrl: String? = null,
+    val assets: List<PostMedia> = emptyList(),
     val startTime: Instant,
-    val endTime: Instant,
-    val location: EventLocation,
-    val rsvpCount: Int,
-    val maxAttendees: Int?,
-    val isOnline: Boolean,
-    val isPublic: Boolean,
-    val isCancelled: Boolean,
-    val status: String,
-    val category: String
+    val endTime: Instant? = null,
+    val timezone: String? = null,
+    val location: EventLocation? = null,
+    val rsvpCount: Int = 0,
+    val maxAttendees: Int? = null,
+    val isOnline: Boolean = false,
+    val isPublic: Boolean = true,
+    val isCancelled: Boolean = false,
+    val status: String? = null,
+    val category: String? = null
 )
 
 @Serializable
 data class EventLocation(
     val name: String,
-    val address: String?,
-    val coordinates: EventCoordinates?
+    val address: String? = null,
+    val coordinates: EventCoordinates? = null
 )
 
 @Serializable

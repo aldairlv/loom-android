@@ -67,3 +67,7 @@ include(":feature:comments:impl")
 include(":feature:events")
 include(":feature:events:api")
 include(":feature:events:impl")
+include(":feature:event-detail")
+
+include(":feature:event-detail:api")
+include(":feature:event-detail:impl")

@@ -17,6 +17,7 @@ import com.loom.core.ui.feed.feedObjects
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SoonRoute(
+    onEventClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SoonViewModel = hiltViewModel()
 ) {
@@ -63,7 +64,8 @@ fun SoonRoute(
                             onQuickRepost = viewModel::onQuickRepost,
                             onCommentRepost = { },
                             onShare = viewModel::onShare,
-                            onFollowClick = viewModel::onFollowClick
+                            onFollowClick = viewModel::onFollowClick,
+                            onEventClick = onEventClick
                         )
 
                         if (state.isFetchingMore && listState.firstVisibleItemIndex != 0) {

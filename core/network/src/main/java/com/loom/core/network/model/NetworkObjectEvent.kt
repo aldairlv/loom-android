@@ -17,7 +17,7 @@ data class NetworkObjectEvent(
     val eventData: NetworkEventData,
     @SerialName("friends_attending")
     val friendsAttending: List<NetworkFriendAttending> = emptyList(),
-    val distance: String? = null
+    val distance: Double? = null
 ) : NetworkObject
 
 @Serializable
@@ -31,7 +31,7 @@ data class NetworkFriendAttending(
 
 @Serializable
 data class NetworkEventCreator(
-    @SerialName("creator_display_name")
+    @SerialName("display_name")
     val displayName: String,
     @SerialName("avatar_url")
     val avatarUrl: String?
@@ -40,25 +40,28 @@ data class NetworkEventCreator(
 @Serializable
 data class NetworkEventData(
     val title: String,
-    val description: String,
-    val assets: List<NetworkPostMedia>,
+    val description: String? = null,
+    @SerialName("thumbnail_url")
+    val thumbnailUrl: String? = null,
+    val assets: List<NetworkPostMedia> = emptyList(),
     @SerialName("start_time")
     val startTime: String,
     @SerialName("end_time")
-    val endTime: String,
-    val location: NetworkEventLocation,
+    val endTime: String? = null,
+    val timezone: String? = null,
+    val location: NetworkEventLocation? = null,
     @SerialName("rsvp_count")
-    val rsvpCount: Int,
+    val rsvpCount: Int = 0,
     @SerialName("max_attendees")
-    val maxAttendees: Int?,
+    val maxAttendees: Int? = null,
     @SerialName("is_online")
-    val isOnline: Boolean,
+    val isOnline: Boolean = false,
     @SerialName("is_public")
-    val isPublic: Boolean,
+    val isPublic: Boolean = true,
     @SerialName("is_cancelled")
-    val isCancelled: Boolean,
-    val status: String,
-    val category: String
+    val isCancelled: Boolean = false,
+    val status: String? = null,
+    val category: String? = null
 )
 
 @Serializable

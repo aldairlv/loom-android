@@ -25,11 +25,14 @@ import com.loom.core.ui.tabs.TabItem
 import com.loom.core.ui.tabs.TabsBar
 import com.loom.core.ui.tabs.TabsSettingsSheet
 import com.loom.feature.events.impl.routes.SoonRoute
+import com.loom.feature.eventdetail.api.navigation.EventNavKey
+import com.loom.core.navigation.Navigator
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 fun EventsScreen(
+    navigator: Navigator,
     modifier: Modifier = Modifier,
     viewModel: EventsViewModel = hiltViewModel()
 ) {
@@ -44,6 +47,7 @@ fun EventsScreen(
         onQuickRepost = viewModel::onQuickRepost,
         onShare = viewModel::onShare,
         onFollowClick = viewModel::onFollowClick,
+        onEventClick = { id -> navigator.navigate(EventNavKey(id)) },
         modifier = modifier
     )
 }
@@ -58,6 +62,7 @@ internal fun EventsScreen(
     onQuickRepost: (String) -> Unit,
     onShare: (String) -> Unit,
     onFollowClick: (String, String, Boolean) -> Unit,
+    onEventClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -119,13 +124,14 @@ internal fun EventsScreen(
         ) { page ->
             val tab = visibleTabs[page]
             when (tab.key) {
-                "upcoming" -> SoonRoute()
+                "upcoming" -> SoonRoute(onEventClick = onEventClick)
                 else -> EventsPage(
                     uiState = uiState,
                     onClickLike = onClickLike,
                     onQuickRepost = onQuickRepost,
                     onShare = onShare,
-                    onFollowClick = onFollowClick
+                    onFollowClick = onFollowClick,
+                    onEventClick = onEventClick
                 )
             }
         }
@@ -147,6 +153,7 @@ private fun EventsPage(
     onQuickRepost: (String) -> Unit,
     onShare: (String) -> Unit,
     onFollowClick: (String, String, Boolean) -> Unit,
+    onEventClick: (String) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         when (uiState) {
@@ -162,7 +169,8 @@ private fun EventsPage(
                         onQuickRepost = onQuickRepost,
                         onCommentRepost = { /* Handle comment repost */ },
                         onShare = onShare,
-                        onFollowClick = onFollowClick
+                        onFollowClick = onFollowClick,
+                        onEventClick = onEventClick
                     )
                 }
             }
@@ -191,7 +199,8 @@ fun EventsScreenPreview() {
             onClickLike = {},
             onQuickRepost = {},
             onShare = {},
-            onFollowClick = { _, _, _ -> }
+            onFollowClick = { _, _, _ -> },
+            onEventClick = {}
         )
     }
 }

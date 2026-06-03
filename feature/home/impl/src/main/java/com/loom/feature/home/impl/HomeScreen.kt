@@ -24,9 +24,11 @@ import com.loom.core.ui.tabs.CollapsibleTabsScaffold
 import com.loom.core.ui.tabs.TabItem
 import com.loom.core.ui.tabs.TabsBar
 import com.loom.core.ui.tabs.TabsSettingsSheet
+import com.loom.core.navigation.Navigator
 
 @Composable
 fun HomeScreen(
+    navigator: Navigator,
     modifier: Modifier = Modifier,
     onCreateClick: () -> Unit,
     onCommentClick: (String) -> Unit = {},
@@ -42,6 +44,7 @@ fun HomeScreen(
             tabContent = { tab ->
                 HomeTabPage(
                     tab = tab,
+                    navigator = navigator,
                     onCommentClick = onCommentClick,
                     onRepostWithComment = onRepostWithComment
                 )
