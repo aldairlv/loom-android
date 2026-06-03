@@ -85,7 +85,10 @@ fun EventFeedCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onEventClick(eventFeed.id) },
+            .clickable { 
+                android.util.Log.d("LOOM_EVENT_DETAIL", "Card: Clicking on event: ${eventFeed.id}")
+                onEventClick(eventFeed.id) 
+            },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -153,7 +156,10 @@ fun EventFeedCard(
                         color = Color.White,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.clickable { onEventClick(eventFeed.id) }
+                        modifier = Modifier.clickable { 
+                            android.util.Log.d("LOOM_EVENT_DETAIL", "Card: Clicking on event title: ${eventFeed.id}")
+                            onEventClick(eventFeed.id) 
+                        }
                     )
                     Text(
                         text = buildAnnotatedString {

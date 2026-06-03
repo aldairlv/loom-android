@@ -23,6 +23,10 @@ object NetworkObjectSerializer :
             .jsonObject["objectType"]
             ?.jsonPrimitive
             ?.content
+            ?: element
+                .jsonObject["type"]
+                ?.jsonPrimitive
+                ?.content
 
         return when (type) {
             "post" -> NetworkObjectPost.serializer()

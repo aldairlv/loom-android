@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("event")
 data class NetworkObjectEvent(
-    override val objectType: String,
+    override val objectType: String = "event",
     override val id: String,
-    override val streamGlobalPosition: Int,
+    override val streamGlobalPosition: Int? = null,
     override val streamSessionId: String? = null,
     val timestamp: Long,
     val tags: List<String> = emptyList(),
@@ -17,7 +17,10 @@ data class NetworkObjectEvent(
     val eventData: NetworkEventData,
     @SerialName("friends_attending")
     val friendsAttending: List<NetworkFriendAttending> = emptyList(),
-    val distance: Double? = null
+    val distance: Double? = null,
+    @SerialName("user_rsvp_status") val userRsvpStatus: String? = null,
+    @SerialName("access_details") val accessDetails: NetworkEventAccessDetails? = null,
+    @SerialName("attendees_sample") val attendeesSample: List<NetworkEventCreator> = emptyList()
 ) : NetworkObject
 
 @Serializable
@@ -31,10 +34,13 @@ data class NetworkFriendAttending(
 
 @Serializable
 data class NetworkEventCreator(
+    val id: String? = null,
     @SerialName("display_name")
     val displayName: String,
     @SerialName("avatar_url")
-    val avatarUrl: String?
+    val avatarUrl: String?,
+    val bio: String? = null,
+    @SerialName("is_followed") val isFollowed: Boolean = false
 )
 
 @Serializable
@@ -61,7 +67,12 @@ data class NetworkEventData(
     @SerialName("is_cancelled")
     val isCancelled: Boolean = false,
     val status: String? = null,
-    val category: String? = null
+    val category: String? = null,
+    val requirements: List<String> = emptyList(),
+    @SerialName("requires_qr_checkin") val requiresQrCheckin: Boolean = false,
+    @SerialName("payment_details") val paymentDetails: NetworkEventPaymentDetails? = null,
+    @SerialName("contact_channels") val contactChannels: NetworkEventContactChannels? = null,
+    @SerialName("rating_summary") val ratingSummary: NetworkEventRatingSummary? = null
 )
 
 @Serializable
@@ -77,4 +88,37 @@ data class NetworkEventLocation(
 data class NetworkEventCoordinates(
     val latitude: Double,
     val longitude: Double
+)
+
+@Serializable
+data class NetworkEventAccessDetails(
+    @SerialName("meeting_instructions") val meetingInstructions: String? = null,
+    @SerialName("live_stream_url") val liveStreamUrl: String? = null,
+    @SerialName("secure_attendance_token") val secureAttendanceToken: String? = null
+)
+
+@Serializable
+data class NetworkEventPaymentDetails(
+    @SerialName("requires_payment") val requiresPayment: Boolean = false,
+    val price: Double? = null,
+    val currency: String? = null,
+    @SerialName("payment_methods_allowed") val paymentMethodsAllowed: List<String> = emptyList(),
+    @SerialName("stripe_price_id") val stripePriceId: String? = null
+)
+
+@Serializable
+data class NetworkEventContactChannels(
+    @SerialName("support_email") val supportEmail: String? = null,
+    @SerialName("support_url") val supportUrl: String? = null,
+    @SerialName("website_url") val websiteUrl: String? = null,
+    @SerialName("whatsapp_url") val whatsappUrl: String? = null,
+    @SerialName("telegram_url") val telegramUrl: String? = null,
+    @SerialName("discord_url") val discordUrl: String? = null,
+    @SerialName("zoom_url") val zoomUrl: String? = null
+)
+
+@Serializable
+data class NetworkEventRatingSummary(
+    @SerialName("average_rating") val averageRating: Double? = null,
+    @SerialName("total_reviews") val totalReviews: Int = 0
 )

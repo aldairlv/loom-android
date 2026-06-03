@@ -8,9 +8,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("trend")
 class NetworkObjectTrend (
-    override val objectType: String,
+    override val objectType: String = "trend",
     override val id: String,
-    override val streamGlobalPosition: Int,
+    override val streamGlobalPosition: Int? = null,
     override val streamSessionId: String? = null,
     val category: String,
     val count: String,

@@ -28,17 +28,24 @@ class EventViewModel @Inject constructor(
     }
 
     private fun fetchEvent() {
-        val id = eventId ?: return
+        val id = eventId ?: run {
+            android.util.Log.e("LOOM_EVENT_DETAIL", "ViewModel: eventId is null")
+            return
+        }
+        android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Fetching event with id: $id")
         viewModelScope.launch {
             _uiState.value = EventUiState.Loading
             try {
                 val event = eventsRepository.getEvent(id)
                 if (event != null) {
+                    android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Event successfully loaded: ${event.id}")
                     _uiState.value = EventUiState.Success(event)
                 } else {
+                    android.util.Log.e("LOOM_EVENT_DETAIL", "ViewModel: Event not found for id: $id")
                     _uiState.value = EventUiState.Error("Evento no encontrado")
                 }
             } catch (e: Exception) {
+                android.util.Log.e("LOOM_EVENT_DETAIL", "ViewModel: Error fetching event", e)
                 _uiState.value = EventUiState.Error(e.message ?: "Error desconocido")
             }
         }

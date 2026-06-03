@@ -56,7 +56,7 @@ private fun NetworkObject.asExternalModel(): FeedObject? {
                 friendsAttending = friendsAttending.map { it.asExternalModel() },
                 distance = distance
             ),
-            streamGlobalPosition = streamGlobalPosition,
+            streamGlobalPosition = streamGlobalPosition ?: 0,
             streamSessionId = streamSessionId
         )
         else -> null

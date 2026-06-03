@@ -22,6 +22,9 @@ fun EventScreen(
     modifier: Modifier = Modifier,
     viewModel: EventViewModel = hiltViewModel()
 ) {
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        android.util.Log.d("LOOM_EVENT_DETAIL", "Screen: EventScreen composed")
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     EventScreen(

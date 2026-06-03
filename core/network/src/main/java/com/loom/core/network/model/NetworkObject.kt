@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 sealed interface NetworkObject{
     val objectType: String
     val id: String
-    val streamGlobalPosition: Int
+    val streamGlobalPosition: Int?
     val streamSessionId: String?
 }
 
