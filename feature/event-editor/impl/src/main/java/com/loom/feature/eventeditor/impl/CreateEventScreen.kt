@@ -1,5 +1,6 @@
 package com.loom.feature.eventeditor.impl
 
+import android.location.Geocoder
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,12 +46,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,8 +61,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import com.loom.core.designsystem.theme.LoomTheme
+import com.loom.core.ui.LoomWheelPicker
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
+import java.util.Locale
 
 @Composable
 fun EventEditorScreen(
@@ -80,7 +93,13 @@ fun EventEditorScreen(
         onUpdateStartTime = viewModel::updateStartTime,
         onUpdateEndTime = viewModel::updateEndTime,
         onCancelDate = viewModel::cancelDateSelection,
-        onSaveDate = viewModel::saveDateSelection
+        onSaveDate = viewModel::saveDateSelection,
+        // Location callbacks
+        onToggleLocationPicker = viewModel::toggleLocationPicker,
+        onLocationNameChange = viewModel::onLocationNameChange,
+        onLocationSelected = viewModel::onLocationSelected,
+        onCancelLocation = viewModel::cancelLocationSelection,
+        onSaveLocation = viewModel::saveLocationSelection
     )
 }
 
@@ -98,7 +117,12 @@ internal fun EventEditorScreen(
     onUpdateStartTime: (LocalDateTime) -> Unit,
     onUpdateEndTime: (LocalDateTime) -> Unit,
     onCancelDate: () -> Unit,
-    onSaveDate: () -> Unit
+    onSaveDate: () -> Unit,
+    onToggleLocationPicker: () -> Unit,
+    onLocationNameChange: (String) -> Unit,
+    onLocationSelected: (Double, Double, String) -> Unit,
+    onCancelLocation: () -> Unit,
+    onSaveLocation: () -> Unit
 ) {
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
@@ -158,6 +182,29 @@ internal fun EventEditorScreen(
                         onToggleEndEnabled = onToggleEndEnabled,
                         onCancel = onCancelDate,
                         onSave = onSaveDate
+                    )
+                }
+            }
+
+            item {
+                LocationInfoSection(
+                    locationName = uiState.locationName.ifBlank { "Location Name" },
+                    locationAddress = uiState.locationAddress.ifBlank { "Location Address" },
+                    onEditClick = onToggleLocationPicker
+                )
+            }
+
+            item {
+                AnimatedVisibility(visible = uiState.isLocationPickerVisible) {
+                    LocationEditorSection(
+                        locationName = uiState.locationName,
+                        locationAddress = uiState.locationAddress,
+                        latitude = uiState.latitude,
+                        longitude = uiState.longitude,
+                        onLocationNameChange = onLocationNameChange,
+                        onLocationSelected = onLocationSelected,
+                        onCancel = onCancelLocation,
+                        onSave = onSaveLocation
                     )
                 }
             }
@@ -345,6 +392,48 @@ private fun DateInfoSection(
 }
 
 @Composable
+private fun LocationInfoSection(
+    locationName: String,
+    locationAddress: String,
+    onEditClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "📍",
+            fontSize = 32.sp,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = locationName,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = locationAddress,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        IconButton(onClick = onEditClick) {
+            Icon(
+                imageVector = Icons.Default.Map,
+                contentDescription = "Edit Location",
+                tint = Color(0xFF4CAF50)
+            )
+        }
+    }
+}
+
+@Composable
 private fun DateEditorSection(
     startTime: LocalDateTime,
     endTime: LocalDateTime,
@@ -421,6 +510,120 @@ private fun DateEditorSection(
 }
 
 @Composable
+private fun LocationEditorSection(
+    locationName: String,
+    locationAddress: String,
+    latitude: Double,
+    longitude: Double,
+    onLocationNameChange: (String) -> Unit,
+    onLocationSelected: (Double, Double, String) -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val geocoder = remember { Geocoder(context, Locale.getDefault()) }
+    
+    val initialPos = LatLng(latitude, longitude)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(initialPos, 15f)
+    }
+    
+    val markerState = rememberMarkerState(position = initialPos)
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Where?",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Lugar (Location Name)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = "Lugar", style = MaterialTheme.typography.labelMedium)
+            BasicTextField(
+                value = locationName,
+                onValueChange = onLocationNameChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(12.dp),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                decorationBox = { innerTextField ->
+                    if (locationName.isEmpty()) {
+                        Text("Nombre del lugar...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                    }
+                    innerTextField()
+                }
+            )
+        }
+
+        // Dirección y Mapa
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = "Address", style = MaterialTheme.typography.labelMedium)
+            Text(
+                text = locationAddress.ifBlank { "Toca el mapa para marcar la dirección" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (locationAddress.isBlank()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+            ) {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    onMapClick = { latLng ->
+                        markerState.position = latLng
+                        // Get address from latLng
+                        try {
+                            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                            val addressText = addresses?.firstOrNull()?.getAddressLine(0) ?: "Unknown address"
+                            onLocationSelected(latLng.latitude, latLng.longitude, addressText)
+                        } catch (e: Exception) {
+                            onLocationSelected(latLng.latitude, latLng.longitude, "Error fetching address")
+                        }
+                    }
+                ) {
+                    Marker(state = markerState)
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextButton(
+                onClick = onCancel,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Cancelar")
+            }
+            Button(
+                onClick = onSave,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Guardar")
+            }
+        }
+    }
+}
+
+@Composable
 private fun ThumbnailSelectorSection(
     allUris: List<Uri>,
     thumbnailUri: Uri?,
@@ -458,7 +661,13 @@ private fun DateTimeEditSection(
     dateTime: LocalDateTime,
     onDateTimeChange: (LocalDateTime) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    val days = remember { (1..31).map { it.toString() } }
+    val months = remember { Month.entries.map { it.name.take(3) } }
+    val years = remember { (2024..2035).map { it.toString() } }
+    val hours = remember { (0..23).map { it.toString().padStart(2, '0') } }
+    val minutes = remember { (0..59).map { it.toString().padStart(2, '0') } }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
             text = title,
             style = MaterialTheme.typography.labelMedium,
@@ -469,108 +678,83 @@ private fun DateTimeEditSection(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SpinnerBox(
-                value = dateTime.dayOfMonth.toString(),
-                label = "Day",
-                onIncrement = {
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, (dateTime.dayOfMonth % 31) + 1, dateTime.hour, dateTime.minute)
-                    )
-                },
-                onDecrement = {
-                    val newDay = if (dateTime.dayOfMonth > 1) dateTime.dayOfMonth - 1 else 31
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, newDay, dateTime.hour, dateTime.minute)
-                    )
-                }
-            )
-            SpinnerBox(
-                value = dateTime.month.name.take(3),
-                label = "Month",
-                onIncrement = {
-                    val nextMonth = if (dateTime.monthNumber < 12) dateTime.monthNumber + 1 else 1
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, nextMonth, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
-                    )
-                },
-                onDecrement = {
-                    val prevMonth = if (dateTime.monthNumber > 1) dateTime.monthNumber - 1 else 12
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, prevMonth, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
-                    )
-                }
-            )
-            SpinnerBox(
-                value = dateTime.year.toString(),
-                label = "Year",
-                onIncrement = {
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year + 1, dateTime.month, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
-                    )
-                },
-                onDecrement = {
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year - 1, dateTime.month, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
-                    )
-                }
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SpinnerBox(
-                value = String.format("%02d", dateTime.hour),
-                label = "Hour",
-                onIncrement = {
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, (dateTime.hour + 1) % 24, dateTime.minute)
-                    )
-                },
-                onDecrement = {
-                    val newHour = if (dateTime.hour > 0) dateTime.hour - 1 else 23
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, newHour, dateTime.minute)
-                    )
-                }
-            )
-            SpinnerBox(
-                value = String.format("%02d", dateTime.minute),
-                label = "Min",
-                onIncrement = {
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, dateTime.hour, (dateTime.minute + 1) % 60)
-                    )
-                },
-                onDecrement = {
-                    val newMin = if (dateTime.minute > 0) dateTime.minute - 1 else 59
-                    onDateTimeChange(
-                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, dateTime.hour, newMin)
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun SpinnerBox(
-    value: String,
-    label: String,
-    onIncrement: () -> Unit,
-    onDecrement: () -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier
-                .size(width = 60.dp, height = 40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .clickable { onIncrement() },
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = value, fontWeight = FontWeight.Bold)
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoomWheelPicker(
+                    items = days,
+                    initialIndex = dateTime.dayOfMonth - 1,
+                    onItemSelected = { index ->
+                        val newDay = index + 1
+                        if (newDay != dateTime.dayOfMonth) {
+                            onDateTimeChange(LocalDateTime(dateTime.year, dateTime.month, newDay, dateTime.hour, dateTime.minute))
+                        }
+                    }
+                )
+                Text("Day", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+
+            Column(modifier = Modifier.weight(1.2f), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoomWheelPicker(
+                    items = months,
+                    initialIndex = dateTime.monthNumber - 1,
+                    onItemSelected = { index ->
+                        val newMonth = Month.entries[index]
+                        if (newMonth != dateTime.month) {
+                            onDateTimeChange(LocalDateTime(dateTime.year, newMonth, dateTime.dayOfMonth, dateTime.hour, dateTime.minute))
+                        }
+                    }
+                )
+                Text("Month", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+
+            Column(modifier = Modifier.weight(1.2f), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoomWheelPicker(
+                    items = years,
+                    initialIndex = years.indexOf(dateTime.year.toString()).coerceAtLeast(0),
+                    onItemSelected = { index ->
+                        val newYear = years[index].toInt()
+                        if (newYear != dateTime.year) {
+                            onDateTimeChange(LocalDateTime(newYear, dateTime.month, dateTime.dayOfMonth, dateTime.hour, dateTime.minute))
+                        }
+                    }
+                )
+                Text("Year", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoomWheelPicker(
+                    items = hours,
+                    initialIndex = dateTime.hour,
+                    onItemSelected = { index ->
+                        if (index != dateTime.hour) {
+                            onDateTimeChange(LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, index, dateTime.minute))
+                        }
+                    }
+                )
+                Text("Hour", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                LoomWheelPicker(
+                    items = minutes,
+                    initialIndex = dateTime.minute,
+                    onItemSelected = { index ->
+                        if (index != dateTime.minute) {
+                            onDateTimeChange(LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, dateTime.hour, index))
+                        }
+                    }
+                )
+                Text("Min", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
     }
 }
 
@@ -625,7 +809,10 @@ private fun EventEditorScreenPreview() {
         EventEditorScreen(
             uiState = CreateEventUiState(
                 title = "Aniversario de Loom",
-                isDatePickerVisible = true
+                isDatePickerVisible = false,
+                isLocationPickerVisible = true,
+                locationName = "Sede Central",
+                locationAddress = "Av. Siempre Viva 742"
             ),
             onClose = {},
             onImagesSelected = {},
@@ -636,7 +823,12 @@ private fun EventEditorScreenPreview() {
             onUpdateStartTime = {},
             onUpdateEndTime = {},
             onCancelDate = {},
-            onSaveDate = {}
+            onSaveDate = {},
+            onToggleLocationPicker = {},
+            onLocationNameChange = {},
+            onLocationSelected = { _, _, _ -> },
+            onCancelLocation = {},
+            onSaveLocation = {}
         )
     }
 }

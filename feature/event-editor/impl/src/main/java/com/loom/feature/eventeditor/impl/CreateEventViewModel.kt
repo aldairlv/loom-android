@@ -9,12 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-import java.util.Locale
 import javax.inject.Inject
 
 data class CreateEventUiState(
@@ -25,6 +22,13 @@ data class CreateEventUiState(
     val endTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
     val isEndEnabled: Boolean = false,
     val isDatePickerVisible: Boolean = false,
+    // Location Data
+    val locationName: String = "",
+    val locationAddress: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val timezone: String = TimeZone.currentSystemDefault().id,
+    val isLocationPickerVisible: Boolean = false,
 ) {
     val allUris: List<Uri> get() = listOfNotNull(thumbnailUri) + assetUris
 
@@ -118,5 +122,32 @@ class CreateEventViewModel @Inject constructor(
 
     fun saveDateSelection() {
         _uiState.update { it.copy(isDatePickerVisible = false) }
+    }
+
+    // Location Actions
+    fun toggleLocationPicker() {
+        _uiState.update { it.copy(isLocationPickerVisible = !it.isLocationPickerVisible) }
+    }
+
+    fun onLocationNameChange(name: String) {
+        _uiState.update { it.copy(locationName = name) }
+    }
+
+    fun onLocationSelected(latitude: Double, longitude: Double, address: String) {
+        _uiState.update { 
+            it.copy(
+                latitude = latitude,
+                longitude = longitude,
+                locationAddress = address
+            )
+        }
+    }
+
+    fun cancelLocationSelection() {
+        _uiState.update { it.copy(isLocationPickerVisible = false) }
+    }
+
+    fun saveLocationSelection() {
+        _uiState.update { it.copy(isLocationPickerVisible = false) }
     }
 }

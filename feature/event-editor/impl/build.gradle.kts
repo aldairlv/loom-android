@@ -1,3 +1,7 @@
+import com.android.build.api.variant.BuildConfigField
+import java.io.StringReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
@@ -15,6 +19,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -59,4 +64,22 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation(libs.maps.compose)
+    implementation(libs.google.maps)
+}
+
+val mapsApiKey = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["MAPS_API_KEY"]
+}.orElse("")
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields!!.put("MAPS_API_KEY", mapsApiKey.map { value ->
+            BuildConfigField(type = "String", value = """"$value"""", comment = null)
+        })
+    }
 }
