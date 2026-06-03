@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,14 +27,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,10 +49,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import kotlinx.datetime.LocalDateTime
+import java.util.Locale
 
 @Composable
 fun EventEditorScreen(
@@ -63,7 +72,13 @@ fun EventEditorScreen(
         onClose = onClose,
         onImagesSelected = viewModel::onImagesSelected,
         onThumbnailSelected = viewModel::onThumbnailSelected,
-        onTitleChange = viewModel::onTitleChange
+        onTitleChange = viewModel::onTitleChange,
+        onToggleDatePicker = viewModel::toggleDatePicker,
+        onToggleEndEnabled = viewModel::onToggleEndEnabled,
+        onUpdateStartTime = viewModel::updateStartTime,
+        onUpdateEndTime = viewModel::updateEndTime,
+        onCancelDate = viewModel::cancelDateSelection,
+        onSaveDate = viewModel::saveDateSelection
     )
 }
 
@@ -75,7 +90,13 @@ internal fun EventEditorScreen(
     onClose: () -> Unit,
     onImagesSelected: (List<Uri>) -> Unit,
     onThumbnailSelected: (Uri) -> Unit,
-    onTitleChange: (String) -> Unit
+    onTitleChange: (String) -> Unit,
+    onToggleDatePicker: () -> Unit,
+    onToggleEndEnabled: (Boolean) -> Unit,
+    onUpdateStartTime: (LocalDateTime) -> Unit,
+    onUpdateEndTime: (LocalDateTime) -> Unit,
+    onCancelDate: () -> Unit,
+    onSaveDate: () -> Unit
 ) {
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
@@ -207,6 +228,109 @@ internal fun EventEditorScreen(
                 )
             }
 
+            // Date Representation Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "📅",
+                    fontSize = 32.sp,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = uiState.formattedDateRange,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = uiState.formattedTimeRange,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconButton(onClick = onToggleDatePicker) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = "Edit Date",
+                        tint = Color(0xFFE91E63) // Pinkish
+                    )
+                }
+            }
+
+            // Date Editor Section
+            AnimatedVisibility(visible = uiState.isDatePickerVisible) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "When?",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    // Start Section
+                    DateTimeEditSection(
+                        title = "Inicio",
+                        dateTime = uiState.startTime,
+                        onDateTimeChange = onUpdateStartTime
+                    )
+
+                    // End Section with Switch
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "End",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Switch(
+                            checked = uiState.isEndEnabled,
+                            onCheckedChange = onToggleEndEnabled
+                        )
+                    }
+
+                    if (uiState.isEndEnabled) {
+                        DateTimeEditSection(
+                            title = "Fin",
+                            dateTime = uiState.endTime,
+                            onDateTimeChange = onUpdateEndTime
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        TextButton(
+                            onClick = onCancelDate,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Cancelar")
+                        }
+                        Button(
+                            onClick = onSaveDate,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Guardar")
+                        }
+                    }
+                }
+            }
+
             // Thumbnail Selection Row
             if (uiState.allUris.isNotEmpty()) {
                 Column(
@@ -234,6 +358,130 @@ internal fun EventEditorScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DateTimeEditSection(
+    title: String,
+    dateTime: LocalDateTime,
+    onDateTimeChange: (LocalDateTime) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+
+        // Date Spinners
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SpinnerBox(
+                value = dateTime.dayOfMonth.toString(),
+                label = "Day",
+                onIncrement = {
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, (dateTime.dayOfMonth % 31) + 1, dateTime.hour, dateTime.minute)
+                    )
+                },
+                onDecrement = {
+                    val newDay = if (dateTime.dayOfMonth > 1) dateTime.dayOfMonth - 1 else 31
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, newDay, dateTime.hour, dateTime.minute)
+                    )
+                }
+            )
+            SpinnerBox(
+                value = dateTime.month.name.take(3),
+                label = "Month",
+                onIncrement = {
+                    val nextMonth = if (dateTime.monthNumber < 12) dateTime.monthNumber + 1 else 1
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, nextMonth, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
+                    )
+                },
+                onDecrement = {
+                    val prevMonth = if (dateTime.monthNumber > 1) dateTime.monthNumber - 1 else 12
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, prevMonth, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
+                    )
+                }
+            )
+            SpinnerBox(
+                value = dateTime.year.toString(),
+                label = "Year",
+                onIncrement = {
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year + 1, dateTime.month, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
+                    )
+                },
+                onDecrement = {
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year - 1, dateTime.month, dateTime.dayOfMonth, dateTime.hour, dateTime.minute)
+                    )
+                }
+            )
+        }
+
+        // Time Spinners
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SpinnerBox(
+                value = String.format("%02d", dateTime.hour),
+                label = "Hour",
+                onIncrement = {
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, (dateTime.hour + 1) % 24, dateTime.minute)
+                    )
+                },
+                onDecrement = {
+                    val newHour = if (dateTime.hour > 0) dateTime.hour - 1 else 23
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, newHour, dateTime.minute)
+                    )
+                }
+            )
+            SpinnerBox(
+                value = String.format("%02d", dateTime.minute),
+                label = "Min",
+                onIncrement = {
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, dateTime.hour, (dateTime.minute + 1) % 60)
+                    )
+                },
+                onDecrement = {
+                    val newMin = if (dateTime.minute > 0) dateTime.minute - 1 else 59
+                    onDateTimeChange(
+                        LocalDateTime(dateTime.year, dateTime.month, dateTime.dayOfMonth, dateTime.hour, newMin)
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpinnerBox(
+    value: String,
+    label: String,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(width = 60.dp, height = 40.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable { onIncrement() }, // Simple tap to increment for demo
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = value, fontWeight = FontWeight.Bold)
+        }
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
