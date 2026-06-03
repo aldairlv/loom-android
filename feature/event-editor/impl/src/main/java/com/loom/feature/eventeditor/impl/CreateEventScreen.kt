@@ -44,7 +44,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -70,6 +72,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.loom.core.designsystem.theme.LoomTheme
 import com.loom.core.ui.LoomWheelPicker
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
 import java.util.Locale
@@ -130,6 +133,23 @@ internal fun EventEditorScreen(
         onResult = { uris -> if (uris.isNotEmpty()) onImagesSelected(uris) }
     )
 
+    val listState = rememberLazyListState()
+
+    // Auto-scroll y bloqueo de scroll para mejorar la interacción con el Mapa y WheelPickers
+    LaunchedEffect(uiState.isDatePickerVisible) {
+        if (uiState.isDatePickerVisible) {
+            delay(300)
+            listState.animateScrollToItem(index = 3)
+        }
+    }
+
+    LaunchedEffect(uiState.isLocationPickerVisible) {
+        if (uiState.isLocationPickerVisible) {
+            delay(300)
+            listState.animateScrollToItem(index = 5)
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -140,11 +160,13 @@ internal fun EventEditorScreen(
         }
     ) { paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            userScrollEnabled = !uiState.isDatePickerVisible && !uiState.isLocationPickerVisible
         ) {
             item {
                 PhotoArea(
@@ -526,7 +548,7 @@ private fun LocationEditorSection(
     val geocoder = remember { Geocoder(context, Locale.getDefault()) }
 
     // Inicializar Places como en LocationScreen si no lo está
-    remember(context) {
+    LaunchedEffect(context) {
         if (!Places.isInitialized()) {
             Places.initialize(context, BuildConfig.MAPS_API_KEY)
         }
