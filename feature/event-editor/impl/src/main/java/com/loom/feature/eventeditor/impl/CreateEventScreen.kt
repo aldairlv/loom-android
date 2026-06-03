@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -50,13 +51,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.loom.core.designsystem.theme.LoomTheme
 import kotlinx.datetime.LocalDateTime
-import java.util.Locale
 
 @Composable
 fun EventEditorScreen(
@@ -106,256 +108,345 @@ internal fun EventEditorScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                },
-                actions = {
-                    TextButton(onClick = { /* Create event logic */ }) {
-                        Text("Create", style = MaterialTheme.typography.labelLarge)
-                    }
-                    IconButton(onClick = { /* More actions */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More")
-                    }
-                }
+            CreateEventTopBar(
+                onClose = onClose,
+                onCreateClick = { /* Create event logic */ }
             )
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-                .padding(16.dp),
+                .fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Main Photo Area / Card Structure
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable {
+            item {
+                PhotoArea(
+                    uris = uiState.allUris,
+                    onAddPhotosClick = {
                         photoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (uiState.allUris.isEmpty()) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Photos",
-                            modifier = Modifier.size(48.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        )
-                        Text(
-                            "Add Photos",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        )
                     }
-                } else {
-                    val pagerState = rememberPagerState(pageCount = { uiState.allUris.size })
-                    
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize()
-                    ) { page ->
-                        AsyncImage(
-                            model = uiState.allUris[page],
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                )
+            }
 
-                    // Ghost Add Icon Overlay
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add more",
-                            modifier = Modifier.size(56.dp),
-                            tint = Color.White.copy(alpha = 0.7f)
-                        )
-                    }
+            item {
+                TitleInput(
+                    title = uiState.title,
+                    onTitleChange = onTitleChange
+                )
+            }
+
+            item {
+                DateInfoSection(
+                    formattedDateRange = uiState.formattedDateRange,
+                    formattedTimeRange = uiState.formattedTimeRange,
+                    onEditClick = onToggleDatePicker
+                )
+            }
+
+            item {
+                AnimatedVisibility(visible = uiState.isDatePickerVisible) {
+                    DateEditorSection(
+                        startTime = uiState.startTime,
+                        endTime = uiState.endTime,
+                        isEndEnabled = uiState.isEndEnabled,
+                        onUpdateStartTime = onUpdateStartTime,
+                        onUpdateEndTime = onUpdateEndTime,
+                        onToggleEndEnabled = onToggleEndEnabled,
+                        onCancel = onCancelDate,
+                        onSave = onSaveDate
+                    )
                 }
             }
 
-            // Title Input Row
+            if (uiState.allUris.isNotEmpty()) {
+                item {
+                    ThumbnailSelectorSection(
+                        allUris = uiState.allUris,
+                        thumbnailUri = uiState.thumbnailUri,
+                        onThumbnailSelected = onThumbnailSelected
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreateEventTopBar(
+    onClose: () -> Unit,
+    onCreateClick: () -> Unit
+) {
+    TopAppBar(
+        title = { },
+        navigationIcon = {
+            IconButton(onClick = onClose) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        },
+        actions = {
+            TextButton(onClick = onCreateClick) {
+                Text("Create", style = MaterialTheme.typography.labelLarge)
+            }
+            IconButton(onClick = { /* More actions */ }) {
+                Icon(Icons.Default.MoreVert, contentDescription = "More")
+            }
+        }
+    )
+}
+
+@Composable
+private fun PhotoArea(
+    uris: List<Uri>,
+    onAddPhotosClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(300.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { onAddPhotosClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (uris.isEmpty()) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Photos",
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+                Text(
+                    "Add Photos",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+        } else {
+            val pagerState = rememberPagerState(pageCount = { uris.size })
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                AsyncImage(
+                    model = uris[page],
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
             ) {
-                BasicTextField(
-                    value = uiState.title,
-                    onValueChange = { newTitle ->
-                        // Filter out manual newlines but allow text wrapping
-                        if (!newTitle.contains("\n")) {
-                            onTitleChange(newTitle)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.headlineSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    decorationBox = { innerTextField ->
-                        if (uiState.title.isEmpty()) {
-                            Text(
-                                text = "Event Title...",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                        }
-                        innerTextField()
-                    }
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add more",
+                    modifier = Modifier.size(56.dp),
+                    tint = Color.White.copy(alpha = 0.7f)
                 )
             }
+        }
+    }
+}
 
-            // Date Representation Row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+@Composable
+private fun TitleInput(
+    title: String,
+    onTitleChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        BasicTextField(
+            value = title,
+            onValueChange = { newTitle ->
+                if (!newTitle.contains("\n")) {
+                    onTitleChange(newTitle)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = MaterialTheme.typography.headlineSmall.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            decorationBox = { innerTextField ->
+                if (title.isEmpty()) {
+                    Text(
+                        text = "Event Title...",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
+                }
+                innerTextField()
+            }
+        )
+    }
+}
+
+@Composable
+private fun DateInfoSection(
+    formattedDateRange: String,
+    formattedTimeRange: String,
+    onEditClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "📅",
+            fontSize = 32.sp,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = formattedDateRange,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = formattedTimeRange,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        IconButton(onClick = onEditClick) {
+            Icon(
+                imageVector = Icons.Default.CalendarMonth,
+                contentDescription = "Edit Date",
+                tint = Color(0xFFE91E63)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DateEditorSection(
+    startTime: LocalDateTime,
+    endTime: LocalDateTime,
+    isEndEnabled: Boolean,
+    onUpdateStartTime: (LocalDateTime) -> Unit,
+    onUpdateEndTime: (LocalDateTime) -> Unit,
+    onToggleEndEnabled: (Boolean) -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "When?",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        DateTimeEditSection(
+            title = "Inicio",
+            dateTime = startTime,
+            onDateTimeChange = onUpdateStartTime
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "End",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Switch(
+                checked = isEndEnabled,
+                onCheckedChange = onToggleEndEnabled
+            )
+        }
+
+        if (isEndEnabled) {
+            DateTimeEditSection(
+                title = "Fin",
+                dateTime = endTime,
+                onDateTimeChange = onUpdateEndTime
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextButton(
+                onClick = onCancel,
+                modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = "📅",
-                    fontSize = 32.sp,
-                    modifier = Modifier.padding(end = 16.dp)
+                Text("Cancelar")
+            }
+            Button(
+                onClick = onSave,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Guardar")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThumbnailSelectorSection(
+    allUris: List<Uri>,
+    thumbnailUri: Uri?,
+    onThumbnailSelected: (Uri) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "Select thumbnail:",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp)
+        ) {
+            items(allUris) { uri ->
+                ThumbnailItem(
+                    uri = uri,
+                    isSelected = uri == thumbnailUri,
+                    onClick = { onThumbnailSelected(uri) }
                 )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = uiState.formattedDateRange,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = uiState.formattedTimeRange,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                IconButton(onClick = onToggleDatePicker) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = "Edit Date",
-                        tint = Color(0xFFE91E63) // Pinkish
-                    )
-                }
-            }
-
-            // Date Editor Section
-            AnimatedVisibility(visible = uiState.isDatePickerVisible) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "When?",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    // Start Section
-                    DateTimeEditSection(
-                        title = "Inicio",
-                        dateTime = uiState.startTime,
-                        onDateTimeChange = onUpdateStartTime
-                    )
-
-                    // End Section with Switch
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "End",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Switch(
-                            checked = uiState.isEndEnabled,
-                            onCheckedChange = onToggleEndEnabled
-                        )
-                    }
-
-                    if (uiState.isEndEnabled) {
-                        DateTimeEditSection(
-                            title = "Fin",
-                            dateTime = uiState.endTime,
-                            onDateTimeChange = onUpdateEndTime
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        TextButton(
-                            onClick = onCancelDate,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Cancelar")
-                        }
-                        Button(
-                            onClick = onSaveDate,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Guardar")
-                        }
-                    }
-                }
-            }
-
-            // Thumbnail Selection Row
-            if (uiState.allUris.isNotEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Select thumbnail:",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(horizontal = 4.dp)
-                    ) {
-                        items(uiState.allUris) { uri ->
-                            ThumbnailItem(
-                                uri = uri,
-                                isSelected = uri == uiState.thumbnailUri,
-                                onClick = { onThumbnailSelected(uri) }
-                            )
-                        }
-                    }
-                }
             }
         }
     }
@@ -378,7 +469,6 @@ private fun DateTimeEditSection(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
-        // Date Spinners
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SpinnerBox(
                 value = dateTime.dayOfMonth.toString(),
@@ -427,7 +517,6 @@ private fun DateTimeEditSection(
             )
         }
 
-        // Time Spinners
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SpinnerBox(
                 value = String.format("%02d", dateTime.hour),
@@ -476,7 +565,7 @@ private fun SpinnerBox(
                 .size(width = 60.dp, height = 40.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .clickable { onIncrement() }, // Simple tap to increment for demo
+                .clickable { onIncrement() },
             contentAlignment = Alignment.Center
         ) {
             Text(text = value, fontWeight = FontWeight.Bold)
@@ -508,7 +597,7 @@ private fun ThumbnailItem(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        
+
         if (isSelected) {
             Box(
                 modifier = Modifier
@@ -526,5 +615,28 @@ private fun ThumbnailItem(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EventEditorScreenPreview() {
+    LoomTheme {
+        EventEditorScreen(
+            uiState = CreateEventUiState(
+                title = "Aniversario de Loom",
+                isDatePickerVisible = true
+            ),
+            onClose = {},
+            onImagesSelected = {},
+            onThumbnailSelected = {},
+            onTitleChange = {},
+            onToggleDatePicker = {},
+            onToggleEndEnabled = {},
+            onUpdateStartTime = {},
+            onUpdateEndTime = {},
+            onCancelDate = {},
+            onSaveDate = {}
+        )
     }
 }
