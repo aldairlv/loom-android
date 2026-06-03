@@ -14,16 +14,43 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -71,6 +98,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.loom.core.designsystem.theme.LoomTheme
+import com.loom.core.model.data.UiEvent
 import com.loom.core.ui.LoomWheelPicker
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDateTime
@@ -84,12 +112,23 @@ fun EventEditorScreen(
     viewModel: CreateEventViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel.uiEvent) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
 
     EventEditorScreen(
         modifier = modifier,
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onClose = onClose,
-        onImagesSelected = viewModel::onImagesSelected,
+        onImagesSelected = { uris -> viewModel.onImagesSelected(context, uris) },
         onThumbnailSelected = viewModel::onThumbnailSelected,
         onTitleChange = viewModel::onTitleChange,
         onToggleDatePicker = viewModel::toggleDatePicker,
@@ -103,7 +142,13 @@ fun EventEditorScreen(
         onLocationNameChange = viewModel::onLocationNameChange,
         onLocationSelected = viewModel::onLocationSelected,
         onCancelLocation = viewModel::cancelLocationSelection,
-        onSaveLocation = viewModel::saveLocationSelection
+        onSaveLocation = viewModel::saveLocationSelection,
+        onDescriptionChange = viewModel::onDescriptionChange,
+        onAddTag = viewModel::addTag,
+        onRemoveTag = viewModel::removeTag,
+        onCreateEvent = {
+            viewModel.publicarEvento(onSuccess = onClose)
+        }
     )
 }
 
@@ -112,6 +157,7 @@ fun EventEditorScreen(
 internal fun EventEditorScreen(
     modifier: Modifier = Modifier,
     uiState: CreateEventUiState,
+    snackbarHostState: SnackbarHostState,
     onClose: () -> Unit,
     onImagesSelected: (List<Uri>) -> Unit,
     onThumbnailSelected: (Uri) -> Unit,
@@ -126,7 +172,11 @@ internal fun EventEditorScreen(
     onLocationNameChange: (String) -> Unit,
     onLocationSelected: (Double, Double, String) -> Unit,
     onCancelLocation: () -> Unit,
-    onSaveLocation: () -> Unit
+    onSaveLocation: () -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onAddTag: (String) -> Unit,
+    onRemoveTag: (String) -> Unit,
+    onCreateEvent: () -> Unit
 ) {
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
@@ -134,19 +184,20 @@ internal fun EventEditorScreen(
     )
 
     val listState = rememberLazyListState()
+    var showTagsBottomSheet by remember { mutableStateOf(false) }
 
     // Auto-scroll y bloqueo de scroll para mejorar la interacción con el Mapa y WheelPickers
     LaunchedEffect(uiState.isDatePickerVisible) {
         if (uiState.isDatePickerVisible) {
             delay(300)
-            listState.animateScrollToItem(index = 3)
+            listState.animateScrollToItem(index = 5)
         }
     }
 
     LaunchedEffect(uiState.isLocationPickerVisible) {
         if (uiState.isLocationPickerVisible) {
             delay(300)
-            listState.animateScrollToItem(index = 5)
+            listState.animateScrollToItem(index = 7)
         }
     }
 
@@ -155,9 +206,11 @@ internal fun EventEditorScreen(
         topBar = {
             CreateEventTopBar(
                 onClose = onClose,
-                onCreateClick = { /* Create event logic */ }
+                onCreateClick = onCreateEvent,
+                isPublishing = uiState.isPublishing
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         LazyColumn(
             state = listState,
@@ -183,6 +236,20 @@ internal fun EventEditorScreen(
                 TitleInput(
                     title = uiState.title,
                     onTitleChange = onTitleChange
+                )
+            }
+
+            item {
+                DescriptionInput(
+                    description = uiState.description,
+                    onDescriptionChange = onDescriptionChange
+                )
+            }
+
+            item {
+                TagSelectionRow(
+                    selectedTags = uiState.selectedTags,
+                    onAddTagsClick = { showTagsBottomSheet = true }
                 )
             }
 
@@ -243,26 +310,42 @@ internal fun EventEditorScreen(
             }
         }
     }
+
+    if (showTagsBottomSheet) {
+        EventTagsBottomSheet(
+            selectedTags = uiState.selectedTags,
+            onAddTag = onAddTag,
+            onRemoveTag = onRemoveTag,
+            onDismiss = { showTagsBottomSheet = false }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateEventTopBar(
     onClose: () -> Unit,
-    onCreateClick: () -> Unit
+    onCreateClick: () -> Unit,
+    isPublishing: Boolean = false
 ) {
     TopAppBar(
         title = { },
         navigationIcon = {
-            IconButton(onClick = onClose) {
+            IconButton(onClick = onClose, enabled = !isPublishing) {
                 Icon(Icons.Default.Close, contentDescription = "Close")
             }
         },
         actions = {
-            TextButton(onClick = onCreateClick) {
-                Text("Create", style = MaterialTheme.typography.labelLarge)
+            TextButton(
+                onClick = onCreateClick,
+                enabled = !isPublishing
+            ) {
+                Text(
+                    text = if (isPublishing) "Creating..." else "Create",
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
-            IconButton(onClick = { /* More actions */ }) {
+            IconButton(onClick = { /* More actions */ }, enabled = !isPublishing) {
                 Icon(Icons.Default.MoreVert, contentDescription = "More")
             }
         }
@@ -328,6 +411,229 @@ private fun PhotoArea(
                     modifier = Modifier.size(56.dp),
                     tint = Color.White.copy(alpha = 0.7f)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DescriptionInput(
+    description: String,
+    onDescriptionChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Description",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 120.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            BasicTextField(
+                value = description,
+                onValueChange = onDescriptionChange,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorationBox = { innerTextField ->
+                    if (description.isEmpty()) {
+                        Text(
+                            text = "Añade la descripción de tu evento",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        )
+                    }
+                    innerTextField()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun TagSelectionRow(
+    selectedTags: List<String>,
+    onAddTagsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            onClick = onAddTagsClick,
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Text(
+                text = if (selectedTags.isEmpty()) "# Añade algunas etiquetas" else "#",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            )
+        }
+
+        selectedTags.forEach { tag ->
+            Surface(
+                onClick = onAddTagsClick,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Text(
+                    text = "#$tag",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+private fun EventTagsBottomSheet(
+    selectedTags: List<String>,
+    onAddTag: (String) -> Unit,
+    onRemoveTag: (String) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val sheetState = rememberModalBottomSheetState()
+    var tagInput by remember { mutableStateOf("") }
+    val scrollState = rememberScrollState()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Añadir Etiquetas",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Text("Hecho", fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .verticalScroll(scrollState)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Tag,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .padding(top = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        selectedTags.forEach { tag ->
+                            Surface(
+                                onClick = { onRemoveTag(tag) },
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(
+                                    text = "#$tag",
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
+
+                        if (selectedTags.size < 50) {
+                            BasicTextField(
+                                value = tagInput,
+                                onValueChange = { tagInput = it },
+                                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                keyboardOptions = KeyboardOptions(
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        if (tagInput.isNotBlank()) {
+                                            onAddTag(tagInput)
+                                            tagInput = ""
+                                        }
+                                    }
+                                ),
+                                decorationBox = { innerTextField ->
+                                    Box(
+                                        modifier = Modifier.padding(vertical = 6.dp),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        if (tagInput.isEmpty()) {
+                                            Text(
+                                                text = "Añadir etiquetas...",
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                                fontSize = 16.sp
+                                            )
+                                        }
+                                        innerTextField()
+                                    }
+                                },
+                                modifier = Modifier.widthIn(min = 120.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -844,6 +1150,7 @@ private fun EventEditorScreenPreview() {
                 locationName = "Sede Central",
                 locationAddress = "Av. Siempre Viva 742"
             ),
+            snackbarHostState = remember { SnackbarHostState() },
             onClose = {},
             onImagesSelected = {},
             onThumbnailSelected = {},
@@ -858,7 +1165,11 @@ private fun EventEditorScreenPreview() {
             onLocationNameChange = {},
             onLocationSelected = { _, _, _ -> },
             onCancelLocation = {},
-            onSaveLocation = {}
+            onSaveLocation = {},
+            onDescriptionChange = {},
+            onAddTag = {},
+            onRemoveTag = {},
+            onCreateEvent = {}
         )
     }
 }

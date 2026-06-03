@@ -1,18 +1,34 @@
 package com.loom.feature.eventeditor.impl
 
+import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.loom.core.data.repository.EventsRepository
+import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.UserDataRepository
 import com.loom.core.data.repository.UserRepository
+import com.loom.core.model.data.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+
+data class MediaUploadStatus(
+    val id: String? = null,
+    val isUploading: Boolean = false,
+)
 
 data class CreateEventUiState(
     val title: String = "",
@@ -29,6 +45,10 @@ data class CreateEventUiState(
     val longitude: Double = 0.0,
     val timezone: String = TimeZone.currentSystemDefault().id,
     val isLocationPickerVisible: Boolean = false,
+    val description: String = "",
+    val selectedTags: List<String> = emptyList(),
+    val mediaUploads: Map<Uri, MediaUploadStatus> = emptyMap(),
+    val isPublishing: Boolean = false,
 ) {
     val allUris: List<Uri> get() = listOfNotNull(thumbnailUri) + assetUris
 
@@ -66,20 +86,33 @@ data class CreateEventUiState(
 class CreateEventViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userDataRepository: UserDataRepository,
+    private val homeRepository: HomeRepository,
+    private val eventsRepository: EventsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateEventUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun onImagesSelected(uris: List<Uri>) {
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+
+    fun onImagesSelected(context: Context, uris: List<Uri>) {
         _uiState.update { currentState ->
-            val totalUris = (currentState.allUris + uris).distinct()
+            val newUris = uris.filter { it !in currentState.allUris }
+            val totalUris = (currentState.allUris + newUris).distinct()
             val newThumbnail = currentState.thumbnailUri ?: totalUris.firstOrNull()
             val newAssets = totalUris.filter { it != newThumbnail }
             
+            val newUploads = currentState.mediaUploads.toMutableMap()
+            newUris.forEach { uri ->
+                newUploads[uri] = MediaUploadStatus(isUploading = true)
+                uploadMediaInternal(context, uri)
+            }
+
             currentState.copy(
                 thumbnailUri = newThumbnail,
-                assetUris = newAssets
+                assetUris = newAssets,
+                mediaUploads = newUploads
             )
         }
     }
@@ -149,5 +182,110 @@ class CreateEventViewModel @Inject constructor(
 
     fun saveLocationSelection() {
         _uiState.update { it.copy(isLocationPickerVisible = false) }
+    }
+
+    fun onDescriptionChange(newDescription: String) {
+        _uiState.update { it.copy(description = newDescription) }
+    }
+
+    fun addTag(tag: String) {
+        _uiState.update { currentState ->
+            if (currentState.selectedTags.size < 50 && !currentState.selectedTags.contains(tag)) {
+                currentState.copy(selectedTags = currentState.selectedTags + tag)
+            } else {
+                currentState
+            }
+        }
+    }
+
+    fun removeTag(tag: String) {
+        _uiState.update { currentState ->
+            currentState.copy(selectedTags = currentState.selectedTags.filter { it != tag })
+        }
+    }
+
+    private fun uploadMediaInternal(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val contentResolver = context.contentResolver
+                val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@launch
+                val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+
+                val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+                val fileName = (uri.lastPathSegment ?: "file").let { name ->
+                    if (extension != null && !name.endsWith(".$extension", ignoreCase = true)) {
+                        "$name.$extension"
+                    } else {
+                        name
+                    }
+                }
+
+                val postMedia = homeRepository.uploadMedia(fileName, mimeType, bytes)
+
+                _uiState.update { currentState ->
+                    val newUploads = currentState.mediaUploads.toMutableMap()
+                    newUploads[uri] = MediaUploadStatus(id = postMedia.id, isUploading = false)
+                    currentState.copy(mediaUploads = newUploads)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiEvent.emit(UiEvent.ShowSnackbar("Error al subir archivo"))
+                _uiState.update { currentState ->
+                    val newUploads = currentState.mediaUploads.toMutableMap()
+                    newUploads[uri] = MediaUploadStatus(isUploading = false)
+                    currentState.copy(mediaUploads = newUploads)
+                }
+            }
+        }
+    }
+
+    fun publicarEvento(onSuccess: () -> Unit) {
+        val state = uiState.value
+
+        if (state.title.isBlank()) {
+            viewModelScope.launch { _uiEvent.emit(UiEvent.ShowSnackbar("El título es obligatorio")) }
+            return
+        }
+
+        val isUploading = state.mediaUploads.values.any { it.isUploading }
+        if (isUploading) {
+            viewModelScope.launch { _uiEvent.emit(UiEvent.ShowSnackbar("Espera a que terminen de subirse las imágenes")) }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isPublishing = true) }
+            try {
+                val assetIds = state.assetUris.mapNotNull { state.mediaUploads[it]?.id }
+                val thumbnailId = state.thumbnailUri?.let { state.mediaUploads[it]?.id }
+
+                val startTimeStr = state.startTime.toInstant(TimeZone.of(state.timezone)).toString()
+                val endTimeStr = if (state.isEndEnabled) {
+                    state.endTime.toInstant(TimeZone.of(state.timezone)).toString()
+                } else null
+
+                eventsRepository.createEvent(
+                    title = state.title,
+                    description = state.description,
+                    startTime = startTimeStr,
+                    endTime = endTimeStr,
+                    locationName = state.locationName.takeIf { it.isNotBlank() },
+                    locationAddress = state.locationAddress.takeIf { it.isNotBlank() },
+                    assetIds = assetIds,
+                    thumbnailId = thumbnailId,
+                    latitude = state.latitude,
+                    longitude = state.longitude,
+                    timezone = state.timezone,
+                    tags = state.selectedTags,
+                    status = "published"
+                )
+                onSuccess()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiEvent.emit(UiEvent.ShowSnackbar("Error al crear el evento"))
+            } finally {
+                _uiState.update { it.copy(isPublishing = false) }
+            }
+        }
     }
 }

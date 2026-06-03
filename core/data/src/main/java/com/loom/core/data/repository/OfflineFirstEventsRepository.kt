@@ -10,6 +10,8 @@ import com.loom.core.model.data.FriendAttending
 import com.loom.core.model.data.PostMedia
 import com.loom.core.network.LoomNetworkDataSource
 import com.loom.core.network.model.NetworkEventCoordinates
+import com.loom.core.network.model.NetworkEventCreateRequest
+import com.loom.core.network.model.NetworkEventCreateResponse
 import com.loom.core.network.model.NetworkEventCreator
 import com.loom.core.network.model.NetworkEventData
 import com.loom.core.network.model.NetworkEventLocation
@@ -17,6 +19,7 @@ import com.loom.core.network.model.NetworkFriendAttending
 import com.loom.core.network.model.NetworkObject
 import com.loom.core.network.model.NetworkObjectEvent
 import com.loom.core.network.model.NetworkPostMedia
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import javax.inject.Inject
 
@@ -41,6 +44,48 @@ internal class OfflineFirstEventsRepository @Inject constructor(
             val feedObject = eventObject.asExternalModel() as? FeedObject.EventFeedObject
             feedObject?.event
         } else null
+    }
+
+    override suspend fun createEvent(
+        title: String,
+        description: String?,
+        startTime: String,
+        endTime: String?,
+        locationName: String?,
+        locationAddress: String?,
+        assetIds: List<String>,
+        thumbnailId: String?,
+        latitude: Double?,
+        longitude: Double?,
+        category: String?,
+        maxAttendees: Int?,
+        isOnline: Boolean?,
+        isPublic: Boolean?,
+        status: String?,
+        tags: List<String>,
+        timezone: String?
+    ): EventFeedItem? {
+        val networkRequest = NetworkEventCreateRequest(
+            title = title,
+            description = description,
+            startTime = startTime,
+            endTime = endTime,
+            locationName = locationName,
+            locationAddress = locationAddress,
+            assetIds = assetIds,
+            thumbnailId = thumbnailId,
+            latitude = latitude,
+            longitude = longitude,
+            category = category,
+            maxAttendees = maxAttendees,
+            isOnline = isOnline,
+            isPublic = isPublic,
+            status = status,
+            tags = tags,
+            timezone = timezone
+        )
+        val networkResponse = network.createEvent(networkRequest)
+        return networkResponse.asExternalModel()
     }
 }
 
@@ -109,4 +154,41 @@ private fun NetworkEventLocation.asExternalModel() = EventLocation(
 private fun NetworkEventCoordinates.asExternalModel() = EventCoordinates(
     latitude = latitude,
     longitude = longitude
+)
+
+private fun NetworkEventCreateResponse.asExternalModel() = EventFeedItem(
+    id = id,
+    timestamp = try { Instant.parse(createdAt).toEpochMilliseconds() } catch (e: Exception) { 0L },
+    tags = tags,
+    creator = EventCreator(
+        displayName = creatorDisplayName,
+        avatarUrl = null
+    ),
+    eventData = EventData(
+        title = title,
+        description = description,
+        thumbnailUrl = thumbnailUrl,
+        assets = assets.map { it.asExternalModel() },
+        startTime = try { Instant.parse(startTime) } catch (e: Exception) { Clock.System.now() },
+        endTime = endTime?.let { try { Instant.parse(it) } catch (e: Exception) { null } },
+        timezone = timezone,
+        location = locationName?.let { name ->
+            val lat = latitude
+            val lon = longitude
+            EventLocation(
+                name = name,
+                address = locationAddress,
+                coordinates = if (lat != null && lon != null) {
+                    EventCoordinates(lat, lon)
+                } else null
+            )
+        },
+        rsvpCount = 0,
+        maxAttendees = maxAttendees,
+        isOnline = isOnline,
+        isPublic = isPublic,
+        isCancelled = isCancelled,
+        status = status,
+        category = category
+    )
 )
