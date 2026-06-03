@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("post")
 data class NetworkObjectPost(
-    override val objectType: String,
+    override val objectType: String = "post",
     override val id: String,
-    override val streamGlobalPosition: Int,
+    override val streamGlobalPosition: Int? = null,
     override val streamSessionId: String? = null,
     val author: NetworkPostAuthor,
     val parent: NetworkPostParent? = null,

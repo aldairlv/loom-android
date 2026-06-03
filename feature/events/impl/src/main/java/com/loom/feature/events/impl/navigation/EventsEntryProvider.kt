@@ -8,6 +8,6 @@ import com.loom.feature.events.impl.EventsScreen
 
 fun EntryProviderScope<NavKey>.eventsEntry(navigator: Navigator) {
     entry<EventsNavKey> { key ->
-        EventsScreen()
+        EventsScreen(navigator = navigator)
     }
 }

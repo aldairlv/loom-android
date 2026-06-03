@@ -17,5 +17,14 @@ sealed interface FeedObject {
         override val id: String = post.id
     }
 
+    @Serializable
+    data class EventFeedObject(
+        val event: EventFeedItem,
+        override val streamGlobalPosition: Int,
+        override val streamSessionId: String?
+    ) : FeedObject {
+        override val id: String = event.id
+    }
+
     // Future objects can be added here
 }

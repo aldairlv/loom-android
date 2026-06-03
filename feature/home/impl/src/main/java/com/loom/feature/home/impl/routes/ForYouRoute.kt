@@ -24,10 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.loom.core.ui.feed.feedObjects
+import com.loom.feature.eventdetail.api.navigation.EventNavKey
+import com.loom.core.navigation.Navigator
 
 
 @Composable
 fun ForYouRoute(
+    navigator: Navigator,
     modifier: Modifier = Modifier,
     onCommentClick: (String) -> Unit = {},
     onCommentRepostClick: (com.loom.core.model.data.PostFeedItem) -> Unit = {},
@@ -43,6 +46,7 @@ fun ForYouRoute(
         onCommentRepost = onCommentRepostClick,
         onShare = viewModel::onShare,
         onFollowClick = viewModel::onFollowClick,
+        onEventClick = { id -> navigator.navigate(EventNavKey(id)) },
         onLoadMore = viewModel::loadMore,
         onRefresh = { viewModel.fetchPosts(isLoadMore = false) },
         modifier = modifier
@@ -59,6 +63,7 @@ internal fun ForYouRoute(
     onCommentRepost: (com.loom.core.model.data.PostFeedItem) -> Unit,
     onShare: (String) -> Unit,
     onFollowClick: (String, String, Boolean) -> Unit,
+    onEventClick: (String) -> Unit,
     onLoadMore: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -105,7 +110,8 @@ internal fun ForYouRoute(
                                 onQuickRepost = onQuickRepost,
                                 onCommentRepost = onCommentRepost,
                                 onShare = onShare,
-                                onFollowClick = onFollowClick
+                                onFollowClick = onFollowClick,
+                                onEventClick = onEventClick
                             )
 
                             if (uiState.isFetchingMore && listState.firstVisibleItemIndex != 0) {

@@ -2,6 +2,7 @@ package com.loom.core.network.serialization.polymorphic
 
 import com.loom.core.network.model.NetworkObject
 import com.loom.core.network.model.NetworkObjectCarousel
+import com.loom.core.network.model.NetworkObjectEvent
 import com.loom.core.network.model.NetworkObjectPost
 import com.loom.core.network.model.NetworkObjectTitle
 import com.loom.core.network.model.NetworkObjectTrend
@@ -22,12 +23,17 @@ object NetworkObjectSerializer :
             .jsonObject["objectType"]
             ?.jsonPrimitive
             ?.content
+            ?: element
+                .jsonObject["type"]
+                ?.jsonPrimitive
+                ?.content
 
         return when (type) {
             "post" -> NetworkObjectPost.serializer()
             "title" -> NetworkObjectTitle.serializer()
             "carousel" -> NetworkObjectCarousel.serializer()
             "trend" -> NetworkObjectTrend.serializer()
+            "event" -> NetworkObjectEvent.serializer()
             else -> error("Unknown type: $type")
         }
     }

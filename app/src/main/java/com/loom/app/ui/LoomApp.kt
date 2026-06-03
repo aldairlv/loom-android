@@ -49,14 +49,18 @@ import com.loom.feature.auth.impl.navigation.emailInputEntry
 import com.loom.feature.auth.impl.navigation.passwordInputEntry
 import com.loom.feature.comments.api.navigation.CommentsNavKey
 import com.loom.feature.comments.impl.navigation.commentsEntry
+import com.loom.feature.eventdetail.api.navigation.EventNavKey
+import com.loom.feature.eventdetail.impl.navigation.eventEntry
 import com.loom.feature.events.impl.navigation.eventsEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
 import com.loom.feature.profile.impl.navigation.profileEntry
 import com.loom.feature.settings.api.navigation.AccountSettingsNavKey
+import com.loom.feature.settings.api.navigation.LocationNavKey
 import com.loom.feature.settings.api.navigation.SettingsNavKey
 import com.loom.feature.settings.impl.navigation.accountSettingsEntry
+import com.loom.feature.settings.impl.navigation.locationEntry
 import com.loom.feature.settings.impl.navigation.settingsEntry
 
 
@@ -129,10 +133,12 @@ internal fun LoomApp(
         profileEntry(navigator)
         commentsEntry(navigator)
         eventsEntry(navigator)
+        eventEntry(navigator)
 
         // Settings
         settingsEntry(navigator)
         accountSettingsEntry(navigator)
+        locationEntry(navigator)
     }
 
     val isLoggedIn = sessionState is SessionState.LoggedIn
@@ -142,7 +148,9 @@ internal fun LoomApp(
         if (currentKey is CreatePostNavKey ||
             currentKey is SettingsNavKey ||
             currentKey is AccountSettingsNavKey ||
-            currentKey is CommentsNavKey
+            currentKey is CommentsNavKey ||
+            currentKey is LocationNavKey ||
+            currentKey is EventNavKey
         ){
             NavDisplay(
                 entries = appState.navigationState.toEntries(entryProvider),

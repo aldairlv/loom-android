@@ -41,6 +41,7 @@ import com.loom.core.network.model.NetworkComment
 import com.loom.core.network.model.NetworkCommentRequest
 import com.loom.core.network.model.NetworkCommentEnvelope
 import com.loom.core.network.model.NetworkCommentResponse
+import com.loom.core.network.model.NetworkEventDetailEnvelope
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PATCH
@@ -104,6 +105,16 @@ private interface RetrofitLoomNetworkApi {
     suspend fun getFeedObjectsForYou(
         @Query("cursor") cursor: String?
     ): NetworkFeedObjectEnvelope
+
+    @GET(value = "feeds/soon/")
+    suspend fun getFeedEventsSoon(
+        @Query("cursor") cursor: String?
+    ): NetworkFeedObjectEnvelope
+
+    @GET(value = "events/events/{id}/")
+    suspend fun getEvent(
+        @Path("id") id: String
+    ): NetworkEventDetailEnvelope
 
     @GET(value = "posts/following/")
     suspend fun getPostsFeedFollowing(
@@ -286,6 +297,29 @@ internal class RetrofitLoomNetwork @Inject constructor(
             next = result.response.feed.queryParams?.cursor,
             results = result.response.feed.elements
         )
+    }
+
+    override suspend fun getFeedEventsSoon(cursor: String?): NetworkFeedObjectResponse {
+        val result = networkApi.getFeedEventsSoon(cursor)
+        return NetworkFeedObjectResponse(
+            next = result.response.feed.queryParams?.cursor,
+            results = result.response.feed.elements
+        )
+    }
+
+    override suspend fun getEvent(id: String): NetworkFeedObjectResponse {
+        android.util.Log.d("LOOM_EVENT_DETAIL", "Network: Fetching event details for id: $id")
+        return try {
+            val result = networkApi.getEvent(id)
+            android.util.Log.d("LOOM_EVENT_DETAIL", "Network: Successfully fetched event: ${result.response.id}")
+            NetworkFeedObjectResponse(
+                next = null,
+                results = listOf(result.response)
+            )
+        } catch (e: Exception) {
+            android.util.Log.e("LOOM_EVENT_DETAIL", "Network: Error fetching event details for id: $id", e)
+            throw e
+        }
     }
 
     override suspend fun getPostsFeedFollowing(cursor: String?): NetworkPostsFeedResponse {

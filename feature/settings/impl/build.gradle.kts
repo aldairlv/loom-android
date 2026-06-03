@@ -1,3 +1,7 @@
+import com.android.build.api.variant.BuildConfigField
+import java.io.StringReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
@@ -16,6 +20,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -59,4 +64,22 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation("com.google.android.libraries.places:places:4.1.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+}
+
+val placesApiKey = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["PLACES_API_KEY"]
+}.orElse("")
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields!!.put("PLACES_API_KEY", placesApiKey.map { value ->
+            BuildConfigField(type = "String", value = """"$value"""", comment = null)
+        })
+    }
 }

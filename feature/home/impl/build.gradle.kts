@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":feature:home:api"))
     implementation(project(":feature:comments:api"))
     implementation(project(":feature:post-editor:api"))
+    implementation(project(":feature:event-detail:api"))
     implementation(project(":core:navigation"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:model"))

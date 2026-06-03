@@ -95,7 +95,7 @@ internal class OfflineFirstHomeRepository @Inject constructor(
                 timelineCategory = "for_you",
                 objectType = networkObj.objectType,
                 objectId = networkObj.id,
-                streamGlobalPosition = networkObj.streamGlobalPosition,
+                streamGlobalPosition = networkObj.streamGlobalPosition ?: 0,
                 streamSessionId = networkObj.streamSessionId
             )
         }
@@ -323,7 +323,7 @@ private fun NetworkObject.asExternalModel(): FeedObject? {
                 updatedAt = updated_at.toInstantOrNow(),
                 publishedAt = published_at?.toInstantOrNull()
             ),
-            streamGlobalPosition = streamGlobalPosition,
+            streamGlobalPosition = streamGlobalPosition ?: 0,
             streamSessionId = streamSessionId
         )
         else -> null // Handle other types as they are implemented
