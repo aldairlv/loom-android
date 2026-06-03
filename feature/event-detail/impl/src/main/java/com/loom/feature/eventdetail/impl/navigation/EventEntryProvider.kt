@@ -9,6 +9,7 @@ import com.loom.feature.eventdetail.impl.EventScreen
 fun EntryProviderScope<NavKey>.eventEntry(navigator: Navigator) {
     entry<EventNavKey> { key ->
         EventScreen(
+            eventId = key.eventId,
             onBackClick = { navigator.goBack() }
         )
     }

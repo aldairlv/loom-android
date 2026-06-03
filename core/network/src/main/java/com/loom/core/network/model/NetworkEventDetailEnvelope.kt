@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NetworkEventDetailEnvelope(
     val meta: NetworkMeta? = null,
-    val response: NetworkObjectEvent
+    val response: NetworkObject
 )

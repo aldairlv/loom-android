@@ -18,12 +18,14 @@ import com.loom.core.ui.event.EventFeedCard
 
 @Composable
 fun EventScreen(
+    eventId: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventViewModel = hiltViewModel()
 ) {
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        android.util.Log.d("LOOM_EVENT_DETAIL", "Screen: EventScreen composed")
+    androidx.compose.runtime.LaunchedEffect(eventId) {
+        android.util.Log.d("LOOM_EVENT_DETAIL", "Screen: EventScreen composed with eventId: $eventId")
+        viewModel.setEventId(eventId)
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.loom.core.data.repository.EventsRepository
 import com.loom.core.model.data.EventFeedItem
+import com.loom.feature.eventdetail.api.navigation.EventNavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,24 +19,26 @@ class EventViewModel @Inject constructor(
     private val eventsRepository: EventsRepository,
 ) : ViewModel() {
 
-    private val eventId: String? = savedStateHandle["eventId"]
+    init {
+        android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Initializing. Keys in SavedStateHandle: ${savedStateHandle.keys()}")
+    }
 
+    private val _eventId = MutableStateFlow<String?>(null)
     private val _uiState = MutableStateFlow<EventUiState>(EventUiState.Loading)
     val uiState: StateFlow<EventUiState> = _uiState.asStateFlow()
 
-    init {
-        fetchEvent()
+    fun setEventId(id: String) {
+        if (_eventId.value == id) return
+        _eventId.value = id
+        fetchEvent(id)
     }
 
-    private fun fetchEvent() {
-        val id = eventId ?: run {
-            android.util.Log.e("LOOM_EVENT_DETAIL", "ViewModel: eventId is null")
-            return
-        }
+    private fun fetchEvent(id: String) {
         android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Fetching event with id: $id")
         viewModelScope.launch {
             _uiState.value = EventUiState.Loading
             try {
+                android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Calling repository.getEvent($id)")
                 val event = eventsRepository.getEvent(id)
                 if (event != null) {
                     android.util.Log.d("LOOM_EVENT_DETAIL", "ViewModel: Event successfully loaded: ${event.id}")
