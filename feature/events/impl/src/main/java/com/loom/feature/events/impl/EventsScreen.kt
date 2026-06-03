@@ -27,29 +27,36 @@ import com.loom.core.ui.tabs.TabsSettingsSheet
 import com.loom.feature.events.impl.routes.SoonRoute
 import com.loom.feature.eventdetail.api.navigation.EventNavKey
 import com.loom.core.navigation.Navigator
+import com.loom.core.ui.post.DraggableCreatePostButton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 fun EventsScreen(
     navigator: Navigator,
+    onCreateClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EventsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val tabs by viewModel.tabs.collectAsStateWithLifecycle()
+    Box(modifier = Modifier.fillMaxSize()) {
+        EventsScreen(
+            uiState = uiState,
+            tabs = tabs,
+            onToggleTab = viewModel::toggleTab,
+            onClickLike = viewModel::onClickLike,
+            onQuickRepost = viewModel::onQuickRepost,
+            onShare = viewModel::onShare,
+            onFollowClick = viewModel::onFollowClick,
+            onEventClick = { id -> navigator.navigate(EventNavKey(id)) },
+            modifier = modifier
+        )
+        DraggableCreatePostButton(
+            onClick = onCreateClick
+        )
+    }
 
-    EventsScreen(
-        uiState = uiState,
-        tabs = tabs,
-        onToggleTab = viewModel::toggleTab,
-        onClickLike = viewModel::onClickLike,
-        onQuickRepost = viewModel::onQuickRepost,
-        onShare = viewModel::onShare,
-        onFollowClick = viewModel::onFollowClick,
-        onEventClick = { id -> navigator.navigate(EventNavKey(id)) },
-        modifier = modifier
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(project(":feature:events:api"))
     implementation(project(":feature:event-detail:api"))
+    implementation(project(":feature:event-editor:api"))
     implementation(project(":core:navigation"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:model"))
