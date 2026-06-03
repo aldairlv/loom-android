@@ -22,6 +22,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -60,7 +62,8 @@ fun EventEditorScreen(
         uiState = uiState,
         onClose = onClose,
         onImagesSelected = viewModel::onImagesSelected,
-        onThumbnailSelected = viewModel::onThumbnailSelected
+        onThumbnailSelected = viewModel::onThumbnailSelected,
+        onTitleChange = viewModel::onTitleChange
     )
 }
 
@@ -71,7 +74,8 @@ internal fun EventEditorScreen(
     uiState: CreateEventUiState,
     onClose: () -> Unit,
     onImagesSelected: (List<Uri>) -> Unit,
-    onThumbnailSelected: (Uri) -> Unit
+    onThumbnailSelected: (Uri) -> Unit,
+    onTitleChange: (String) -> Unit
 ) {
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
@@ -167,6 +171,40 @@ internal fun EventEditorScreen(
                         )
                     }
                 }
+            }
+
+            // Title Input Row
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                BasicTextField(
+                    value = uiState.title,
+                    onValueChange = { newTitle ->
+                        // Filter out manual newlines but allow text wrapping
+                        if (!newTitle.contains("\n")) {
+                            onTitleChange(newTitle)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    decorationBox = { innerTextField ->
+                        if (uiState.title.isEmpty()) {
+                            Text(
+                                text = "Event Title...",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
             }
 
             // Thumbnail Selection Row

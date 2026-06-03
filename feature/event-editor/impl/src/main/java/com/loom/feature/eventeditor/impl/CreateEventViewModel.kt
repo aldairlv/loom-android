@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 data class CreateEventUiState(
+    val title: String = "",
     val thumbnailUri: Uri? = null,
     val assetUris: List<Uri> = emptyList(),
 ) {
@@ -49,5 +50,9 @@ class CreateEventViewModel @Inject constructor(
                 assetUris = totalUris.filter { it != uri }
             )
         }
+    }
+
+    fun onTitleChange(newTitle: String) {
+        _uiState.update { it.copy(title = newTitle) }
     }
 }
