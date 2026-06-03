@@ -44,7 +44,7 @@ fun LoomWheelPicker(
 
     Box(
         modifier = modifier
-            .height(110.dp)
+            .height(90.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(12.dp)
@@ -55,7 +55,7 @@ fun LoomWheelPicker(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(34.dp)
+                .height(30.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                     shape = RoundedCornerShape(8.dp)
@@ -79,7 +79,7 @@ fun LoomWheelPicker(
                     else
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     fontWeight = if (pagerState.currentPage == page) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = if (pagerState.currentPage == page) 16.sp else 14.sp
+                    fontSize = if (pagerState.currentPage == page) 15.sp else 13.sp
                 )
             }
         }
