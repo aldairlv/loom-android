@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.google.android.libraries.places.api.Places
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -523,6 +524,13 @@ private fun LocationEditorSection(
 ) {
     val context = LocalContext.current
     val geocoder = remember { Geocoder(context, Locale.getDefault()) }
+
+    // Inicializar Places como en LocationScreen si no lo está
+    remember(context) {
+        if (!Places.isInitialized()) {
+            Places.initialize(context, BuildConfig.MAPS_API_KEY)
+        }
+    }
     
     val initialPos = LatLng(latitude, longitude)
     val cameraPositionState = rememberCameraPositionState {

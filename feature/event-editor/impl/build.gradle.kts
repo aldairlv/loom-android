@@ -66,6 +66,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(libs.maps.compose)
     implementation(libs.google.maps)
+    implementation("com.google.android.libraries.places:places:4.1.0")
 }
 
 val mapsApiKey = providers.fileContents(
