@@ -4,9 +4,11 @@ import com.loom.core.data.repository.AuthRepository
 import com.loom.core.data.repository.DataTokenManager
 import com.loom.core.data.repository.EventsRepository
 import com.loom.core.data.repository.HomeRepository
+import com.loom.core.data.repository.NotificationsRepository
 import com.loom.core.data.repository.OfflineFirstAuthRepository
 import com.loom.core.data.repository.OfflineFirstEventsRepository
 import com.loom.core.data.repository.OfflineFirstHomeRepository
+import com.loom.core.data.repository.OfflineFirstNotificationsRepository
 import com.loom.core.data.repository.OfflineFirstProfileRepository
 import com.loom.core.data.repository.OfflineFirstSettingsRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
@@ -72,5 +74,10 @@ abstract class DataModule {
     internal abstract fun bindsSettingsRepository(
         settingsRepository: OfflineFirstSettingsRepository
     ): SettingsRepository
+
+    @Binds
+    internal abstract fun bindsNotificationsRepository(
+        notificationsRepository: OfflineFirstNotificationsRepository
+    ): NotificationsRepository
 
 }

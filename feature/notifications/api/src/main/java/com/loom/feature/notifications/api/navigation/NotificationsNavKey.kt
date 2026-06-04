@@ -1,8 +1,8 @@
-package com.loom.feature.home.api.navigation
+package com.loom.feature.notifications.api.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-object HomeNavKey: NavKey {
+object NotificationsNavKey: NavKey {
 }

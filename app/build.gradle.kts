@@ -115,4 +115,7 @@ dependencies {
     implementation(project(":feature:event-detail:impl"))
     implementation(project(":feature:event-editor:api"))
     implementation(project(":feature:event-editor:impl"))
+    implementation(project(":feature:notifications:api"))
+    implementation(project(":feature:notifications:impl"))
+
 }

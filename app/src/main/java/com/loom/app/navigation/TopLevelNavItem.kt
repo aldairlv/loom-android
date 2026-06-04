@@ -11,11 +11,13 @@ import com.loom.feature.auth.api.navigation.EmailInputNavKey
 import com.loom.feature.auth.api.navigation.PasswordInputNavKey
 import com.loom.feature.events.api.navigation.EventsNavKey
 import com.loom.feature.home.api.navigation.HomeNavKey
+import com.loom.feature.notifications.api.navigation.NotificationsNavKey
 import com.loom.feature.profile.api.navigation.ProfileNavKey
 import com.loom.feature.home.api.R as homeR
 import com.loom.feature.explore.api.R as exploreR
 import com.loom.feature.events.api.R as eventsR
 import com.loom.feature.profile.api.R as profileR
+import com.loom.feature.notifications.api.R as notificationsR
 
 /**
  * Type for the top level navigation items in the Loom application.
@@ -52,8 +54,8 @@ val EXPLORE = TopLevelNavItem(
 val ACTIVITY = TopLevelNavItem(
     selectedIcon = LoomIcons.Activity,
     unselectedIcon = LoomIcons.ActivityBorder,
-    iconTextId = homeR.string.feature_home_api_title,
-    titleTextId = homeR.string.feature_home_api_title,
+    iconTextId = notificationsR.string.feature_notifications_api_title,
+    titleTextId = notificationsR.string.feature_notifications_api_title,
 )
 val PROFILE = TopLevelNavItem(
     selectedIcon = LoomIcons.Person,
@@ -66,6 +68,7 @@ val TOP_LEVEL_NAV_ITEMS = mapOf(
     HomeNavKey to HOME,
     ExploreNavKey to EXPLORE,
     EventsNavKey to EVENTS,
+    NotificationsNavKey to ACTIVITY,
     ProfileNavKey to PROFILE,
 
 )
