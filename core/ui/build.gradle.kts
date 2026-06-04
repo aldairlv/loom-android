@@ -1,3 +1,6 @@
+import java.io.StringReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
@@ -12,6 +15,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"
@@ -84,4 +88,24 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.4.1")
     implementation(libs.androidx.compose.foundation.layout)
     implementation("io.coil-kt:coil-gif:2.6.0")
+    implementation(libs.maps.compose)
+    implementation(libs.google.maps)
+    implementation("com.google.android.libraries.places:places:4.1.0")
+}
+
+val mapsApiKey = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    val reader = StringReader(text)
+    properties.load(reader)
+    properties["MAPS_API_KEY"]
+}.orElse("")
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields!!.put("MAPS_API_KEY", mapsApiKey.map { value ->
+            com.android.build.api.variant.BuildConfigField(type = "String", value = """"$value"""", comment = null)
+        })
+    }
 }

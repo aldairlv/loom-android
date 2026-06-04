@@ -10,6 +10,7 @@ import com.loom.core.data.repository.HomeRepository
 import com.loom.core.data.repository.UserDataRepository
 import com.loom.core.data.repository.UserRepository
 import com.loom.core.model.data.UiEvent
+import com.loom.core.ui.event.editor.EventEditorUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,28 +32,28 @@ data class MediaUploadStatus(
 )
 
 data class CreateEventUiState(
-    val title: String = "",
-    val thumbnailUri: Uri? = null,
+    override val title: String = "",
+    override val thumbnailUri: Uri? = null,
     val assetUris: List<Uri> = emptyList(),
-    val startTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-    val endTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-    val isEndEnabled: Boolean = false,
-    val isDatePickerVisible: Boolean = false,
+    override val startTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    override val endTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    override val isEndEnabled: Boolean = false,
+    override val isDatePickerVisible: Boolean = false,
     // Location Data
-    val locationName: String = "",
-    val locationAddress: String = "",
-    val latitude: Double = 0.0,
-    val longitude: Double = 0.0,
+    override val locationName: String = "",
+    override val locationAddress: String = "",
+    override val latitude: Double = 0.0,
+    override val longitude: Double = 0.0,
     val timezone: String = TimeZone.currentSystemDefault().id,
-    val isLocationPickerVisible: Boolean = false,
-    val description: String = "",
-    val selectedTags: List<String> = emptyList(),
+    override val isLocationPickerVisible: Boolean = false,
+    override val description: String = "",
+    override val selectedTags: List<String> = emptyList(),
     val mediaUploads: Map<Uri, MediaUploadStatus> = emptyMap(),
-    val isPublishing: Boolean = false,
-) {
-    val allUris: List<Uri> get() = listOfNotNull(thumbnailUri) + assetUris
+    override val isPublishing: Boolean = false,
+) : EventEditorUiState {
+    override val allUris: List<Uri> get() = listOfNotNull(thumbnailUri) + assetUris
 
-    val formattedDateRange: String
+    override val formattedDateRange: String
         get() {
             val startStr = "${startTime.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }}, ${startTime.dayOfMonth} ${startTime.month.name.lowercase().take(3)} ${startTime.year}"
             return if (isEndEnabled && (startTime.date != endTime.date)) {
@@ -63,7 +64,7 @@ data class CreateEventUiState(
             }
         }
 
-    val formattedTimeRange: String
+    override val formattedTimeRange: String
         get() {
             val timeZone = TimeZone.currentSystemDefault()
             val startStr = String.format("%02d:%02d", startTime.hour, startTime.minute)
