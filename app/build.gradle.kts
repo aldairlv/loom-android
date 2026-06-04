@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.StringReader
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,6 +8,14 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+val mapsApiKey = providers.fileContents(
+    rootProject.layout.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["MAPS_API_KEY"]?.toString() ?: ""
+}.getOrElse("")
 
 android {
     namespace = "com.loom.app"
@@ -22,6 +33,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -39,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -48,7 +62,6 @@ dependencies {
     implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -100,4 +113,6 @@ dependencies {
     implementation(project(":feature:events:impl"))
     implementation(project(":feature:event-detail:api"))
     implementation(project(":feature:event-detail:impl"))
+    implementation(project(":feature:event-editor:api"))
+    implementation(project(":feature:event-editor:impl"))
 }

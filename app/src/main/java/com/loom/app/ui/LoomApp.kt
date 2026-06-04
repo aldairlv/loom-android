@@ -51,6 +51,8 @@ import com.loom.feature.comments.api.navigation.CommentsNavKey
 import com.loom.feature.comments.impl.navigation.commentsEntry
 import com.loom.feature.eventdetail.api.navigation.EventNavKey
 import com.loom.feature.eventdetail.impl.navigation.eventEntry
+import com.loom.feature.eventeditor.api.navigation.CreateEventNavKey
+import com.loom.feature.eventeditor.impl.navigation.createEventEntry
 import com.loom.feature.events.impl.navigation.eventsEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
@@ -134,6 +136,7 @@ internal fun LoomApp(
         commentsEntry(navigator)
         eventsEntry(navigator)
         eventEntry(navigator)
+        createEventEntry(navigator)
 
         // Settings
         settingsEntry(navigator)
@@ -150,7 +153,8 @@ internal fun LoomApp(
             currentKey is AccountSettingsNavKey ||
             currentKey is CommentsNavKey ||
             currentKey is LocationNavKey ||
-            currentKey is EventNavKey
+            currentKey is EventNavKey ||
+            currentKey is CreateEventNavKey
         ){
             NavDisplay(
                 entries = appState.navigationState.toEntries(entryProvider),

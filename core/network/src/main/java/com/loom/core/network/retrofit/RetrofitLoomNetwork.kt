@@ -42,6 +42,8 @@ import com.loom.core.network.model.NetworkCommentRequest
 import com.loom.core.network.model.NetworkCommentEnvelope
 import com.loom.core.network.model.NetworkCommentResponse
 import com.loom.core.network.model.NetworkEventDetailEnvelope
+import com.loom.core.network.model.NetworkEventCreateRequest
+import com.loom.core.network.model.NetworkEventCreateResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PATCH
@@ -115,6 +117,11 @@ private interface RetrofitLoomNetworkApi {
     suspend fun getEvent(
         @Path("id") id: String
     ): NetworkEventDetailEnvelope
+
+    @POST(value = "events/events/")
+    suspend fun createEvent(
+        @Body request: NetworkEventCreateRequest
+    ): NetworkEventCreateResponse
 
     @GET(value = "posts/following/")
     suspend fun getPostsFeedFollowing(
@@ -321,6 +328,9 @@ internal class RetrofitLoomNetwork @Inject constructor(
             throw e
         }
     }
+
+    override suspend fun createEvent(request: NetworkEventCreateRequest): NetworkEventCreateResponse =
+        networkApi.createEvent(request)
 
     override suspend fun getPostsFeedFollowing(cursor: String?): NetworkPostsFeedResponse {
         val result = networkApi.getPostsFeedFollowing(cursor)

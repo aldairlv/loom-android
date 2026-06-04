@@ -71,3 +71,7 @@ include(":feature:event-detail")
 
 include(":feature:event-detail:api")
 include(":feature:event-detail:impl")
+
+include(":feature:event-editor")
+include(":feature:event-editor:api")
+include(":feature:event-editor:impl")
