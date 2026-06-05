@@ -1,5 +1,6 @@
 package com.loom.core.data.repository
 
+import com.loom.core.common.util.DeviceIdProvider
 import com.loom.core.database.dao.UserAccountProfileDao
 import com.loom.core.database.model.asEntity
 import com.loom.core.database.model.asExternalModel
@@ -16,6 +17,7 @@ import javax.inject.Inject
 internal class OfflineFirstUserRepository @Inject constructor(
     private val userAccountProfileDao: UserAccountProfileDao,
     private val network: LoomNetworkDataSource,
+    private val deviceIdProvider: DeviceIdProvider,
 ) : UserRepository {
 
     override fun getUserAccountProfile(id: String): Flow<UserAccountProfile?> {
@@ -38,12 +40,13 @@ internal class OfflineFirstUserRepository @Inject constructor(
         userAccountProfileDao.insertOrUpdateUserAccountProfile(networkProfile.asExternalModel().asEntity())
     }
 
-    override suspend fun registerDevice(deviceId: String, fcmToken: String) {
+    override suspend fun registerDevice(deviceId: String, fcmToken: String?, isActive: Boolean) {
         network.registerDevice(
             NetworkDeviceRequest(
                 deviceId = deviceId,
                 registrationToken = fcmToken,
-                deviceType = "android"
+                deviceType = if (isActive) "android" else null,
+                isActive = isActive
             )
         )
     }

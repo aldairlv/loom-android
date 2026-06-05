@@ -25,6 +25,7 @@ import com.loom.app.ui.rememberLoomAppState
 import com.loom.core.data.util.NetworkMonitor
 //import com.loom.core.data.repository.PostRepository
 import com.loom.core.data.repository.UserRepository
+import com.loom.core.data.repository.RealtimeNotificationManager
 import android.provider.Settings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
@@ -56,6 +57,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userRepository: UserRepository
 
+    @Inject
+    lateinit var realtimeNotificationManager: RealtimeNotificationManager
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -73,7 +77,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         askNotificationPermission()
-        fetchFcmToken()
+
+        realtimeNotificationManager.startListening(lifecycleScope)
 
         // We keep this as a mutable state, so that we can track changes inside the composition.
         // This allows us to react to dark/light mode changes.
@@ -118,6 +123,20 @@ class MainActivity : ComponentActivity() {
                                     darkScrim = darkScrim,
                                 ) { darkTheme },
                             )
+                        }
+                    }
+            }
+        }
+
+        // Register FCM device only when logged in
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.sessionState
+                    .map { it is SessionState.LoggedIn }
+                    .distinctUntilChanged()
+                    .collect { isLoggedIn ->
+                        if (isLoggedIn) {
+                            fetchFcmToken()
                         }
                     }
             }

@@ -8,5 +8,5 @@ interface UserRepository {
     fun getUserAccountProfileByUserId(userId: String): Flow<UserAccountProfile?>
     suspend fun syncUserAccountProfile(id: String)
     suspend fun syncMyProfile()
-    suspend fun registerDevice(deviceId: String, fcmToken: String)
+    suspend fun registerDevice(deviceId: String, fcmToken: String? = null, isActive: Boolean = true)
 }

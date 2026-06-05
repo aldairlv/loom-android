@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.tracing.trace
 import coil.ImageLoader
 import com.loom.core.network.LoomNetworkDataSource
+import com.loom.core.network.LoomNotificationService
 import com.loom.core.network.retrofit.RetrofitLoomNetwork
+import com.loom.core.network.websocket.OkHttpNotificationService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +20,8 @@ import javax.inject.Singleton
 import coil.decode.SvgDecoder
 import com.loom.core.network.retrofit.AuthInterceptor
 import com.loom.core.network.retrofit.TokenAuthenticator
+
+import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -33,18 +37,25 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun okHttpCallFactory(
+    fun providesOkHttpClient(
         authInterceptor: AuthInterceptor,
         tokenAuthenticator: TokenAuthenticator,
-    ): Call.Factory = OkHttpClient.Builder()
+    ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .authenticator(tokenAuthenticator)
+        .pingInterval(30, TimeUnit.SECONDS)
         .addInterceptor(
             HttpLoggingInterceptor().apply {
                 setLevel(HttpLoggingInterceptor.Level.BODY)
             }
         )
         .build()
+
+    @Provides
+    @Singleton
+    fun okHttpCallFactory(
+        okHttpClient: OkHttpClient,
+    ): Call.Factory = okHttpClient
 
     // Vinculación entre la interfaz a la versión de Retrofit (o Demo)
     @Provides
@@ -54,6 +65,14 @@ internal object NetworkModule {
         okhttpCallFactory: dagger.Lazy<Call.Factory>,
     ): LoomNetworkDataSource {
         return RetrofitLoomNetwork(networkJson, okhttpCallFactory)
+    }
+
+    @Provides
+    @Singleton
+    fun providesLoomNotificationService(
+        okHttpClient: OkHttpClient,
+    ): LoomNotificationService {
+        return OkHttpNotificationService(okHttpClient)
     }
 
     @Provides
