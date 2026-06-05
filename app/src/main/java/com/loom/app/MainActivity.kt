@@ -24,6 +24,8 @@ import com.loom.app.ui.rememberLoomAppState
 
 import com.loom.core.data.util.NetworkMonitor
 //import com.loom.core.data.repository.PostRepository
+import com.loom.core.data.repository.UserRepository
+import android.provider.Settings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -50,6 +52,9 @@ import com.loom.feature.home.api.navigation.HomeNavKey
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -195,6 +200,16 @@ class MainActivity : ComponentActivity() {
 
             val token = task.result
             Log.d("FCM_TOKEN", "Tu token actual es: $token")
+
+            val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+            lifecycleScope.launch {
+                try {
+                    userRepository.registerDevice(deviceId, token)
+                    Log.d("FCM_TOKEN", "Dispositivo registrado en el backend")
+                } catch (e: Exception) {
+                    Log.e("FCM_TOKEN", "Error registrando dispositivo en el backend", e)
+                }
+            }
         }
     }
 }

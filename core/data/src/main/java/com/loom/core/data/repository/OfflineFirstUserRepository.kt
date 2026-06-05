@@ -6,6 +6,7 @@ import com.loom.core.database.model.asExternalModel
 import com.loom.core.model.data.LocationCoords
 import com.loom.core.model.data.UserAccountProfile
 import com.loom.core.network.LoomNetworkDataSource
+import com.loom.core.network.model.NetworkDeviceRequest
 import com.loom.core.network.model.NetworkLocationCoords
 import com.loom.core.network.model.NetworkUserProfile
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,16 @@ internal class OfflineFirstUserRepository @Inject constructor(
     override suspend fun syncMyProfile() {
         val networkProfile = network.getMyProfile()
         userAccountProfileDao.insertOrUpdateUserAccountProfile(networkProfile.asExternalModel().asEntity())
+    }
+
+    override suspend fun registerDevice(deviceId: String, fcmToken: String) {
+        network.registerDevice(
+            NetworkDeviceRequest(
+                deviceId = deviceId,
+                registrationToken = fcmToken,
+                deviceType = "android"
+            )
+        )
     }
 }
 

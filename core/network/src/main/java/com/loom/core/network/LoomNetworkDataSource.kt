@@ -25,6 +25,8 @@ import com.loom.core.network.model.NetworkCommentResponse
 import com.loom.core.network.model.NetworkEventCreateRequest
 import com.loom.core.network.model.NetworkEventCreateResponse
 import com.loom.core.network.model.NetworkNotificationList
+import com.loom.core.network.model.NetworkDeviceRequest
+import com.loom.core.network.model.NetworkDeviceResponse
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -126,4 +128,6 @@ interface LoomNetworkDataSource {
     suspend fun createEvent(request: NetworkEventCreateRequest): NetworkEventCreateResponse
 
     suspend fun getNotifications(cursor: String? = null): NetworkNotificationList
+
+    suspend fun registerDevice(request: NetworkDeviceRequest): NetworkDeviceResponse
 }
