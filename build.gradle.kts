@@ -8,6 +8,9 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.android) apply false // Usa este para módulos Android
     alias(libs.plugins.kotlin.serialization) apply false // Añadido
+    // Add the dependency for the Google services Gradle plugin
+    id("com.google.gms.google-services") version "4.4.4" apply false
+
 }
 //id("com.google.devtools.ksp") version "2.3.4" apply false
 //id("com.google.dagger.hilt.android") version "2.57.1" apply false

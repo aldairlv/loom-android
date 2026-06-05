@@ -40,6 +40,7 @@ uiUnit = "1.11.2"
 roomKtx = "2.8.4"
 mapsCompose = "8.3.0"
 googleMaps = "20.0.0"
+firebaseBom = "34.14.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -100,6 +101,8 @@ androidx-compose-ui-unit = { group = "androidx.compose.ui", name = "ui-unit", ve
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMaps" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
