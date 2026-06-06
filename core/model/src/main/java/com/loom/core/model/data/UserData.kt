@@ -11,6 +11,7 @@ data class UserData(
     val accessToken: String,
     val refreshToken: String,
     val userId: String,
+    val lastNotificationPermissionRequestTime: Long = 0,
 )
 
 val UserData.isLoggedIn: Boolean

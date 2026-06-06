@@ -40,4 +40,8 @@ internal class OfflineFirstUserDataRepository @Inject constructor(
     override suspend fun clearTokens() {
         loomPreferencesDataSource.clearTokens()
     }
+
+    override suspend fun setLastNotificationPermissionRequestTime(time: Long) {
+        loomPreferencesDataSource.setLastNotificationPermissionRequestTime(time)
+    }
 }
