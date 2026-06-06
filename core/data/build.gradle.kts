@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.tracing.ktx)
+    implementation(libs.androidx.lifecycle.process)
     implementation("androidx.media3:media3-exoplayer:1.4.1") // Verifica la versión más reciente
     implementation("androidx.media3:media3-ui:1.4.1")
 
