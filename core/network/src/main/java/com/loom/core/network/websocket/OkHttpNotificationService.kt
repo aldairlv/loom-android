@@ -43,28 +43,27 @@ internal class OkHttpNotificationService @Inject constructor(
 
         webSocket = okHttpClient.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d("LoomWebSocket", "Connected to notifications")
+                Log.d("RealtimeManager", "WebSocket connection established successfully")
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                Log.d("LoomWebSocket", "Message received: $text")
+                Log.d("RealtimeManager", "WebSocket message received: $text")
                 _messages.tryEmit(text)
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                 webSocket.close(1000, null)
-                Log.d("LoomWebSocket", "Closing: $code / $reason")
+                Log.d("RealtimeManager", "WebSocket closing: $code / $reason")
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 this@OkHttpNotificationService.webSocket = null
-                Log.d("LoomWebSocket", "Closed: $code / $reason")
+                Log.d("RealtimeManager", "WebSocket closed: $code / $reason")
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e("LoomWebSocket", "Error: ${t.message}", t)
+                Log.e("RealtimeManager", "WebSocket connection failure: ${t.message}", t)
                 this@OkHttpNotificationService.webSocket = null
-                // Optional: Implement reconnection logic here or in a higher layer
             }
         })
     }
