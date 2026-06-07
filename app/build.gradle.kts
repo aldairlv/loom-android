@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 val mapsApiKey = providers.fileContents(
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -94,6 +96,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:data"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:notifications"))
     implementation(project(":sync:work"))
     implementation(project(":feature:explore:api"))
     implementation(project(":feature:explore:impl"))
@@ -115,4 +118,9 @@ dependencies {
     implementation(project(":feature:event-detail:impl"))
     implementation(project(":feature:event-editor:api"))
     implementation(project(":feature:event-editor:impl"))
+    implementation(project(":feature:notifications:api"))
+    implementation(project(":feature:notifications:impl"))
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
 }

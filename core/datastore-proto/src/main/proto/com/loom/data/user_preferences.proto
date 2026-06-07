@@ -14,4 +14,5 @@ message UserPreferences {
   string access_token = 5;
   string refresh_token = 6;
   string user_id = 7;
+  int64 last_notification_permission_request_time = 8;
 }

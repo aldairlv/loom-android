@@ -44,6 +44,10 @@ import com.loom.core.network.model.NetworkCommentResponse
 import com.loom.core.network.model.NetworkEventDetailEnvelope
 import com.loom.core.network.model.NetworkEventCreateRequest
 import com.loom.core.network.model.NetworkEventCreateResponse
+import com.loom.core.network.model.NetworkNotificationEnvelope
+import com.loom.core.network.model.NetworkNotificationList
+import com.loom.core.network.model.NetworkDeviceRequest
+import com.loom.core.network.model.NetworkDeviceResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PATCH
@@ -221,6 +225,16 @@ private interface RetrofitLoomNetworkApi {
         @Path("id") id: String,
         @Path("comment_id") commentId: String
     )
+
+    @GET(value = "notifications/")
+    suspend fun getNotifications(
+        @Query("cursor") cursor: String?
+    ): NetworkNotificationEnvelope
+
+    @POST(value = "devices/")
+    suspend fun registerDevice(
+        @Body request: NetworkDeviceRequest
+    ): NetworkDeviceResponse
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -442,5 +456,13 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun deleteComment(postId: String, commentId: String) =
         networkApi.deleteComment(postId, commentId)
+
+    override suspend fun getNotifications(cursor: String?): NetworkNotificationList {
+        val result = networkApi.getNotifications(cursor)
+        return result.response.notifications
+    }
+
+    override suspend fun registerDevice(request: NetworkDeviceRequest): NetworkDeviceResponse =
+        networkApi.registerDevice(request)
 
 }

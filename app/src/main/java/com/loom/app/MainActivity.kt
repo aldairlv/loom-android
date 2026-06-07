@@ -1,16 +1,22 @@
 package com.loom.app
 
 import android.os.Bundle
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,6 +24,9 @@ import com.loom.app.ui.rememberLoomAppState
 
 import com.loom.core.data.util.NetworkMonitor
 //import com.loom.core.data.repository.PostRepository
+import com.loom.core.data.repository.UserRepository
+import com.loom.core.data.repository.RealtimeNotificationManager
+import android.provider.Settings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,6 +38,7 @@ import kotlin.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tracing.trace
+import com.google.firebase.messaging.FirebaseMessaging
 import com.loom.app.util.isSystemInDarkTheme
 import com.loom.app.MainActivityUiState.Loading
 import com.loom.app.ui.LoomApp
@@ -43,16 +53,32 @@ import com.loom.feature.home.api.navigation.HomeNavKey
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
-    /*@Inject
-    lateinit var exploreRepository: ExploreRepository
+
     @Inject
-    lateinit var timelineRepository: TimelineRepository*/
+    lateinit var userRepository: UserRepository
+
+    @Inject
+    lateinit var realtimeNotificationManager: RealtimeNotificationManager
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("NOTIFICATIONS", "Permiso de notificaciones concedido")
+        } else {
+            Log.d("NOTIFICATIONS", "Permiso de notificaciones denegado")
+        }
+    }
 
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        askNotificationPermission()
+
+        realtimeNotificationManager.startListening(lifecycleScope)
 
         // We keep this as a mutable state, so that we can track changes inside the composition.
         // This allows us to react to dark/light mode changes.
@@ -97,6 +123,20 @@ class MainActivity : ComponentActivity() {
                                     darkScrim = darkScrim,
                                 ) { darkTheme },
                             )
+                        }
+                    }
+            }
+        }
+
+        // Register FCM device only when logged in
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.sessionState
+                    .map { it is SessionState.LoggedIn }
+                    .distinctUntilChanged()
+                    .collect { isLoggedIn ->
+                        if (isLoggedIn) {
+                            fetchFcmToken()
                         }
                     }
             }
@@ -155,6 +195,41 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // Ya tienes el permiso
+            } else {
+                // Solicitar el permiso al usuario
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun fetchFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM_TOKEN", "Error obteniendo el token", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val token = task.result
+            Log.d("FCM_TOKEN", "Tu token actual es: $token")
+
+            val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+            lifecycleScope.launch {
+                try {
+                    userRepository.registerDevice(deviceId, token)
+                    Log.d("FCM_TOKEN", "Dispositivo registrado en el backend")
+                } catch (e: Exception) {
+                    Log.e("FCM_TOKEN", "Error registrando dispositivo en el backend", e)
+                }
+            }
+        }
     }
 }
 

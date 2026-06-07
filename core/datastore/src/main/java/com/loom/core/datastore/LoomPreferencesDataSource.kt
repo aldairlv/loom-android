@@ -37,8 +37,17 @@ class LoomPreferencesDataSource @Inject constructor(
                 accessToken = it.accessToken,
                 refreshToken = it.refreshToken,
                 userId = it.userId,
+                lastNotificationPermissionRequestTime = it.lastNotificationPermissionRequestTime,
             )
         }
+
+    suspend fun setLastNotificationPermissionRequestTime(time: Long) {
+        userPreferences.updateData {
+            it.copy {
+                this.lastNotificationPermissionRequestTime = time
+            }
+        }
+    }
 
     suspend fun setThemeBrand(themeBrand: ThemeBrand) {
         userPreferences.updateData {

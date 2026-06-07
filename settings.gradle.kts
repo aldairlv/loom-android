@@ -75,3 +75,7 @@ include(":feature:event-detail:impl")
 include(":feature:event-editor")
 include(":feature:event-editor:api")
 include(":feature:event-editor:impl")
+
+include(":feature:notifications")
+include(":feature:notifications:api")
+include(":feature:notifications:impl")

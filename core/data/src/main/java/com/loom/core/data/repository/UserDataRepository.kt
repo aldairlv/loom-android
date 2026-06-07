@@ -42,4 +42,9 @@ interface UserDataRepository {
      * Clears the auth tokens and user id.
      */
     suspend fun clearTokens()
+
+    /**
+     * Sets the last time the notification permission was requested.
+     */
+    suspend fun setLastNotificationPermissionRequestTime(time: Long)
 }

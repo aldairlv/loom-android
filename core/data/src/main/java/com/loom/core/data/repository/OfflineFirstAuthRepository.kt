@@ -3,6 +3,7 @@ package com.loom.core.data.repository
 
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import com.loom.core.common.util.DeviceIdProvider
 import com.loom.core.database.LoomDatabase
 import com.loom.core.model.data.VerifyEmailResult
 import com.loom.core.network.LoomNetworkDataSource
@@ -19,7 +20,9 @@ import retrofit2.HttpException
 internal class OfflineFirstAuthRepository @Inject constructor(
     private val network: LoomNetworkDataSource,
     private val userDataRepository: UserDataRepository,
+    private val userRepository: UserRepository,
     private val database: LoomDatabase,
+    private val deviceIdProvider: DeviceIdProvider,
     private val json: Json,
 ): AuthRepository {
     override suspend fun login(email: String, password: String): Result<Unit> {
@@ -88,6 +91,16 @@ internal class OfflineFirstAuthRepository @Inject constructor(
 
     override suspend fun logout(): Result<Unit> = withContext(Dispatchers.IO) {
         return@withContext try {
+            // Register device as inactive before logout
+            try {
+                userRepository.registerDevice(
+                    deviceId = deviceIdProvider.deviceId,
+                    isActive = false
+                )
+            } catch (e: Exception) {
+                // Ignore failure of device de-registration on logout
+            }
+
             network.logout()
             userDataRepository.clearTokens()
             database.clearAllTables()

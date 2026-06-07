@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_notifications_api_title">Activity</string>
+    <string name="feature_notifications_api_loading">Cargando notificaciones...</string>
+    <string name="feature_notifications_api_error">Error al cargar las notificaciones.</string>
+</resources>

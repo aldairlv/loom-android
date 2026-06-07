@@ -57,6 +57,7 @@ import com.loom.feature.events.impl.navigation.eventsEntry
 import com.loom.feature.posteditor.api.navigation.CreatePostNavKey
 import com.loom.feature.posteditor.impl.navigation.createPostEntry
 import com.loom.feature.home.impl.navigation.homeEntry
+import com.loom.feature.notifications.impl.navigation.notificationsEntry
 import com.loom.feature.profile.impl.navigation.profileEntry
 import com.loom.feature.settings.api.navigation.AccountSettingsNavKey
 import com.loom.feature.settings.api.navigation.LocationNavKey
@@ -137,6 +138,7 @@ internal fun LoomApp(
         eventsEntry(navigator)
         eventEntry(navigator)
         createEventEntry(navigator)
+        notificationsEntry(navigator)
 
         // Settings
         settingsEntry(navigator)
