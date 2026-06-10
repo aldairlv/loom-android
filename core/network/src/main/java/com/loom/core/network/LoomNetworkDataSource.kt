@@ -27,6 +27,14 @@ import com.loom.core.network.model.NetworkEventCreateResponse
 import com.loom.core.network.model.NetworkNotificationList
 import com.loom.core.network.model.NetworkDeviceRequest
 import com.loom.core.network.model.NetworkDeviceResponse
+import com.loom.core.network.model.NetworkConversation
+import com.loom.core.network.model.NetworkConversationEnvelope
+import com.loom.core.network.model.NetworkConversationsEnvelope
+import com.loom.core.network.model.NetworkMessage
+import com.loom.core.network.model.NetworkMessagesEnvelope
+import com.loom.core.network.model.NetworkMessageEnvelope
+import com.loom.core.network.model.NetworkUnreadEnvelope
+import com.loom.core.network.model.NetworkReadEnvelope
 
 interface LoomNetworkDataSource {
     suspend fun login(request: NetworkLoginRequest): NetworkAuthResponse
@@ -130,4 +138,15 @@ interface LoomNetworkDataSource {
     suspend fun getNotifications(cursor: String? = null): NetworkNotificationList
 
     suspend fun registerDevice(request: NetworkDeviceRequest): NetworkDeviceResponse
+
+    // Chats
+    suspend fun getConversations(): List<NetworkConversation>
+    suspend fun createDirectChat(userId: String): NetworkConversation
+    suspend fun createGroupChat(name: String, participantIds: List<String>): NetworkConversation
+    suspend fun getConversation(id: String): NetworkConversation
+    suspend fun getMessages(conversationId: String, before: String? = null, limit: Int = 50): List<NetworkMessage>
+    suspend fun sendMessage(conversationId: String, content: String? = null, type: String, mediaUrl: String? = null): NetworkMessage
+    suspend fun markRead(conversationId: String)
+    suspend fun getUnreadCount(conversationId: String): Int
+    suspend fun deleteMessage(messageId: String)
 }

@@ -79,3 +79,7 @@ include(":feature:event-editor:impl")
 include(":feature:notifications")
 include(":feature:notifications:api")
 include(":feature:notifications:impl")
+
+
+include(":feature:chats")
+include(":feature:chats:impl")

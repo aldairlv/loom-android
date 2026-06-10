@@ -48,6 +48,17 @@ import com.loom.core.network.model.NetworkNotificationEnvelope
 import com.loom.core.network.model.NetworkNotificationList
 import com.loom.core.network.model.NetworkDeviceRequest
 import com.loom.core.network.model.NetworkDeviceResponse
+import com.loom.core.network.model.NetworkConversation
+import com.loom.core.network.model.NetworkConversationEnvelope
+import com.loom.core.network.model.NetworkConversationsEnvelope
+import com.loom.core.network.model.NetworkMessage
+import com.loom.core.network.model.NetworkMessagesEnvelope
+import com.loom.core.network.model.NetworkMessageEnvelope
+import com.loom.core.network.model.NetworkCreateDirectChatRequest
+import com.loom.core.network.model.NetworkCreateGroupChatRequest
+import com.loom.core.network.model.NetworkSendMessageRequest
+import com.loom.core.network.model.NetworkUnreadEnvelope
+import com.loom.core.network.model.NetworkReadEnvelope
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PATCH
@@ -235,6 +246,53 @@ private interface RetrofitLoomNetworkApi {
     suspend fun registerDevice(
         @Body request: NetworkDeviceRequest
     ): NetworkDeviceResponse
+
+    // Chats
+    @GET(value = "chats/conversations/")
+    suspend fun getConversations(): NetworkConversationsEnvelope
+
+    @POST(value = "chats/conversations/")
+    suspend fun createDirectChat(
+        @Body request: NetworkCreateDirectChatRequest
+    ): NetworkConversationEnvelope
+
+    @POST(value = "chats/conversations/group/")
+    suspend fun createGroupChat(
+        @Body request: NetworkCreateGroupChatRequest
+    ): NetworkConversationEnvelope
+
+    @GET(value = "chats/conversations/{id}/")
+    suspend fun getConversation(
+        @Path("id") id: String
+    ): NetworkConversationEnvelope
+
+    @GET(value = "chats/conversations/{id}/messages/")
+    suspend fun getMessages(
+        @Path("id") id: String,
+        @Query("before") before: String? = null,
+        @Query("limit") limit: Int = 50
+    ): NetworkMessagesEnvelope
+
+    @POST(value = "chats/conversations/{id}/messages/")
+    suspend fun sendMessage(
+        @Path("id") id: String,
+        @Body request: NetworkSendMessageRequest
+    ): NetworkMessageEnvelope
+
+    @POST(value = "chats/conversations/{id}/read/")
+    suspend fun markRead(
+        @Path("id") id: String
+    ): NetworkReadEnvelope
+
+    @GET(value = "chats/conversations/{id}/unread/")
+    suspend fun getUnreadCount(
+        @Path("id") id: String
+    ): NetworkUnreadEnvelope
+
+    @DELETE(value = "chats/messages/{id}/")
+    suspend fun deleteMessage(
+        @Path("id") id: String
+    )
 }
 
 private const val LOOM_BASE_URL = BuildConfig.BACKEND_URL
@@ -464,5 +522,46 @@ internal class RetrofitLoomNetwork @Inject constructor(
 
     override suspend fun registerDevice(request: NetworkDeviceRequest): NetworkDeviceResponse =
         networkApi.registerDevice(request)
+
+    override suspend fun getConversations(): List<NetworkConversation> =
+        networkApi.getConversations().response.conversations.elements
+
+    override suspend fun createDirectChat(userId: String): NetworkConversation =
+        networkApi.createDirectChat(NetworkCreateDirectChatRequest(userId)).response.conversation
+
+    override suspend fun createGroupChat(name: String, participantIds: List<String>): NetworkConversation =
+        networkApi.createGroupChat(NetworkCreateGroupChatRequest(name, participantIds)).response.conversation
+
+    override suspend fun getConversation(id: String): NetworkConversation =
+        networkApi.getConversation(id).response.conversation
+
+    override suspend fun getMessages(
+        conversationId: String,
+        before: String?,
+        limit: Int
+    ): List<NetworkMessage> =
+        networkApi.getMessages(conversationId, before, limit).response.messages.elements
+
+    override suspend fun sendMessage(
+        conversationId: String,
+        content: String?,
+        type: String,
+        mediaUrl: String?
+    ): NetworkMessage =
+        networkApi.sendMessage(
+            conversationId,
+            NetworkSendMessageRequest(content, type, mediaUrl)
+        ).response.message
+
+    override suspend fun markRead(conversationId: String) {
+        networkApi.markRead(conversationId)
+    }
+
+    override suspend fun getUnreadCount(conversationId: String): Int =
+        networkApi.getUnreadCount(conversationId).response.unread.count
+
+    override suspend fun deleteMessage(messageId: String) {
+        networkApi.deleteMessage(messageId)
+    }
 
 }

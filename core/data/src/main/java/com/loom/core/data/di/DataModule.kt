@@ -13,6 +13,8 @@ import com.loom.core.data.repository.OfflineFirstProfileRepository
 import com.loom.core.data.repository.OfflineFirstSettingsRepository
 import com.loom.core.data.repository.OfflineFirstUserDataRepository
 import com.loom.core.data.repository.OfflineFirstUserRepository
+import com.loom.core.data.repository.ChatsRepository
+import com.loom.core.data.repository.OfflineFirstChatsRepository
 import com.loom.core.data.repository.ProfileRepository
 import com.loom.core.data.repository.SettingsRepository
 import com.loom.core.data.repository.TimelineRepository
@@ -79,5 +81,10 @@ abstract class DataModule {
     internal abstract fun bindsNotificationsRepository(
         notificationsRepository: OfflineFirstNotificationsRepository
     ): NotificationsRepository
+
+    @Binds
+    internal abstract fun bindsChatsRepository(
+        chatsRepository: OfflineFirstChatsRepository
+    ): ChatsRepository
 
 }
