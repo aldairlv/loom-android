@@ -28,24 +28,17 @@ fun ChatsRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatsScreen(
     conversations: List<NetworkConversation>,
     onConversationClick: (String) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("Chats") })
-        }
-    ) { padding ->
-        LazyColumn(contentPadding = padding) {
-            items(conversations) { conversation ->
-                ConversationItem(
-                    conversation = conversation,
-                    onClick = { onConversationClick(conversation.id) }
-                )
-            }
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(conversations) { conversation ->
+            ConversationItem(
+                conversation = conversation,
+                onClick = { onConversationClick(conversation.id) }
+            )
         }
     }
 }

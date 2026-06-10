@@ -39,7 +39,7 @@ import com.loom.core.designsystem.R.drawable
 import com.loom.core.ui.tabs.TabsBar
 import com.loom.feature.notifications.impl.routes.ActivityRoute
 import com.loom.feature.notifications.impl.routes.AskRoute
-import com.loom.feature.notifications.impl.routes.ChatsRoute
+import com.loom.feature.chats.impl.ChatsRoute
 
 @Composable
 fun NotificationsScreen(
@@ -135,7 +135,7 @@ fun NotificationsScreen(
         ) { page ->
             when (visibleTabs[page].key) {
                 "activity" -> ActivityRoute()
-                "chats" -> ChatsRoute()
+                "chats" -> ChatsRoute(onConversationClick = { /* Navigate to Chat Details */ })
                 "ask" -> AskRoute()
             }
         }
